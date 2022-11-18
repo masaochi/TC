@@ -14,6 +14,10 @@ test `make`
 ### Prerequisite
 - C++ compiler (C++11)
 - Fortran90 compiler
+- MPI library
+- Boost C++ library
+- FFTW library
+- Eigen3 library
 
 ## Documentation
 a
