@@ -9,14 +9,18 @@ a
 ## Installation
 a
 
+## Documentation
+a
+
 ## License
 Copyright (c) 2022 Masayuki Ochi
 
 This software is released under the MIT license. For license rights and limitations, see LICENSE.txt.
 
 ## Author
+Masayuki Ochi (Osaka University)
 
-## Citation
+## Papers
 under construction
 
 
