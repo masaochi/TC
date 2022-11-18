@@ -1,0 +1,87 @@
+!
+! [Functionality]
+! Read wavefunctions from "qe_wfc_char" (file name) in QE (Quantum Espresso)
+!
+! <namespace read_qe is declared in include/read_qe.hpp, 
+!  defined in read_qe.cpp & read_qe_xml.cpp & read_qe_wfc.f90>
+!
+! [Other info]
+! See Modules/io_base.f90 in QE to know details about QE variables.
+!
+subroutine read_qe_wfc(nlength, qe_wfc_char, ik, igwx, nbnd, npol, mill, evc) bind(c, name="read_qe_wfc")
+  use, intrinsic :: iso_c_binding
+  implicit none
+  include 'mpif.h'
+
+!! specify the file name to be read (see above)
+  integer(c_int), intent(in) :: nlength
+  character(c_char), intent(in) :: qe_wfc_char(nlength)
+
+!! QE variables (same names as QE), should be consistent with the xml file of QE
+  integer(c_int), intent(in) :: ik     ! k-point index (wfc{ik}.dat will be read)
+  integer(c_int), intent(in) :: igwx   ! no. of plane waves for each k-point
+  integer(c_int), intent(in) :: nbnd   ! no. of bands
+  integer(c_int), intent(in) :: npol   ! (non-collinear) 2 meaning spinor, (otherwise) 1
+
+!! QE variables (same name as QE), should be extracted from wfc*.dat
+  integer(c_int), intent(inout) :: mill(3,igwx)            ! miller index for G vector in evc(:,:)
+  complex(c_double), intent(inout) :: evc(npol*igwx,nbnd)  ! wave function
+
+!! QE variables (same name as QE), not used outside this subroutine
+  real(8) :: xk(3)       ! k-point coordinate
+  integer :: ispin       ! [no-spin or non-collinear] 1 [spin-polarized] 1 = up, 2 = down
+  logical :: gamma_only  ! .true. = memory-saved treatment of wfc in gamma-only calc
+  real(8) :: scalef      ! scale factor (usually 1.0)
+  integer :: ngw         ! no. of plane waves? not used.
+  real(8) :: b1(3), b2(3), b3(3)   ! reciprocal lattice vectors
+
+!! temporary variables in this subroutine
+  character(nlength) :: filename_converted
+  integer :: iunit, ibnd
+  integer(c_int) :: ic1, ic2, ic3
+  integer :: ierr
+
+  filename_converted = transfer(qe_wfc_char, filename_converted) ! i.e. filename_converted(i:i) = qe_wfc_char(i)
+!  write(6,*) "Read QE wave functions from ", trim(filename_converted)
+  iunit = 100
+  open(iunit, file = filename_converted, form = 'unformatted', status = 'old')
+  
+  read(iunit) ic1, xk, ispin, gamma_only, scalef
+  call error_chk_qe_wavefunc_int(ik, ic1, "ik")
+  if(gamma_only.eqv..true.) then
+     write(6,*) 'TC++ does not support gamma_only calculation. (read_qe_wfc)'
+     call MPI_ABORT(MPI_COMM_WORLD,999,ierr)
+  end if
+  
+  read(iunit) ngw, ic1, ic2, ic3
+  call error_chk_qe_wavefunc_int(igwx, ic1, "igwx")
+  call error_chk_qe_wavefunc_int(npol, ic2, "npol")
+  call error_chk_qe_wavefunc_int(nbnd, ic3, "nbnd")
+  
+  read(iunit) b1, b2, b3  
+  read(iunit) mill(1:3,1:igwx)
+  do ibnd = 1, nbnd ! ibnd = band index
+     read(iunit) evc(1:npol*igwx,ibnd)
+  end do ! ibnd
+  evc(:,:) = scalef*evc(:,:) ! multiplied with the scale factor
+
+  close(iunit)       
+end subroutine read_qe_wfc
+
+subroutine error_chk_qe_wavefunc_int(ixml, iwfc, varname)
+  use, intrinsic :: iso_c_binding
+  implicit none
+  include 'mpif.h'
+
+  integer(c_int), intent(in) :: ixml   ! input from xml file (QE)
+  integer(c_int), intent(in) :: iwfc   ! input from wfc file (QE)
+  character(*), intent(in) :: varname  ! name of the variable
+
+  integer :: ierr
+
+  if(ixml.ne.iwfc) then
+     write(6,*) " Input from xml: ", ixml, " Input from wfc.dat: ", iwfc
+     write(6,*) " Error: ", varname, " is not consistent between them. (read_qe_wfc)"
+     call MPI_ABORT(MPI_COMM_WORLD,999,ierr)
+  end if
+end subroutine error_chk_qe_wavefunc_int
