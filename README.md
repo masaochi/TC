@@ -13,7 +13,7 @@ test `make`
 
 ### Prerequisite
 - C++ compiler (C++11)
-- Fortran90 compiler
+- Fortran compiler (Fortran90)
 - MPI library
 - Boost C++ library
 - FFTW library
