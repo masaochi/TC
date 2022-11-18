@@ -7,7 +7,13 @@ TC++ is...
 a
 
 ## Installation
-a
+
+test `make`
+> testtest
+
+### Prerequisite
+- C++ compiler (C++11)
+- Fortran90 compiler
 
 ## Documentation
 a
