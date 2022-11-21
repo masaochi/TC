@@ -14,7 +14,7 @@ TC++ is a first-principles calculation code using the Hartree-Fock (HF) and the 
 - RPA-type Jastrow factor
 
 ## Installation
-Download the source files and unzip it. Then, `cd src` and edit `Makefile` to specify the following compilers and libraries except Quantum ESPRESSO. Finally, typing `make` will create an execution file named `tc++` in `src`.
+Download the source files and unzip it. Then, `cd src` and edit [`Makefile`](./src/Makefile) to specify the following compilers and libraries except Quantum ESPRESSO. Finally, typing `make` will create an execution file named `tc++` in `src`.
 
 ### Prerequisite
 - C++ compiler (C++11 or newer)
