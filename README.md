@@ -34,7 +34,7 @@ Copyright (c) 2022 Masayuki Ochi
 Released under the MIT license. See LICENSE file.
 
 ## Author
-Masayuki Ochi (Osaka University)
+[Masayuki Ochi](http://ann.phys.sci.osaka-u.ac.jp/ochi/ochi_en.html) (Osaka University)
 
 ## Papers
 Under construction...
