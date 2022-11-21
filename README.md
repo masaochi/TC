@@ -23,7 +23,7 @@ Download the source files and unzip it. Then, `cd src` and edit `Makefile` to sp
 - Boost C++ library
 - FFTW library (Note: If you compiled FFTW with the Intel compiler, please compile TC++ with the Intel compiler to avoid some errors.)
 - Eigen3 library
-- Quantum ESPRESSO (ver. 6.2 or newer) is used in precalculation to get several information such as an initial guess of one-electron orbitals.
+- Quantum ESPRESSO (ver. 6.2 or newer) is used in precalculation to get several information such as an initial guess of one-electron orbitals. TC++ requires xml and wfc files dumped by QE.
 
 ## Documentation
 Under construction... (available soon!)
