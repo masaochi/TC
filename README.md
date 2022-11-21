@@ -5,12 +5,13 @@ TC++ is a first-principles calculation code using the Hartree-Fock (HF) and the 
 
 ## Supported functionalities
 - Free-electron mode (FREE), HF, TC, BITC (biorthogonal TC)
-- SCF calculation, band calculation
+- SCF and band calculations
 - Solid-state calculation under the periodic boundary condition. Homogeneous-electron-gas calculation using a periodic cell is also possible.
 - Plane-wave basis set
-- Norm-conserving pseudopotentials without partial core correction
-- Non-spin-polarized calculation or spin-polarized calculation (only spin-collinear calculation without spin-orbit coupling is available)
+- Norm-conserving pseudopotentials without partial core correction (available, e.g., in [Pseudopotential Library](https://pseudopotentiallibrary.org/))
+- Non-spin-polarized calculation or spin-polarized calculation. For the latter one, only spin-collinear calculation without spin-orbit coupling is available.
 - Monkhorst-Pack k-grid with/without a shift. k-grid should not break any crystal symmetry. Gamma-only calculation is at present not supported.
+- RPA-type Jastrow factor
 
 ## Installation
 Download the source files and unzip it. Then, `cd src` and edit Makefile to specify the following compilers and libraries. Finally, typing `make` will create an execution file named `tc++` in `src`.
