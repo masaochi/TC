@@ -1,26 +1,31 @@
 # TC++
 Version 1.0 (2022/11/18)
 
-TC++ is...
+TC++ is a first-principles calculation code using the Hartree-Fock (HF) and the transcorrelated (TC) methods for periodic systems.
 
-## Features
-a
+## Supported functionalities
+- Free-electron mode (FREE), HF, TC, BITC (biorthogonal TC)
+- SCF calculation, band calculation
+- Solid-state calculation under the periodic boundary condition. Homogeneous-electron-gas calculation using a periodic cell is also possible.
+- Plane-wave basis set
+- Norm-conserving pseudopotentials without partial core correction
+- Non-spin-polarized calculation or spin-polarized calculation (only spin-collinear calculation without spin-orbit coupling is available)
+- Monkhorst-Pack k-grid with/without a shift. k-grid should not break any crystal symmetry. Gamma-only calculation is at present not supported.
 
 ## Installation
-
-test `make`
-> testtest
+Download the source files and unzip it. Then, `cd src` and edit Makefile to specify the following compilers and libraries. Finally, typing `make` will create an execution file named `tc++` in `src`.
 
 ### Prerequisite
-- C++ compiler (C++11)
-- Fortran compiler (Fortran90)
+- C++ compiler (C++11 or newer)
+- Fortran compiler (Fortran90 or newer)
 - MPI library
 - Boost C++ library
 - FFTW library
 - Eigen3 library
+- Quantum ESPRESSO (ver. 6.2 or newer) is used in precalculation.
 
 ## Documentation
-a
+Under construction... (available soon!)
 
 ## License
 Copyright (c) 2022 Masayuki Ochi
@@ -31,6 +36,6 @@ Released under the MIT license. See LICENSE file.
 Masayuki Ochi (Osaka University)
 
 ## Papers
-under construction
+Under construction...
 
 
