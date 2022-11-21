@@ -10,7 +10,7 @@ TC++ is a first-principles calculation code using the Hartree-Fock (HF) and the 
 - Plane-wave basis set
 - Norm-conserving pseudopotentials without partial core correction (available, e.g., in [Pseudopotential Library](https://pseudopotentiallibrary.org/))
 - For spin-polarized calculation, only spin-collinear calculation without spin-orbit coupling is available.
-- Monkhorst-Pack k-grid with/without a shift. k-grid should not break any crystal symmetry. Gamma-only calculation is at present not supported.
+- Monkhorst-Pack k-grid with/without a shift. A k-grid should not break any crystal symmetry. Gamma-only calculation is at present not supported.
 - RPA-type Jastrow factor
 
 ## Installation
