@@ -21,7 +21,7 @@ Download the source files and unzip it. Then, `cd src` and edit [`Makefile`](./s
 - Fortran compiler (Fortran90 or newer)
 - MPI library
 - [Boost C++ library](https://www.boost.org/)
-- [FFTW library](https://www.fftw.org/) (Note: If you compiled FFTW with the Intel compiler, please compile TC++ with the Intel compiler to avoid some errors.)
+- [FFTW3 library](https://www.fftw.org/) (Note: If you compiled FFTW with the Intel compiler, please compile TC++ with the Intel compiler to avoid some errors.)
 - [Eigen3 library](https://eigen.tuxfamily.org/)
 - [Quantum ESPRESSO](https://www.quantum-espresso.org/) (ver.6.2 or newer) is used in precalculation to get several information such as an initial guess of one-electron orbitals. TC++ requires xml and wfc files dumped by QE.
 

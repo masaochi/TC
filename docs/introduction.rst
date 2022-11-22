@@ -19,7 +19,7 @@ Supported Functionalities
 
 Terms of use
 ------------
-TC++ is a free/libre open-source software, released under the MIT License. See the file LICENSE included in the distribution.
+TC++ is a free/libre open-source software, released under the MIT License. See the file ``LICENSE`` included in the distribution.
 
 Author & Contact
 ----------------
