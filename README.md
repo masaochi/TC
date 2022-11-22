@@ -16,7 +16,7 @@ TC++ is a first-principles calculation code using the Hartree-Fock (HF) and the 
 ## Installation
 Download the source files and unzip it. Then, `cd src` and edit [`Makefile`](./src/Makefile) to specify the following compilers and libraries except Quantum ESPRESSO. Finally, typing `make` will create an execution file named `tc++` in `src`.
 
-### Prerequisite
+### Prerequisites
 - C++ compiler (C++11 or newer)
 - Fortran compiler (Fortran90 or newer)
 - MPI library
@@ -34,6 +34,8 @@ Copyright (c) 2022 Masayuki Ochi
 Released under the MIT license. See [`LICENSE`](./LICENSE).
 
 ## Author
-[Masayuki Ochi](http://ann.phys.sci.osaka-u.ac.jp/ochi/ochi_en.html) (Osaka University)
+[Masayuki Ochi](http://ann.phys.sci.osaka-u.ac.jp/ochi/ochi_en.html) (Osaka University, Japan)
+ochi@presto.phys.sci.osaka-u.ac.jp
+
 
 

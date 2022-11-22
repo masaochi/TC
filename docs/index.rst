@@ -1,12 +1,11 @@
-TC++
+User's Guide for TC++ ver.1.0
 ==============================
-
-User Guide
-==========
 
 .. toctree::
    :maxdepth: 3
    :numbered: 2
    :glob:
 
-   about
+   introduction
+   installation
+   
