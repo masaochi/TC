@@ -1,0 +1,6 @@
+calc_method   HF  # change here for different methods (TC, BITC)
+calc_mode     BAND
+pseudo_dir    /home/user/QE/pseudo_potential
+qe_save_dir   /home/user/where_QE_BANDcalc_was_performed/prefix.save
+smearing_mode fixed
+# restarts true

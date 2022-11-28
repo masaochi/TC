@@ -1,0 +1,7 @@
+calc_method     FREE  # change here for different methods (HF, TC)
+calc_mode       SCF   # SCF or BAND
+pseudo_dir      /home/user/QE/pseudo_potential
+qe_save_dir     /home/user/where_QE_SCFcalc_was_performed/prefix.save
+smearing_mode   gaussian
+smearing_width  0.02  # in Ht.
+is_heg          true
