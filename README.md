@@ -26,7 +26,7 @@ Download the source files and unzip it. Then, `cd src` and edit [`Makefile`](./s
 - [Quantum ESPRESSO](https://www.quantum-espresso.org/) (ver.6.2 or newer) is used in precalculation to get several information such as an initial guess of one-electron orbitals. TC++ requires xml and wfc files dumped by QE.
 
 ## Documentation
-Under construction... (available soon!)
+[User's Guide](https://TCplusplus.readthedocs.io/)
 
 ## License
 Copyright (c) 2022 Masayuki Ochi
