@@ -16,7 +16,8 @@ Supported Functionalities
 - For spin-polarized calculation, only spin-collinear calculation without spin-orbit coupling is available.
 - Monkhorst-Pack k-grid with/without a shift. A k-grid should not break any crystal symmetry. Gamma-only calculation is at present not supported.
 - RPA-type Jastrow factor
-
+  :math:`u_{\sigma, \sigma'}({\bf r}, {\bf r'}) = \frac{A_{\sigma, \sigma'}}{|{\bf r}-{\bf r'}|}(1-e^{-|{\bf r}-{\bf r'}|/C_{\sigma,\sigma'}})`
+  
 Terms of use
 ------------
 TC++ is a free/libre open-source software, released under the MIT License. See the file ``LICENSE`` included in the distribution.
