@@ -11,6 +11,8 @@ Before TC++ calculation, users should perform QE calculation using DFT, HF, etc.
 Any exchange-correlation energy functionals can be used as long as one can get one-electron orbitals.
 Please note the following issues in QE calculation:
 
+- It is recommended to perform QE calculation in the same environment for Fortran90 as TC++ because TC++ reads binary files containing wave-function data dumped by QE. In TC++, Fortran90 is used only for this purpose.
+
 - Set ``wfcdir`` to be the same as ``outdir`` to ensure that the xml and wfc files (see below) are dumped in the same directory.
   Since this is the default setting for ``wfcdir`` in QE, there is no need to specify ``wfcdir`` in the input file, at present.
 
@@ -18,7 +20,7 @@ Please note the following issues in QE calculation:
   copy that directory, and perform BAND calculation there.
 
 - Please specify ``noinv = .true.`` and ``no_t_rev = .true.`` for spin-polarized calculation since TC++ at present does not support these symmetry operations.
-
+  
 - There are some restrictions on pseudopotentials. See below.
 
 
@@ -48,6 +50,8 @@ Users just need to make ``input.in`` and specify where the first three files (ps
 
   This file should be made by users and read by TC++. See :doc:`input_in` for details.
 
+For restarting SCF calculation or performing band calculation after SCF, TC++ requires some other input files dumped by TC++. Please see output_files_.
+  
 How to run TC++
 ---------------
 
@@ -59,9 +63,11 @@ Since TC++ does not use OpenMP parallelization, please set **OMP_NUM_THREADS** t
 
 .. note::
 
-   If you find that the memory requirement is too demanding for your environment, it is possible to specify a larger value for **OMP_NUM_THREADS**.
-   This **does not** accelerate calculation, but might reduce the memory requirement **per node** in parallelized calculation.
+   If you find that the memory requirement is too demanding for your machines, it is possible to specify a larger value for **OMP_NUM_THREADS**,
+   which reduces the memory requirement **per node** in parallelized calculation.
    Also, it might be possible to apply OpenMP parallelization only for calculations done by the external libraries just by editting ``Makefile`` (while I have not tried).
+
+.. _output_files:
 
 
 Output files of TC++
