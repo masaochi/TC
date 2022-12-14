@@ -171,8 +171,7 @@ Eigen::Vector3i PlaneWaveBasis::get_Gvector(const int &ipw) const
 // convert phi to orbital on FFT grid
 // non-collinear calc. not supported
 // Note: even in the BAND mode, calc_mode=="SCF" can be used to get the SCF orbitals
-void PlaneWaveBasis::get_orbital_FFTgrid(const int &ispin, const int &ik, 
-                                         const int &isym, const int &iband,
+void PlaneWaveBasis::get_orbital_FFTgrid(const int &ispin, const int &ik, const int &isym,
                                          const bool is_time_reversal_used_at_k,
                                          const Eigen::VectorXcd &phi,
                                          Eigen::VectorXcd &orbital_FFTgrid,

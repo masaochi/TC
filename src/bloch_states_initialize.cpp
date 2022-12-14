@@ -98,6 +98,17 @@ void BlochStates::resize_filling(const int &num_independent_spins,
             filling_[ispin][ik].resize(num_bands_scf_[ispin]);
         }
     }
+
+    // initialize (while not used in BAND calculation...)
+    filling_old_.resize(num_independent_spins);
+    for (int ispin=0; ispin<num_independent_spins; ispin++)
+    {
+        filling_old_[ispin].resize(num_irreducible_kpoints_scf);
+        for (int ik=0; ik<num_irreducible_kpoints_scf; ik++)
+        {
+            filling_old_[ispin][ik].resize(0); // resized in the SCF loop. Only occupied bands are allocated for filling_old_.
+        }
+    }
 }
 
 void BlochStates::resize_num_occupied_bands(const int &num_independent_spins,
@@ -187,6 +198,19 @@ void BlochStates::resize_phik_qe(const PlaneWaveBasis &plane_wave_basis,
             }
         }
     }
+
+    if (calc_mode=="SCF")
+    {
+        phik_scf_old_.resize(num_independent_spins);
+        for (int ispin=0; ispin<num_independent_spins; ispin++)
+        {
+            phik_scf_old_[ispin].resize(num_irreducible_kpoints);
+            for (int ik=0; ik<num_irreducible_kpoints; ik++)
+            {
+                phik_scf_old_[ispin][ik].resize(0); // resized in the SCF loop
+            }
+        }
+    }
 }
 
 void BlochStates::set_phik_qe(const int ispin, const int ik, const std::vector<Complex> &evc,
@@ -273,9 +297,13 @@ void BlochStates::bcast_qe_input(const PlaneWaveBasis &plane_wave_basis,
     MPI_Bcast(&num_electrons_, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     // phik
-    resize_phik_qe(plane_wave_basis, is_spinor, num_independent_spins, calc_mode);
-    bcast_phik(false, calc_mode); // false: do not bcast phik_left
-    if (calc_method=="BITC" && calc_mode=="SCF") { phik_left_scf_ = phik_scf_; } // phik_left
+    if (!am_i_mpi_rank0) { resize_phik_qe(plane_wave_basis, is_spinor, num_independent_spins, calc_mode); }
+    bcast_phik(false, false, calc_mode, am_i_mpi_rank0); // false(1st): do not bcast phik_left. false(2nd): do not bcast phik_scf_old
+    if (calc_method=="BITC" && calc_mode=="SCF") // phik_left
+    {
+        phik_left_scf_ = phik_scf_;
+        phik_left_scf_old_ = phik_scf_old_;
+    }
     if (calc_method=="BITC" && calc_mode=="BAND") { phik_left_band_ = phik_band_; } // phik_left
 
     // not bcast but required initialization

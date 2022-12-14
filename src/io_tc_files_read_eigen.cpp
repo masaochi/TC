@@ -18,7 +18,7 @@ void io_tc_files::read_eigen(const FileNames &file_names,
     const bool is_bitc = method.calc_method()=="BITC" ? true : false;
 
     if (am_i_mpi_rank0) { read_wfc(file_names, method, calc_mode, bloch_states, ost); }
-    bloch_states.bcast_phik(is_bitc, calc_mode);
+    bloch_states.bcast_phik(is_bitc, false, calc_mode, am_i_mpi_rank0); // false: do not bcast phik_scf_old
     if (am_i_mpi_rank0) { read_energy(file_names, method, calc_mode, bloch_states, ost); }
     bloch_states.bcast_eigenvalues(calc_mode);
 }

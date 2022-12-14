@@ -100,7 +100,9 @@ If the convergence is not achieved, we can restart calculation using ``input.in`
 
 However, it is often difficult to achieve convergence in BITC calculations.
 While convergence can be improved by increasing the number of k-points and/or ``max_num_blocks_david`` in ``input.in``,
-we did not do so in this tutorial. Band structures shown later were obtained without taking these ways or restarting calculation.
+we did not do so in this tutorial.
+To improve the convergence, it is also effective to reduce ``mixing_beta`` with ``mixes_density_matrix`` = true.
+Band structures shown later were obtained without taking these ways or restarting calculation.
 Finally, perform the band calculation using the following ``input.in``,
 
 ::

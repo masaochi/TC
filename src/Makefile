@@ -51,11 +51,7 @@ spin.o calc_hamiltonian_all.o \
 calc_hamiltonian_kinetic.o calc_hamiltonian_pseudo.o \
 calc_hamiltonian_hf2h.o calc_hamiltonian_hf2x.o \
 calc_hamiltonian_tc2h.o calc_hamiltonian_tc2x.o \
-calc_hamiltonian_tc3a1.o calc_hamiltonian_tc3a2.o \
-calc_hamiltonian_tc3a3.o calc_hamiltonian_tc3a4.o \
-calc_hamiltonian_tc3b1.o calc_hamiltonian_tc3b2.o \
-calc_hamiltonian_tc3b3.o calc_hamiltonian_tc3b4.o \
-calc_hamiltonian_tc3b5.o calc_hamiltonian_tc3b6.o \
+calc_hamiltonian_tc3a1.o calc_hamiltonian_tc3b1.o \
 calc_hamiltonian_tc3a2a4b2b5.o \
 calc_hamiltonian_tc3a3b3b4b6.o \
 diagonalization.o diagonalization_davidson.o diagonalization_utils.o \

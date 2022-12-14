@@ -25,6 +25,7 @@ smearing_width 0.025    # (SCF, BAND) in Hartree (default: 0.01) not used when s
 #energy_tolerance 1e-5  # (SCF, BAND) convergence criteria for the total energy (SCF) or the sum of eigenvalues (BAND) (in Hartree) (default: 1e-5). should >=0.0
 #charge_tolerance 1e-4  # (SCF) convergence criteria (in e-) (default: 1e-4). should >=0.0
 #max_num_iterations 30  # (SCF, BAND) maximum num. of iterations for the self-consistent loop (default: 30 for SCF, 15 for BAND). should >=0
+#mixes_density_matrix true # (SCF) mixes the density matrix (true) or the density (false) (default: false)
 #mixing_beta 0.5        # (SCF) coefficient of the new electron density in linear mixing (default: 0.7). should >=0.0
 
 #num_refresh_david 2    # (SCF, BAND) Trial vectors are updated by "num_refresh_david"-times for each update of the Fock operator (default: 1). should >=1

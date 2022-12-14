@@ -376,7 +376,7 @@ void Diagonalization::block_davidson(Parallelization &parallelization,
                         }
 
                         // update bloch_states.phik for the TC final loop
-                        if (iter_inner==num_refresh_david_-1) { bloch_states.reset_phik(ispin, ik, V_tmp, "right", method.calc_mode()); }
+                        if (iter_inner==num_refresh_david_-1) { bloch_states.reset_phik(ispin, ik, V_tmp, "right", mixes_density_matrix_, method.calc_mode()); }
                     }
                     else // BITC final loop: update bloch_states.phik & phik_left
                     {
@@ -385,7 +385,7 @@ void Diagonalization::block_davidson(Parallelization &parallelization,
                         // Also right eigevectors are normalized by Eigen implementation of compute().
 
                         // update bloch_states.phik for the BITC final loop
-                        bloch_states.reset_phik(ispin, ik, V_tmp, "right", method.calc_mode());
+                        bloch_states.reset_phik(ispin, ik, V_tmp, "right", mixes_density_matrix_, method.calc_mode());
 
                         for (int iband=0; iband<num_bands_tc[ispin]; iband++)
                         {
@@ -398,7 +398,7 @@ void Diagonalization::block_davidson(Parallelization &parallelization,
                                 }
                             }
                         }
-                        bloch_states.reset_phik(ispin, ik, V_tmp, "left", method.calc_mode());
+                        bloch_states.reset_phik(ispin, ik, V_tmp, "left", mixes_density_matrix_, method.calc_mode());
                     }
 
                     if (iter_inner==(num_refresh_david_-1)) // final loop
@@ -456,7 +456,7 @@ void Diagonalization::block_davidson(Parallelization &parallelization,
         }
         else // final loop: update bloch_states
         {
-            bloch_states.bcast_phik(is_bitc, method.calc_mode());
+            bloch_states.bcast_phik(is_bitc, mixes_density_matrix_, method.calc_mode(), am_i_mpi_rank0);
             bloch_states.bcast_eigenvalues(method.calc_mode());
             if (method.calc_mode()=="SCF") { total_energy.bcast_energies(uses_3body); }
         }

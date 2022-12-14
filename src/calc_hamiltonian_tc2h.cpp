@@ -67,12 +67,23 @@ void calc_hamiltonian::tc2h(const Parallelization &parallelization,
                 qvect = crystal_structure.reciprocal_vectors().transpose() *
                     kpoints.kvectors_scf()[iq][isymq];
 
-                for (int ibandq=0; ibandq<bloch_states.num_occupied_bands()[ispin][iq]; ibandq++)
+                const int nbands_old = bloch_states.filling_old()[ispin][iq].size();
+                for (int ibandq=-nbands_old; ibandq<bloch_states.num_occupied_bands()[ispin][iq]; ibandq++)
                 {
-                    plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq, ibandq,
-                                                         kpoints.is_time_reversal_used_at_k()[iq][isymq],
-                                                         bloch_states.phik_scf()[ispin][iq][ibandq][0],
-                                                         orbital, "SCF");
+                    if (ibandq>=0)
+                    {
+                        plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq,
+                                                             kpoints.is_time_reversal_used_at_k()[iq][isymq],
+                                                             bloch_states.phik_scf()[ispin][iq][ibandq][0],
+                                                             orbital, "SCF");
+                    }
+                    else
+                    {
+                        plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq,
+                                                             kpoints.is_time_reversal_used_at_k()[iq][isymq],
+                                                             bloch_states.phik_scf_old()[ispin][iq][-1-ibandq][0],
+                                                             orbital, "SCF");
+                    }
                     for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
                     {
                         for (int idim=0; idim<3; idim++)
@@ -82,13 +93,24 @@ void calc_hamiltonian::tc2h(const Parallelization &parallelization,
                     }
                     if (is_bitc)
                     {
-                        plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq, ibandq,
-                                                             kpoints.is_time_reversal_used_at_k()[iq][isymq],
-                                                             bloch_states.phik_left_scf()[ispin][iq][ibandq][0],
-                                                             orbital, "SCF");
+                        if (ibandq>=0)
+                        {
+                            plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq,
+                                                                 kpoints.is_time_reversal_used_at_k()[iq][isymq],
+                                                                 bloch_states.phik_left_scf()[ispin][iq][ibandq][0],
+                                                                 orbital, "SCF");
+                        }
+                        else
+                        {
+                            plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq,
+                                                                 kpoints.is_time_reversal_used_at_k()[iq][isymq],
+                                                                 bloch_states.phik_left_scf_old()[ispin][iq][-1-ibandq][0],
+                                                                 orbital, "SCF");
+                        }
                     }
                     plane_wave_basis.FFT_backward(orbital, orbital); // -> phi_q(R)
-                    orbital = bloch_states.filling()[ispin][iq][ibandq] * orbital.conjugate();
+                    double filq = ibandq>=0 ? bloch_states.filling()[ispin][iq][ibandq] : bloch_states.filling_old()[ispin][iq][-1-ibandq];
+                    orbital = filq * orbital.conjugate();
                     for (int idim=0; idim<3; idim++)
                     {
                         plane_wave_basis.FFT_backward(grad_orbital[idim], grad_orbital[idim]);
@@ -177,7 +199,7 @@ void calc_hamiltonian::tc2h(const Parallelization &parallelization,
                 {
                     // phi -> orbital on the FFT-grid
                     plane_wave_basis.get_orbital_FFTgrid(ispin, ik, 0, // isym = 0
-                                                         jband, false, // time-rersal not used for isym=0
+                                                         false, // time-rersal not used for isym=0
                                                          phi[ispin][ik][jband][jspinor], orbital,
                                                          method.calc_mode());
                     for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)

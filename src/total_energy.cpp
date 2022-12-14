@@ -176,11 +176,18 @@ void TotalEnergy::calc_total_energy(const Spin &spin,
     if (am_i_mpi_rank0) 
     {
         *ost << "   Total energy (Ewald energy) = " << ewald_energy_ << " Ht." << std::endl; 
-        *ost << "   Total energy (1-body terms) = " << total_energy_1body_ << " Ht." << std::endl; 
-        *ost << "   Total energy (2-body terms) = " << total_energy_2body_ << " Ht." << std::endl; 
-        if (uses_3body) { *ost << "   Total energy (3-body terms) = " << total_energy_3body_ << " Ht." << std::endl; }
-        *ost << "   Total energy = " << total_energy_ << " Ht." << std::endl; 
-        if (kpoints.smearing_mode()=="gaussian") { *ost << "   Total energy (sigma->0) = " << (total_energy_ + total_energy_sigma0)/2.0 << " Ht." << std::endl; }
-        *ost << "   Total energy difference from the previous loop = " << total_energy_difference_ << " Ht." << std::endl; 
+        *ost << "   Total energy (1-body terms) = ( " << total_energy_1body_.real() << " , "  <<  total_energy_1body_.imag() << " ) Ht." << std::endl; 
+        *ost << "   Total energy (2-body terms) = ( " << total_energy_2body_.real() << " , "  <<  total_energy_2body_.imag() << " ) Ht." << std::endl; 
+        if (uses_3body) 
+        {
+            *ost << "   Total energy (3-body terms) = ( " << total_energy_3body_.real() << " , "  <<  total_energy_3body_.imag() << " ) Ht." << std::endl;
+        }
+        *ost << "   Total energy = ( " << total_energy_.real() << " , " << total_energy_.imag() << " ) Ht." << std::endl; 
+        if (kpoints.smearing_mode()=="gaussian") 
+        {
+            *ost << "   Total energy (sigma->0) = ( " << ((total_energy_ + total_energy_sigma0)/2.0).real()
+                 << " , " << ((total_energy_ + total_energy_sigma0)/2.0).imag() << " ) Ht." << std::endl; }
+        *ost << "   Total energy difference from the previous loop = ( " << total_energy_difference_.real() 
+             << " , " << total_energy_difference_.imag() << " ) Ht." << std::endl; 
     }
 }

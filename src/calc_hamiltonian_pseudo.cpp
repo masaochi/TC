@@ -161,7 +161,7 @@ void calc_hamiltonian::pseudo(const Parallelization &parallelization,
 
                     // (2/2) pseudo potential (local part)
                     plane_wave_basis.get_orbital_FFTgrid(ispin, ik, 0, // isym = 0
-                                                         jband, false, // time-rersal not used for isym=0
+                                                         false, // time-rersal not used for isym=0
                                                          phi[ispin][ik][jband][jspinor], orbital,
                                                          method.calc_mode());
                     plane_wave_basis.FFT_backward(orbital, orbital); // G-space to R-space

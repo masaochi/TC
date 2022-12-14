@@ -81,7 +81,11 @@ The following output files are obtained by TC++ calculation:
 
 - ``output.out``
 
-  Many information obtained by calculation are shown.
+  Many information obtained by calculation are shown. For example, you can track the total-energy convergence by
+
+    p `< grep "Total energy =" output.out' u 5
+
+  with **gnuplot**.
 
 - ``tc_bandplot.dat``
 

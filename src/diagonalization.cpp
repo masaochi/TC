@@ -5,7 +5,8 @@
 
 void Diagonalization::set(const bool restarts,
                           const double &energy_tolerance, const double &charge_tolerance,
-                          const int &max_num_iterations, const double &mixing_beta,
+                          const int &max_num_iterations, 
+                          const bool &mixes_density_matrix, const double &mixing_beta,
                           const int &num_refresh_david, const int &max_num_blocks_david,
                           const std::string &calc_mode, const bool is_heg)
 {
@@ -51,14 +52,16 @@ void Diagonalization::set(const bool restarts,
 //                                               "should not be negative");
     }
 
-    if (mixing_beta > -1e-8) 
+    mixes_density_matrix_ = mixes_density_matrix;
+
+    if (mixing_beta > 1e-8) 
     {
         mixing_beta_ = mixing_beta;
     }
     else
     {
         error_messages::inappropriate_argument("mixing_beta", mixing_beta,
-                                               "should not be negative");
+                                               "should be positive");
     }
 
     if (num_refresh_david >= 1)
@@ -88,6 +91,7 @@ void Diagonalization::bcast(const bool am_i_mpi_rank0)
     MPI_Bcast(&energy_tolerance_, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&charge_tolerance_, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&max_num_iterations_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&mixes_density_matrix_, 1, MPI_CXX_BOOL, 0, MPI_COMM_WORLD);
     MPI_Bcast(&mixing_beta_, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&num_refresh_david_, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&max_num_blocks_david_, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -115,7 +119,8 @@ void Diagonalization::scf(Parallelization &parallelization,
         bool is_first_iter = iter==0 ? true : false;
 
         // Preparation for SCF calc.
-        bloch_states.set_filling(spin, kpoints, am_i_mpi_rank0, ost);
+        bloch_states.set_filling(spin, kpoints, (mixes_density_matrix_ && !is_first_iter),
+                                 mixing_beta_, am_i_mpi_rank0, ost); // set filling_old when (mixes_... && !is_first_iter)==true
         if (!is_first_iter) 
         {
             total_energy.calc_total_energy(spin, kpoints,
@@ -123,9 +128,11 @@ void Diagonalization::scf(Parallelization &parallelization,
                                            bloch_states.fermi_energy(), uses_3body, am_i_mpi_rank0, ost);
             is_energy_converged =
                 (std::abs(total_energy.total_energy_difference()) < energy_tolerance_);
+        
+            if (mixes_density_matrix_) { bloch_states.mix_density_matrix(mixing_beta_); }
         }
-        bloch_states.set_density(crystal_structure, kpoints, plane_wave_basis, mixing_beta_, 
-                                 is_first_iter, is_bitc, am_i_mpi_rank0, ost);
+        bloch_states.set_density(crystal_structure, kpoints, plane_wave_basis, mixes_density_matrix_, 
+                                 mixing_beta_, is_first_iter, is_bitc, am_i_mpi_rank0, ost);
         if (am_i_mpi_rank0) { my_clock.print_time_from_save(ost, "preparation for SCF calc. (set filling and density)"); }
 
         // Convergence check
@@ -149,6 +156,8 @@ void Diagonalization::scf(Parallelization &parallelization,
                        plane_wave_basis, 
                        bloch_states, total_energy, ost);
 
+        if (!is_first_iter && mixes_density_matrix_) { bloch_states.recover_filling_for_density_matrix(mixing_beta_); } // recover filling
+
         if (am_i_mpi_rank0) { my_clock.print_time_from_save(ost, "diagonalization"); }
         if (am_i_mpi_rank0) { io_tc_files::dump_eigen(file_names, method, "SCF", bloch_states, ost); } // output for each iteration
         if (am_i_mpi_rank0) { my_clock.print_time_from_save(ost, "dumping wave functions etc."); }
@@ -156,7 +165,7 @@ void Diagonalization::scf(Parallelization &parallelization,
     } // iter
 
     // When the convergence is NOT achieved
-    bloch_states.set_filling(spin, kpoints, am_i_mpi_rank0, ost);
+    bloch_states.set_filling(spin, kpoints, false, mixing_beta_, am_i_mpi_rank0, ost); // no need to mix the density matrix
     total_energy.calc_total_energy(spin, kpoints,
                                    bloch_states.filling(), bloch_states.eigenvalues_scf(),
                                    bloch_states.fermi_energy(), uses_3body, am_i_mpi_rank0, ost);
@@ -179,9 +188,9 @@ void Diagonalization::band(Parallelization &parallelization,
 
     if (am_i_mpi_rank0) { *ost << " Start BAND calculation!" << std::endl; }
 
-    bloch_states.set_filling(spin, kpoints, am_i_mpi_rank0, ost);
-    bloch_states.set_density(crystal_structure, kpoints, plane_wave_basis, mixing_beta_, 
-                             true, is_bitc, am_i_mpi_rank0, ost);
+    bloch_states.set_filling(spin, kpoints, false, mixing_beta_, am_i_mpi_rank0, ost); // no need to mix the density matrix
+    bloch_states.set_density(crystal_structure, kpoints, plane_wave_basis, mixes_density_matrix_,
+                             mixing_beta_, true, is_bitc, am_i_mpi_rank0, ost);
     if (am_i_mpi_rank0) { my_clock.print_time_from_save(ost, "preparation for BAND calc. (set filling and density)"); }
 
     // "iter" loop is required even for BAND calculation

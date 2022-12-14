@@ -85,8 +85,8 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
 
     // divergence correction for \nabla u
     Eigen::Vector3d kVaux;
-    std::vector<Eigen::VectorXcd> div_corr_2bx1;
-    std::vector<std::vector<Eigen::VectorXcd> > div_corr_2bx2;
+    std::vector<Eigen::VectorXcd> div_corr_2bx1, div_corr_2bx1_old;
+    std::vector<std::vector<Eigen::VectorXcd> > div_corr_2bx2, div_corr_2bx2_old;
 
     for (int ispin=0; ispin<num_independent_spins; ispin++)
     {
@@ -121,28 +121,57 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                         div_corr_2bx2[ibandk].resize(3);
                     }
 
-                    for (int ibandk=0; ibandk<num_bands_tc[ispin]; ibandk++)
+                    // for density-matrix mixing
+                    const int nbands_old = 
+                        method.calc_mode()=="BAND" ? 0 : bloch_states.filling_old()[ispin][ik].size();
+                    div_corr_2bx1_old.resize(nbands_old);
+                    div_corr_2bx2_old.resize(nbands_old);
+                    for (int ibandk=0; ibandk<nbands_old; ibandk++)
                     {
-                        double filling_ibandk = method.calc_mode()=="BAND" ?
-                            kpoints.return_band_filling(spin, bloch_states.eigenvalues_band()[ispin][ik][ibandk].real(),
-                                                        bloch_states.fermi_energy(),
-                                                        bloch_states.num_electrons(), ibandk) :
-                            kpoints.return_band_filling(spin, bloch_states.eigenvalues_scf()[ispin][ik][ibandk].real(),
-                                                        bloch_states.fermi_energy(),
-                                                        bloch_states.num_electrons(), ibandk);
-                        if (filling_ibandk < 1e-8) { continue; } // no filling                                                                    
-                        // NOTE! filling_ibandk is non-zero even for zero-weight k-points (in fake scf) 
+                        div_corr_2bx2_old[ibandk].resize(3);
+                    }
+
+                    for (int ibandk=-nbands_old; ibandk<num_bands_tc[ispin]; ibandk++)
+                    {
+                        double filling_ibandk = 
+                            ibandk>=0 ? (method.calc_mode()=="BAND" ?
+                                         kpoints.return_band_filling(spin, bloch_states.eigenvalues_band()[ispin][ik][ibandk].real(),
+                                                                     bloch_states.fermi_energy(),
+                                                                     bloch_states.num_electrons(), ibandk) :
+                                         bloch_states.filling()[ispin][ik][ibandk]) :
+                            bloch_states.filling_old()[ispin][ik][-1-ibandk];
+
+                        if (ibandk>=0 && method.calc_mode()=="SCF")
+                        {
+                            // above filling_ibandk (=filling[ispin][ik][ibandk]) is not correct for zero-weight k-points in SCF calc.
+                            if (kpoints.kweight_scf()[ik] < 1e-8)
+                            {
+                                filling_ibandk = 
+                                    kpoints.return_band_filling(spin, bloch_states.eigenvalues_scf()[ispin][ik][ibandk].real(),
+                                                                bloch_states.fermi_energy(),
+                                                                bloch_states.num_electrons(), ibandk);
+                            }
+                        }
+ 
+                        if (filling_ibandk < 1e-8) { continue; } // no filling                                                              
+
+                        Eigen::VectorXcd &div_corr_2bx1_ref =
+                            ibandk>=0 ? div_corr_2bx1[ibandk] : div_corr_2bx1_old[-1-ibandk];
+                        std::vector<Eigen::VectorXcd> &div_corr_2bx2_ref =
+                            ibandk>=0 ? div_corr_2bx2[ibandk] : div_corr_2bx2_old[-1-ibandk];
 
                         // [2b_x1]
-                        div_corr_2bx1[ibandk] = Eigen::VectorXcd::Zero(plane_wave_basis.size_FFT_grid());
+                        div_corr_2bx1_ref = Eigen::VectorXcd::Zero(plane_wave_basis.size_FFT_grid());
 
-                        const Eigen::VectorXcd &phik_ref = method.calc_mode()=="BAND" ?
-                            bloch_states.phik_band()[ispin][ik][ibandk][0] :
-                            bloch_states.phik_scf()[ispin][ik][ibandk][0];
+                        const Eigen::VectorXcd &phik_ref =
+                            ibandk>=0 ? (method.calc_mode()=="BAND" ?
+                                         bloch_states.phik_band()[ispin][ik][ibandk][0] :
+                                         bloch_states.phik_scf()[ispin][ik][ibandk][0]) :
+                            bloch_states.phik_scf_old()[ispin][ik][-1-ibandk][0];
 
                         // Note: names "phiq" and "grad_phiq" are meaningless here.
                         plane_wave_basis.get_orbital_FFTgrid(ispin, ik, 0, // isym = 0
-                                                             ibandk, false, // time-rersal not used for isym=0
+                                                             false, // time-rersal not used for isym=0
                                                              phik_ref, phiq, method.calc_mode());
                         for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
                         {
@@ -154,23 +183,25 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                         Eigen::Vector3d coeff_vec_2bx1 = filling_ibandk * kVaux;
                         for (int idim=0; idim<3; idim++)
                         {
-                            div_corr_2bx1[ibandk] += coeff_vec_2bx1(idim) * grad_phiq[idim]; // NOTE! function in k-space.
+                            div_corr_2bx1_ref += coeff_vec_2bx1(idim) * grad_phiq[idim]; // NOTE! function in k-space.
                         }
 
                         // [2b_x2]
                         Eigen::VectorXcd &chi_ref_div = is_bitc ? chiq : phiq; // bra orbital
                         if (is_bitc)
                         {
-                            const Eigen::VectorXcd &chik_ref = method.calc_mode()=="BAND" ?
-                                bloch_states.phik_left_band()[ispin][ik][ibandk][0] :
-                                bloch_states.phik_left_scf()[ispin][ik][ibandk][0];
+                            const Eigen::VectorXcd &chik_ref =
+                                ibandk>=0 ? (method.calc_mode()=="BAND" ?
+                                             bloch_states.phik_left_band()[ispin][ik][ibandk][0] :
+                                             bloch_states.phik_left_scf()[ispin][ik][ibandk][0]) :
+                                bloch_states.phik_left_scf_old()[ispin][ik][-1-ibandk][0];
 
-                            plane_wave_basis.get_orbital_FFTgrid(ispin, ik, 0, ibandk, false,
+                            plane_wave_basis.get_orbital_FFTgrid(ispin, ik, 0, false,
                                                                  chik_ref, chiq, method.calc_mode());
                         }                        
                         for (int idim=0; idim<3; idim++)
                         {
-                            div_corr_2bx2[ibandk][idim] = 
+                            div_corr_2bx2_ref[idim] = 
                                 kVaux(idim) * chi_ref_div; // NOTE! function in k-space. conjugate() will be later taken.
                         }
                     } // ibandk
@@ -182,7 +213,7 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                 if (!parallelization.is_assigned_irreducible_kpoints_all_bands()[ispin][ik][jband]) { continue; }
                 // calculate phij and grad_phij
                 plane_wave_basis.get_orbital_FFTgrid(ispin, ik, 0, // isym = 0
-                                                     jband, false, // time-rersal not used for isym=0
+                                                     false, // time-rersal not used for isym=0
                                                      phi[ispin][ik][jband][0], phij,
                                                      method.calc_mode());
                 for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
@@ -229,21 +260,44 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                                 duk[idim](ipw) = kqGvect[idim](ipw) * uk;
                             }
                         }
-                        for (int ibandq=0; ibandq<bloch_states.num_occupied_bands()[ispin][iq]; ibandq++)
+
+                        const int nbands_old = bloch_states.filling_old()[ispin][iq].size();
+                        for (int ibandq=-nbands_old; ibandq<bloch_states.num_occupied_bands()[ispin][iq]; ibandq++)
                         {
                             // calculate phiq and grad_phiq
                             Eigen::VectorXcd &chiq_ref = is_bitc ? chiq : phiq; // bra orbital
 
-                            plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq, ibandq,
-                                                                 kpoints.is_time_reversal_used_at_k()[iq][isymq],
-                                                                 bloch_states.phik_scf()[ispin][iq][ibandq][0], phiq,
-                                                                 "SCF");
+                            if (ibandq>=0)
+                            {
+                                plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq,
+                                                                     kpoints.is_time_reversal_used_at_k()[iq][isymq],
+                                                                     bloch_states.phik_scf()[ispin][iq][ibandq][0], phiq,
+                                                                     "SCF");
+                            }
+                            else
+                            {
+                                plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq,
+                                                                     kpoints.is_time_reversal_used_at_k()[iq][isymq],
+                                                                     bloch_states.phik_scf_old()[ispin][iq][-1-ibandq][0], phiq,
+                                                                     "SCF");
+                            }
+
                             if (is_bitc)
                             {
-                                plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq, ibandq,
-                                                                     kpoints.is_time_reversal_used_at_k()[iq][isymq],
-                                                                     bloch_states.phik_left_scf()[ispin][iq][ibandq][0], chiq,
-                                                                     "SCF");
+                                if (ibandq>=0)
+                                {
+                                    plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq,
+                                                                         kpoints.is_time_reversal_used_at_k()[iq][isymq],
+                                                                         bloch_states.phik_left_scf()[ispin][iq][ibandq][0], chiq,
+                                                                         "SCF");
+                                }
+                                else
+                                {
+                                    plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq,
+                                                                         kpoints.is_time_reversal_used_at_k()[iq][isymq],
+                                                                         bloch_states.phik_left_scf_old()[ispin][iq][-1-ibandq][0], chiq,
+                                                                         "SCF");
+                                }
                                 plane_wave_basis.FFT_backward(chiq, chiq);
                             }
 
@@ -265,6 +319,9 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                                 plane_wave_basis.FFT_backward(phi_grad_phi[idim], phi_grad_phi[idim]);
                             }
 
+
+                           double filq = ibandq>=0 ? bloch_states.filling()[ispin][iq][ibandq] 
+                               : bloch_states.filling_old()[ispin][iq][-1-ibandq];
                            // [2b_x1] <*,q| \nabla_1 u_12 \nabla_1 |q,j>
                            temp = Eigen::VectorXcd::Zero(plane_wave_basis.size_FFT_grid());
                            for (int idim=0; idim<3; idim++)
@@ -272,7 +329,7 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                                 temp = temp.array()
                                     + phi_grad_phi[idim].array() * grad_phiq[idim].array();
                             }
-                           Hphij_sub -= bloch_states.filling()[ispin][iq][ibandq] * temp; // -1 = I^2
+                           Hphij_sub -= filq * temp; // -1 = I^2
 
                             // [2b_x2]
                             for (int idim=0; idim<3; idim++)
@@ -291,7 +348,7 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                             }
                             plane_wave_basis.FFT_backward(phiqj, phiqj); // -> (R)
                             Hphij_sub = Hphij_sub.array() +
-                                bloch_states.filling()[ispin][iq][ibandq] * phiqj.array() * phiq.array(); // in R-space
+                                filq * phiqj.array() * phiq.array(); // in R-space
                         } // ibandq
                     } // isymq
                 } // iq
@@ -317,24 +374,47 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                     div_corr *= (-1); // "-": exchange (same as two_body_factor)
                     if (num_independent_spins==1) { div_corr /= 2.0; } // same as two_body_factor
                     
-                    for (int ibandk=0; ibandk<num_bands_tc[ispin]; ibandk++)
+                    const int nbands_old = 
+                        method.calc_mode()=="BAND" ? 0 : bloch_states.filling_old()[ispin][ik].size();
+                    for (int ibandk=-nbands_old; ibandk<num_bands_tc[ispin]; ibandk++)
                     {
-                        double filling_ibandk = method.calc_mode()=="BAND" ?
-                            kpoints.return_band_filling(spin, bloch_states.eigenvalues_band()[ispin][ik][ibandk].real(),
-                                                        bloch_states.fermi_energy(),
-                                                        bloch_states.num_electrons(), ibandk) :
-                            kpoints.return_band_filling(spin, bloch_states.eigenvalues_scf()[ispin][ik][ibandk].real(),
-                                                        bloch_states.fermi_energy(),
-                                                        bloch_states.num_electrons(), ibandk);
-                        if (filling_ibandk < 1e-8) { continue; } // no filling then no correction
-                        
-                        const Eigen::VectorXcd &phik_ref = method.calc_mode()=="BAND" ?
-                            bloch_states.phik_band()[ispin][ik][ibandk][0] :
-                            bloch_states.phik_scf()[ispin][ik][ibandk][0];
+                        double filling_ibandk = 
+                            ibandk>=0 ? (method.calc_mode()=="BAND" ?
+                                         kpoints.return_band_filling(spin, bloch_states.eigenvalues_band()[ispin][ik][ibandk].real(),
+                                                                     bloch_states.fermi_energy(),
+                                                                     bloch_states.num_electrons(), ibandk) :
+                                         bloch_states.filling()[ispin][ik][ibandk]) :
+                            bloch_states.filling_old()[ispin][ik][-1-ibandk];
+
+                        if (ibandk>=0 && method.calc_mode()=="SCF")
+                        {
+                            // above filling_ibandk (=filling[ispin][ik][ibandk]) is not correct for zero-weight k-points in SCF calc.
+                            if (kpoints.kweight_scf()[ik] < 1e-8)
+                            {
+                                filling_ibandk = 
+                                    kpoints.return_band_filling(spin, bloch_states.eigenvalues_scf()[ispin][ik][ibandk].real(),
+                                                                bloch_states.fermi_energy(),
+                                                                bloch_states.num_electrons(), ibandk);
+                            }
+                        }
+
+                        if (filling_ibandk < 1e-8) { continue; } // no filling then no correction                        
+
+                        Eigen::VectorXcd &div_corr_2bx1_ref =
+                            ibandk>=0 ? div_corr_2bx1[ibandk] : div_corr_2bx1_old[-1-ibandk];
+                        std::vector<Eigen::VectorXcd> &div_corr_2bx2_ref =
+                            ibandk>=0 ? div_corr_2bx2[ibandk] : div_corr_2bx2_old[-1-ibandk];
+
+                        const Eigen::VectorXcd &phik_ref =
+                            ibandk>=0 ? (method.calc_mode()=="BAND" ?
+                                         bloch_states.phik_band()[ispin][ik][ibandk][0] :
+                                         bloch_states.phik_scf()[ispin][ik][ibandk][0]) :
+                            bloch_states.phik_scf_old()[ispin][ik][-1-ibandk][0];
                         
                         const Eigen::VectorXcd &chik_ref = !is_bitc ? phik_ref :
-                            (method.calc_mode()=="BAND" ? bloch_states.phik_left_band()[ispin][ik][ibandk][0] :
-                             bloch_states.phik_left_scf()[ispin][ik][ibandk][0]);
+                            (ibandk>=0 ? (method.calc_mode()=="BAND" ? bloch_states.phik_left_band()[ispin][ik][ibandk][0] :
+                                          bloch_states.phik_left_scf()[ispin][ik][ibandk][0]) :
+                             bloch_states.phik_left_scf_old()[ispin][ik][-1-ibandk][0]);
                         
                         Complex prod = chik_ref.dot(phi[ispin][ik][jband][0]); // conj(phii)*phij
                         prod *= div_corr; // [2a_x]
@@ -345,13 +425,13 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                             {
                                 // NOTE! function in k-space
                                 H2phi[ispin][ik][jband][0](ipw_at_k) 
-                                    -= div_corr_2bx1[ibandk](Gindex_at_k(ipw_at_k)); // [2b_x1] I^2 = -1
+                                    -= div_corr_2bx1_ref(Gindex_at_k(ipw_at_k)); // [2b_x1] I^2 = -1
                             }
                             for (int idim=0; idim<3; idim++)
                             {
                                 // NOTE! inner product in k-space
                                 plane_wave_basis.FFT_forward(grad_phij[idim], grad_phiq[idim]); // save in "grad_phiq" (meaningless name)
-                                prod += div_corr_2bx2[ibandk][idim].dot(grad_phiq[idim]); // [2b_x2] I^2 * convolution = +1. conj(div)*gphij
+                                prod += div_corr_2bx2_ref[idim].dot(grad_phiq[idim]); // [2b_x2] I^2 * convolution = +1. conj(div)*gphij
                             }
                         } // if (||kVaux||^2 > 1e-8)
                         

@@ -25,3 +25,12 @@ TC++ is a free/libre open-source software, released under the MIT License. See t
 Author & Contact
 ----------------
 `Masayuki Ochi <http://ann.phys.sci.osaka-u.ac.jp/ochi/ochi_en.html>`_ (Osaka University, Japan)  ochi@presto.phys.sci.osaka-u.ac.jp
+
+History
+-------
+- 2022/11/18 ver.1.0
+- 2022/12/14 ver.1.1
+
+  + ``mixes_density_matrix`` is implemented, which can improve convergence of calculation (See :doc:`input_in`)
+  + A format of the total energies in ``output.out`` is slightly changed in order to track the total-energy convergence easily (e.g., by ``p `< grep "Total energy =" output.out' u 5`` with **gnuplot**).
+  + Some files that are not used are removed (e.g., ``calc_hamiltonian_tc3a2.cpp``)

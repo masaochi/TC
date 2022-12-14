@@ -57,7 +57,7 @@ void calc_hamiltonian::hf2x(const Parallelization &parallelization,
             {
                 if (!parallelization.is_assigned_irreducible_kpoints_all_bands()[ispin][ik][jband]) { continue; }
                 plane_wave_basis.get_orbital_FFTgrid(ispin, ik, 0, // isym = 0
-                                                     jband, false, // time-rersal not used for isym=0
+                                                     false, // time-rersal not used for isym=0
                                                      phi[ispin][ik][jband][0], phij,
                                                      method.calc_mode());
                 plane_wave_basis.FFT_backward(phij, phij);
@@ -83,19 +83,31 @@ void calc_hamiltonian::hf2x(const Parallelization &parallelization,
                             }
                         } // ipw
 
-                        for (int ibandq=0; ibandq<bloch_states.num_occupied_bands()[ispin][iq]; ibandq++)
+                        const int nbands_old = bloch_states.filling_old()[ispin][iq].size();
+                        for (int ibandq=-nbands_old; ibandq<bloch_states.num_occupied_bands()[ispin][iq]; ibandq++)
                         {
-                            plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq, ibandq,
-                                                                 kpoints.is_time_reversal_used_at_k()[iq][isymq],
-                                                                 bloch_states.phik_scf()[ispin][iq][ibandq][0], phiq,
-                                                                 "SCF");
+                            if (ibandq>=0)
+                            {
+                                plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq,
+                                                                     kpoints.is_time_reversal_used_at_k()[iq][isymq],
+                                                                     bloch_states.phik_scf()[ispin][iq][ibandq][0], phiq,
+                                                                     "SCF");
+                            }
+                            else
+                            {
+                                plane_wave_basis.get_orbital_FFTgrid(ispin, iq, isymq,
+                                                                     kpoints.is_time_reversal_used_at_k()[iq][isymq],
+                                                                     bloch_states.phik_scf_old()[ispin][iq][-1-ibandq][0], phiq,
+                                                                     "SCF");
+                            }
                             plane_wave_basis.FFT_backward(phiq, phiq);
                             phiqj = phiq.conjugate().array() * phij.array(); // in R-space
                             plane_wave_basis.FFT_forward(phiqj, phiqj);
                             phiqj = phiqj.array() * V_coulomb.array(); // in G-space
                             plane_wave_basis.FFT_backward(phiqj, phiqj);
-                            Hphij_sub = Hphij_sub.array()
-                                + bloch_states.filling()[ispin][iq][ibandq] * phiqj.array() * phiq.array(); // in R-space
+
+                            double filq = ibandq>=0 ? bloch_states.filling()[ispin][iq][ibandq] : bloch_states.filling_old()[ispin][iq][-1-ibandq];
+                            Hphij_sub = Hphij_sub.array() + filq * phiqj.array() * phiq.array(); // in R-space
                         } // ibandq
                     } // isymq
                 } // iq
@@ -121,21 +133,38 @@ void calc_hamiltonian::hf2x(const Parallelization &parallelization,
                     div_corr *= (-1); // "-": exchange (same as two_body_factor)
                     if (num_independent_spins==1) { div_corr /= 2.0; } // same as two_body_factor
                     
-                    for (int ibandk=0; ibandk<num_bands_tc[ispin]; ibandk++)
+                    const int nbands_old = 
+                        method.calc_mode()=="BAND" ? 0 : bloch_states.filling_old()[ispin][ik].size();
+                    for (int ibandk=-nbands_old; ibandk<num_bands_tc[ispin]; ibandk++)
                     {
-                        double filling_ibandk = method.calc_mode()=="BAND" ?
-                            kpoints.return_band_filling(spin, bloch_states.eigenvalues_band()[ispin][ik][ibandk].real(),
-                                                        bloch_states.fermi_energy(),
-                                                        bloch_states.num_electrons(), ibandk) :
-                            kpoints.return_band_filling(spin, bloch_states.eigenvalues_scf()[ispin][ik][ibandk].real(),
-                                                        bloch_states.fermi_energy(),
-                                                        bloch_states.num_electrons(), ibandk);
+                        double filling_ibandk = 
+                            ibandk>=0 ? (method.calc_mode()=="BAND" ?
+                                         kpoints.return_band_filling(spin, bloch_states.eigenvalues_band()[ispin][ik][ibandk].real(),
+                                                                     bloch_states.fermi_energy(),
+                                                                     bloch_states.num_electrons(), ibandk) :
+                                         bloch_states.filling()[ispin][ik][ibandk]) :
+                            bloch_states.filling_old()[ispin][ik][-1-ibandk];
+
+                        if (ibandk>=0 && method.calc_mode()=="SCF")
+                        {
+                            // above filling_ibandk (=filling[ispin][ik][ibandk]) is not correct for zero-weight k-points in SCF calc.
+                            if (kpoints.kweight_scf()[ik] < 1e-8)
+                            {
+                                filling_ibandk = 
+                                    kpoints.return_band_filling(spin, bloch_states.eigenvalues_scf()[ispin][ik][ibandk].real(),
+                                                                bloch_states.fermi_energy(),
+                                                                bloch_states.num_electrons(), ibandk);
+                            }
+                        }
+
                         if (filling_ibandk < 1e-8) { continue; } // no filling then no correction
-                        
-                        const Eigen::VectorXcd &phik_ref = method.calc_mode()=="BAND" ?
-                            bloch_states.phik_band()[ispin][ik][ibandk][0] :
-                            bloch_states.phik_scf()[ispin][ik][ibandk][0];
-                        
+                            
+                        const Eigen::VectorXcd &phik_ref =
+                            ibandk>=0 ? (method.calc_mode()=="BAND" ?
+                                         bloch_states.phik_band()[ispin][ik][ibandk][0] :
+                                         bloch_states.phik_scf()[ispin][ik][ibandk][0]) :
+                            bloch_states.phik_scf_old()[ispin][ik][-1-ibandk][0];
+ 
                         Complex prod = phik_ref.dot(phi[ispin][ik][jband][0]); // conj(phik)*phi
                         prod *= filling_ibandk * div_corr;
                         H2phi[ispin][ik][jband][0] += prod * phik_ref;

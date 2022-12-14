@@ -69,6 +69,7 @@ void io_tc_files::read_input_in(FileNames &file_names,
         double energy_tolerance = diagonalization.energy_tolerance();
         double charge_tolerance = diagonalization.charge_tolerance();
         int max_num_iterations = diagonalization.max_num_iterations();
+        bool mixes_density_matrix = diagonalization.mixes_density_matrix();
         double mixing_beta = diagonalization.mixing_beta();
         int num_refresh_david = diagonalization.num_refresh_david();
         int max_num_blocks_david = diagonalization.max_num_blocks_david();
@@ -78,7 +79,7 @@ void io_tc_files::read_input_in(FileNames &file_names,
         std::vector<std::vector<double> > A_long = potentials.jastrow.A_long();
 
         std::string sline, s1, s2;
-        std::vector<bool> is_already_set(19, false); // 19 = total num. of the input keywords
+        std::vector<bool> is_already_set(20, false); // 20 = total num. of the input keywords
         while (std::getline(ifs, sline))
         {
             std::stringstream ss{sline};
@@ -193,6 +194,12 @@ void io_tc_files::read_input_in(FileNames &file_names,
                 A_long[1][1] = boost::lexical_cast<double>(s2);
                 is_already_set[18] = true;
             }
+            else if (s1=="mixes_density_matrix")
+            {
+                if (is_already_set[19]) { already_set_error(s1, ost); }
+                mixes_density_matrix = read_bool(s1,s2); 
+                is_already_set[19] = true;
+            }
             else if (s1!="" && s1.c_str()[0]!='#' && s1!="num_bands_tc") // neither a void line nor a comment line
             {
                 *ost << "Error in reading input.in. Your keyword " << s1 << " is not valid. " << std::endl;
@@ -228,7 +235,8 @@ void io_tc_files::read_input_in(FileNames &file_names,
         kpoints.set_tc_input(smearing_mode, smearing_width);
         diagonalization.set(restarts,
                             energy_tolerance, charge_tolerance,
-                            max_num_iterations, mixing_beta,
+                            max_num_iterations, 
+                            mixes_density_matrix, mixing_beta,
                             num_refresh_david, max_num_blocks_david,
                             method.calc_mode(), is_heg);
         potentials.set_includes_div_correction(includes_div_correction);
@@ -253,6 +261,7 @@ void io_tc_files::read_input_in(FileNames &file_names,
         *ost << "  energy_tolerance = " << diagonalization.energy_tolerance() << std::endl;
         *ost << "  charge_tolerance = " << diagonalization.charge_tolerance() << std::endl;
         *ost << "  max_num_iterations = " << diagonalization.max_num_iterations() << std::endl;
+        *ost << "  mixes_density_matrix = " << bool_to_string(diagonalization.mixes_density_matrix()) << std::endl;
         *ost << "  mixing_beta = " << diagonalization.mixing_beta() << std::endl;
         *ost << "  num_refresh_david = " << diagonalization.num_refresh_david() << std::endl;
         *ost << "  max_num_blocks_david = " << diagonalization.max_num_blocks_david() << std::endl;

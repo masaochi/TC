@@ -1,5 +1,5 @@
 # TC++
-Version 1.0 (2022/11/18)
+Version 1.1 (2022/12/14)
 
 TC++ is a first-principles calculation code using the Hartree-Fock (HF) and the transcorrelated (TC) methods for periodic systems.
 

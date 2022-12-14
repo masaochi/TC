@@ -18,7 +18,7 @@ calc_method_ , calc_mode_ , pseudo_dir_ , qe_save_dir_
 
 [**Optional keywords**]
 A_dn_dn_ , A_up_dn_ , A_up_up_ , charge_tolerance_ , energy_tolerance_ , includes_div_correction_ ,
-is_heg_ , max_num_blocks_david_ , max_num_iterations_ , mixing_beta_ , num_bands_tc_ ,
+is_heg_ , max_num_blocks_david_ , max_num_iterations_ , mixes_density_matrix_ , mixing_beta_ , num_bands_tc_ ,
 num_refresh_david_ , restarts_ , smearing_mode_ , smearing_width_ 
 
 Mandatory Keywords
@@ -166,16 +166,28 @@ Optional keywords
 | Maximum number of iterations for the self-consistent-field loop (Also needed for calc_mode_ = BAND).     |
 +----------------------------------------------------------------------------------------------------------+
 
-.. _mixing_beta:
+.. _mixes_density_matrix:
 
 +------------------------------------+--------------------------------------------------------------------------+
-| **mixing_beta**                    | REAL                                                                     |
+| **mixes_density_matrix**           | BOOLEAN                                                                  |
 +------------------------------------+--------------------------------------------------------------------------+
-| *Default:* 0.7                     | :math:`\geq 0`                                                           |
+| *Default:* false                   | true, false                                                              |
 +------------------------------------+--------------------------------------------------------------------------+
-| | Mixing ratio for simple density mixing: new density = **mixing_beta** :math:`\times` new density :math:`+`  |
-| | :math:`(1-` **mixing_beta** :math:`)\times` old density. Used only for calc_mode_ = SCF.                    |
+| | The density matrix (true) or the density (false) is used for mixing. The former with a small mixing_beta_   |
+| | can improve the convergence of calculation while computational time will be longer (by about a              |
+| | factor of two). Used only for calc_mode_ = SCF. From ver.1.1.                                               |
 +---------------------------------------------------------------------------------------------------------------+
+
+.. _mixing_beta:
+
++------------------------------------+--------------------------------------------------------------------------------------+
+| **mixing_beta**                    | REAL                                                                                 |
++------------------------------------+--------------------------------------------------------------------------------------+
+| *Default:* 0.7                     | :math:`> 0`                                                                          |
++------------------------------------+--------------------------------------------------------------------------------------+
+| | Mixing ratio for linear mixing: new density (or density matrix) = **mixing_beta** :math:`\times` new density :math:`+`  |
+| | :math:`(1-` **mixing_beta** :math:`)\times` old density. Used only for calc_mode_ = SCF.                                |
++---------------------------------------------------------------------------------------------------------------------------+
 
 .. _num_bands_tc:
 
@@ -277,6 +289,7 @@ Example 4
    A_dn_dn         0.2
    max_num_iterations    15
    max_num_blocks_david  5
-
+   mixes_density_matrix  true
+   mixing_beta     0.2
 
 

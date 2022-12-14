@@ -16,9 +16,15 @@ void Parallelization::print(std::ostream *ost) const
 }
 
 // set is_assigned_...
+
 // is_assigned_all_kpoints_occupied_bands_[ispin][ik][isym][iband]
 //   ispin = spin (1 for no-spin, 2 for spin-polarized), ik = irreducible k-point (on the SCF k-mesh)
 //   isym = index of symmetrically-equivalent k-point, iband = occupied band
+
+// is_assigned_all_kpoints_occupied_bands_old_[ispin][ik][isym][iband]
+//   same as above but for old wave functions (i.e., those obtained in the previous SCF loop)
+//   necessary for density-matrix mixing (mixes_density_matrix && calc_mode==SCF)
+
 // is_assigned_irreducible_kpoints_all_bands_[ispin][ik][iband]
 //   ispin,ik = same as above but on the SCF or BAND k-mesh, iband = every band
 void Parallelization::set_orbital_parallelization(const BlochStates &bloch_states, const Kpoints &kpoints,
@@ -34,8 +40,9 @@ void Parallelization::set_orbital_parallelization(const BlochStates &bloch_state
     int icount, ibegin, iend;
     std::vector<int> ncount_at_each_process(num_mpi_processes_);
 
-    // (1) set is_assigned_all_kpoints_occupied_bands_[ispin][ik][isym][iband]
+    // (1) set is_assigned_all_kpoints_occupied_bands_[ispin][ik][isym][iband] and is_assigned_all_kpoints_occupied_bands_old_[ispin][ik][isym][iband]
     is_assigned_all_kpoints_occupied_bands_.resize(num_independent_spins);
+    is_assigned_all_kpoints_occupied_bands_old_.resize(num_independent_spins);
     for (int ispin=0; ispin<num_independent_spins; ispin++) // MPI processes are assigned for each "ispin" for efficient parallelization.
     {
         icount = 0;
@@ -43,7 +50,10 @@ void Parallelization::set_orbital_parallelization(const BlochStates &bloch_state
         {
             for (int isym=0; isym<kpoints.kvectors_scf()[ik].size(); isym++)
             {
-                for (int iband=0; iband<bloch_states.num_occupied_bands()[ispin][ik]; iband++)
+                // For mixes_density_matrix==false, filling_old()[ispin][ik].size()==0.
+                // For mixes_density_matrix==true, this size equals the num. of occupied bands for old wave functions.
+                const int nbands_old = bloch_states.filling_old()[ispin][ik].size();
+                for (int iband=-nbands_old; iband<bloch_states.num_occupied_bands()[ispin][ik]; iband++)
                 {
                     icount++;
                 }
@@ -70,21 +80,39 @@ void Parallelization::set_orbital_parallelization(const BlochStates &bloch_state
         icount = 0;
 
         is_assigned_all_kpoints_occupied_bands_[ispin].resize(num_irreducible_kpoints_scf);
+        is_assigned_all_kpoints_occupied_bands_old_[ispin].resize(num_irreducible_kpoints_scf);
         for (int ik=0; ik<num_irreducible_kpoints_scf; ik++)
         {
             is_assigned_all_kpoints_occupied_bands_[ispin][ik].resize(kpoints.kvectors_scf()[ik].size());
+            is_assigned_all_kpoints_occupied_bands_old_[ispin][ik].resize(kpoints.kvectors_scf()[ik].size());
             for (int isym=0; isym<kpoints.kvectors_scf()[ik].size(); isym++)
             {
                 is_assigned_all_kpoints_occupied_bands_[ispin][ik][isym].resize(bloch_states.num_occupied_bands()[ispin][ik]);
-                for (int iband=0; iband<bloch_states.num_occupied_bands()[ispin][ik]; iband++)
+                const int nbands_old = bloch_states.filling_old()[ispin][ik].size();
+                is_assigned_all_kpoints_occupied_bands_old_[ispin][ik][isym].resize(nbands_old);
+                for (int iband=-nbands_old; iband<bloch_states.num_occupied_bands()[ispin][ik]; iband++)
                 {
                     if (icount>=ibegin && icount<=iend)
                     {
-                        is_assigned_all_kpoints_occupied_bands_[ispin][ik][isym][iband] = true;
+                        if (iband>=0)
+                        {
+                            is_assigned_all_kpoints_occupied_bands_[ispin][ik][isym][iband] = true;
+                        }
+                        else
+                        {
+                            is_assigned_all_kpoints_occupied_bands_old_[ispin][ik][isym][-1-iband] = true;
+                        }
                     }
                     else
                     {
-                        is_assigned_all_kpoints_occupied_bands_[ispin][ik][isym][iband] = false;
+                        if (iband>=0)
+                        {
+                            is_assigned_all_kpoints_occupied_bands_[ispin][ik][isym][iband] = false;
+                        }
+                        else
+                        {
+                            is_assigned_all_kpoints_occupied_bands_old_[ispin][ik][isym][-1-iband] = false;
+                        }
                     }
                     icount++;
                 }

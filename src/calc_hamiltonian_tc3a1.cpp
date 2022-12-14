@@ -99,7 +99,7 @@ void calc_hamiltonian::tc3a1(const Parallelization &parallelization,
                 {
                     // phi -> orbital on the FFT-grid
                     plane_wave_basis.get_orbital_FFTgrid(ispin, ik, 0, // isym = 0
-                                                         jband, false, // time-rersal not used for isym=0
+                                                         false, // time-rersal not used for isym=0
                                                          phi[ispin][ik][jband][jspinor], orbital,
                                                          method.calc_mode());
                     plane_wave_basis.FFT_backward(orbital, orbital); // -> phi_j(R)

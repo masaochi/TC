@@ -5,23 +5,40 @@
 
 // public
 
-// set fermi_energy_ & filling_ & num_occupied_bands_ 
+// set fermi_energy_ & filling_ & filling_old_ & num_occupied_bands_ 
 void BlochStates::set_filling(const Spin &spin, const Kpoints &kpoints, 
+                              const bool sets_filling_old, const double &mixing_beta,
                               const bool am_i_mpi_rank0, std::ostream *ost)
 {
     const int num_independent_spins = filling_.size();
     const int num_irreducible_kpoints_scf = filling_[0].size();
     const double spin_factor = (num_independent_spins==1 && !spin.is_spinor()) ? 2.0 : 1.0; // 2 for no-spin
 
+    if (am_i_mpi_rank0) {  *ost << "  bloch_states.set_filling()" << std::endl; }
+
+    // set filling_old_
+    if (sets_filling_old)
+    {
+        for (int ispin=0; ispin<num_independent_spins; ispin++)
+        {
+            for (int ik=0; ik<num_irreducible_kpoints_scf; ik++)
+            {
+                filling_old_[ispin][ik].resize(num_occupied_bands_[ispin][ik]);
+                for (int iband=0; iband<num_occupied_bands_[ispin][ik]; iband++)
+                {
+                    filling_old_[ispin][ik][iband] = filling_[ispin][ik][iband];
+                }
+            }
+        }
+    }
+
     if (am_i_mpi_rank0)
     {
-        *ost << "  bloch_states.set_filling()" << std::endl;
-
         if (kpoints.smearing_mode()=="fixed")
         {
             // find the valence-band top assuming the insulating band structure
 
-            int num_occupied_bands = spin.is_spinor() ?
+            const int num_occupied_bands = spin.is_spinor() ?
                 std::round(num_electrons_) : std::round(num_electrons_/2.0);
 
             fermi_energy_ = -1e5;
@@ -192,10 +209,53 @@ void BlochStates::set_filling(const Spin &spin, const Kpoints &kpoints,
     }
 }
 
+// called only when diagonalization.mixes_density_matrix_==true && not the first loop.
+void BlochStates::mix_density_matrix(const double &mixing_beta)
+{
+    assert(filling_.size() == filling_old.size());
+    assert(filling_[0].size() == filling_old_[0].size());
+
+    for (int ispin=0; ispin<filling_.size(); ispin++)
+    {
+        for (int ik=0; ik<filling_[ispin].size(); ik++)
+        {
+            for (int iband=0; iband<filling_[ispin][ik].size(); iband++)
+            {
+                filling_[ispin][ik][iband] *= mixing_beta;
+            }
+            for (int iband=0; iband<filling_old_[ispin][ik].size(); iband++)
+            {
+                filling_old_[ispin][ik][iband] *= (1.0 - mixing_beta);
+            }
+        }
+    }
+}
+
+void BlochStates::recover_filling_for_density_matrix(const double &mixing_beta)
+{
+    assert(filling_.size() == filling_old.size());
+    assert(filling_[0].size() == filling_old_[0].size());
+
+    for (int ispin=0; ispin<filling_.size(); ispin++)
+    {
+        for (int ik=0; ik<filling_[ispin].size(); ik++)
+        {
+            for (int iband=0; iband<filling_[ispin][ik].size(); iband++)
+            {
+                filling_[ispin][ik][iband] /= mixing_beta;
+            }
+            for (int iband=0; iband<filling_old_[ispin][ik].size(); iband++)
+            {
+                filling_old_[ispin][ik][iband] = 0.0;
+            }
+        }
+    }
+}
+
 // non-collinear calculation is not supported
 void BlochStates::set_density(const CrystalStructure &crystal_structure,
                               const Kpoints &kpoints, PlaneWaveBasis &plane_wave_basis,
-                              const double &mixing_beta,
+                              const bool &mixes_density_matrix, const double &mixing_beta,
                               const bool is_first_iter, const bool is_bitc,
                               const bool am_i_mpi_rank0, std::ostream *ost)
 {
@@ -224,11 +284,21 @@ void BlochStates::set_density(const CrystalStructure &crystal_structure,
             {
                 for (int isym=0; isym<kpoints.kvectors_scf()[ik].size(); isym++)
                 {
-                    for (int iband=0; iband<num_occupied_bands_[ispin][ik]; iband++)
+                    const int nbands_old = filling_old_[ispin][ik].size();
+                    for (int iband=-nbands_old; iband<num_occupied_bands_[ispin][ik]; iband++) // negative = orbitals in the previous SCF loop
                     {
-                        plane_wave_basis.get_orbital_FFTgrid(ispin, ik, isym, iband,
-                                                             kpoints.is_time_reversal_used_at_k()[ik][isym],
-                                                             phik_scf_[ispin][ik][iband][0], orbital, "SCF");
+                        if (iband>=0) 
+                        {
+                            plane_wave_basis.get_orbital_FFTgrid(ispin, ik, isym,
+                                                                 kpoints.is_time_reversal_used_at_k()[ik][isym],
+                                                                 phik_scf_[ispin][ik][iband][0], orbital, "SCF");
+                        } 
+                        else
+                        {
+                            plane_wave_basis.get_orbital_FFTgrid(ispin, ik, isym,
+                                                                 kpoints.is_time_reversal_used_at_k()[ik][isym],
+                                                                 phik_scf_old_[ispin][ik][-1-iband][0], orbital, "SCF");
+                        }
                         plane_wave_basis.FFT_backward(orbital, orbital);
                         if (!is_bitc)
                         {
@@ -236,9 +306,18 @@ void BlochStates::set_density(const CrystalStructure &crystal_structure,
                         }
                         else // BITC
                         {
-                            plane_wave_basis.get_orbital_FFTgrid(ispin, ik, isym, iband,
-                                                                 kpoints.is_time_reversal_used_at_k()[ik][isym],
-                                                                 phik_left_scf_[ispin][ik][iband][0], orbital_left, "SCF");
+                            if (iband>=0)
+                            {
+                                plane_wave_basis.get_orbital_FFTgrid(ispin, ik, isym,
+                                                                     kpoints.is_time_reversal_used_at_k()[ik][isym],
+                                                                     phik_left_scf_[ispin][ik][iband][0], orbital_left, "SCF");
+                            }
+                            else
+                            {
+                                plane_wave_basis.get_orbital_FFTgrid(ispin, ik, isym,
+                                                                     kpoints.is_time_reversal_used_at_k()[ik][isym],
+                                                                     phik_left_scf_old_[ispin][ik][-1-iband][0], orbital_left, "SCF");
+                            }
                             plane_wave_basis.FFT_backward(orbital_left, orbital_left);
                             tmp_density_sub = orbital_left.array().conjugate() * orbital.array();
                         } // is_bitc
@@ -250,18 +329,25 @@ void BlochStates::set_density(const CrystalStructure &crystal_structure,
                             error_messages::stop("normalization breaks."); 
                         }
 
-                        tmp_density += filling_[ispin][ik][iband]*tmp_density_sub;
+                        if (iband>=0)
+                        {
+                            tmp_density += filling_[ispin][ik][iband]*tmp_density_sub;
+                        }
+                        else
+                        {
+                            tmp_density += filling_old_[ispin][ik][-1-iband]*tmp_density_sub;
+                        }
                     } // iband
                 } // isym
             } // ik
             if (num_independent_spins==1) { tmp_density /= 2.0; } // prevent double-counting of the spin factor ("2" is already included in filling_)
-            if (is_first_iter)
+            if (is_first_iter) // first loop
             {
                 density_[ispin] = tmp_density;
             }
-            else // density mixing
+            else // not the first loop
             {
-                tmp_density = (1.0-mixing_beta)*density_[ispin] + mixing_beta*tmp_density; // new density
+                if (!mixes_density_matrix) { tmp_density = (1.0-mixing_beta)*density_[ispin] + mixing_beta*tmp_density; } // density mixing (new density)
                 density_difference_ += (tmp_density - density_[ispin]).array().abs().sum(); // L1 norm: \int |rho - rho_old|
                 density_[ispin] = tmp_density;
             }
