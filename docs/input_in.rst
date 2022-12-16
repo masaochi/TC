@@ -226,7 +226,8 @@ Optional keywords
 +------------------------------------+---------------------------------------------------------------------+
 | *Default:* gaussian                | fixed, gaussian                                                     |
 +------------------------------------+---------------------------------------------------------------------+
-| Recommended values are *fixed* for insulators and *gaussian* for metals.                                 |
+| | *fixed*: fixed occupation for each k-point, *gaussian*: Gaussian smearing with smearing_width_.        |
+| | Recommended values are *fixed* for insulators and *gaussian* for metals.                               |
 +----------------------------------------------------------------------------------------------------------+
 
 
