@@ -96,6 +96,27 @@ void get_array(std::ifstream &ifs, std::vector<double> &rvec, const std::string 
     assert(imesh == rvec.size());
 }
 
+std::string get_element(const boost::property_tree::ptree &pt, const std::string &comment,
+                        const std::string &element_name, std::ostream *ost)
+{
+    if (auto tmp = pt.get_optional<std::string>(element_name))
+    {
+        *ost << "   " << comment << element_name << " = " << tmp << std::endl;
+        return tmp.get();
+    }
+    else
+    {
+        error_messages::not_found(element_name,"upf files");
+    }
+}
+
+// Keyword "element_name" is read from the upf file
+std::string read_upf_element(const boost::property_tree::ptree &pt, const std::string &element_name,
+                             std::ostream *ost)
+{
+    return get_element(pt, "", element_name, ost);
+}
+
 } // namespace
 
 void read_upf::read_upf(FileNames &file_names,
@@ -137,7 +158,8 @@ void read_upf::read_upf(FileNames &file_names,
             bool is_upf_ver2 = check_upf_ver2(ifs, ost); // UPF ver.2 or ver.1 (XML schema not supported)
             int mesh_size; // num. of radial mesh grid
             int num_projectors; // num. of Kleinman-Bylander projectors
-            read_upf_header(ifs, is_upf_ver2, Z_valence[iatomic_species], 
+            read_upf_header(ifs, file_names.upf()[iatomic_species],
+                            is_upf_ver2, Z_valence[iatomic_species], 
                             mesh_size, num_projectors, ost);
 
             // set some arrays
@@ -189,7 +211,8 @@ bool read_upf::check_upf_ver2(std::ifstream &ifs, std::ostream *ost)
 }
 
 // read PP_HEADER
-void read_upf::read_upf_header(std::ifstream &ifs, const bool is_upf_ver2,
+void read_upf::read_upf_header(std::ifstream &ifs, const std::string &file_name_upf,
+                               const bool is_upf_ver2,
                                double &Z_valence, int &mesh_size, int &num_projectors,
                                std::ostream *ost)
 {
@@ -200,54 +223,44 @@ void read_upf::read_upf_header(std::ifstream &ifs, const bool is_upf_ver2,
 
     if (is_upf_ver2) // UPF ver.2
     {
-        while(std::getline(ifs, sline))
+        // read using boost
+        boost::property_tree::ptree pt;
+        boost::property_tree::xml_parser::read_xml(file_name_upf, pt);
+
+        std::string pseudo_type = read_upf_element(pt, "UPF.PP_HEADER.<xmlattr>.pseudo_type", ost);
+        std::string is_ultrasoft = read_upf_element(pt, "UPF.PP_HEADER.<xmlattr>.is_ultrasoft", ost);
+        std::string is_paw = read_upf_element(pt, "UPF.PP_HEADER.<xmlattr>.is_paw", ost);
+        std::string is_coulomb = read_upf_element(pt, "UPF.PP_HEADER.<xmlattr>.is_coulomb", ost);
+
+        // pseudo type (should be norm-conserving pseudopot.)
+        if (pseudo_type=="US" || pseudo_type=="PAW" ||
+            is_ultrasoft=="T" || is_paw=="T" || is_coulomb=="T")
         {
-            // pseudo type (should be norm-conserving pseudopot.)
-            if (sline.find("pseudo_type=\"US\"") != std::string::npos ||
-                sline.find("pseudo_type=\"PAW\"") != std::string::npos ||
-                sline.find("is_ultrasoft=\"T\"") != std::string::npos ||
-                sline.find("is_paw=\"T\"") != std::string::npos ||
-                sline.find("is_coulomb=\"T\"") != std::string::npos)
-            {
-                error_messages::stop("Ultrasoft, PAW, 1/r (is_coulomb=\"T\") are not supported.");
-            }
-        
-            // nonlinear core correction
-            if (sline.find("core_correction=\"T\"") != std::string::npos)
-            {
-                error_messages::stop("Non-linear core correction is not supported...");
-            }
-            else if (sline.find("core_correction=\"F\"") != std::string::npos)
-            {
-                *ost << "   Non-linear core correction is not included in pseudopot." << std::endl;
-            }
-
-            if (sline.find("z_valence") != std::string::npos)
-            {
-                Z_valence = std::stod(get_keyword(sline));
-                *ost << "   Z_valence = " << Z_valence << std::endl;
-            }
-
-            //if (sline.find("l_max") != std::string::npos)
-            //{
-            //    lmax = std::stoi(get_keyword(sline));
-            //    *ost << "   lmax: " << lmax << std::endl;
-            //}
-
-            if (sline.find("mesh_size") != std::string::npos)
-            {
-                mesh_size = std::stoi(get_keyword(sline));
-                *ost << "   mesh_size = " << mesh_size << std::endl;
-            }
-
-            if (sline.find("number_of_proj") != std::string::npos)
-            {
-                num_projectors = std::stoi(get_keyword(sline));
-                *ost << "   num. of projectors = " << num_projectors << std::endl;
-            }
-
-            if (sline.find("PP_MESH") != std::string::npos) { break; } // end reading
+            error_messages::stop("Ultrasoft, PAW, 1/r (is_coulomb=\"T\") are not supported.");
         }
+
+        std::string core_correction = read_upf_element(pt, "UPF.PP_HEADER.<xmlattr>.core_correction", ost);
+        // nonlinear core correction
+        if (core_correction=="T")
+        {
+            error_messages::stop("Non-linear core correction is not supported...");
+        }
+        else if (core_correction=="F")
+        {
+            *ost << "   Non-linear core correction is not included in pseudopot." << std::endl;
+        }
+        
+        std::string Z_valence_string = read_upf_element(pt, "UPF.PP_HEADER.<xmlattr>.z_valence", ost);
+        Z_valence = std::stod(Z_valence_string);
+        *ost << "   Z_valence = " << Z_valence << std::endl;
+
+        std::string mesh_size_string = read_upf_element(pt, "UPF.PP_HEADER.<xmlattr>.mesh_size", ost);
+        mesh_size = std::stoi(mesh_size_string);
+        *ost << "   mesh_size = " << mesh_size << std::endl;
+
+        std::string number_of_proj_string = read_upf_element(pt, "UPF.PP_HEADER.<xmlattr>.number_of_proj", ost);
+        num_projectors = std::stoi(number_of_proj_string);
+        *ost << "   num. of projectors = " << num_projectors << std::endl;
     }
     else // UPF ver.1
     {

@@ -13,9 +13,10 @@ void read_upf(FileNames &file_names,
               PlaneWaveBasis &plane_wave_basis,
               const bool am_i_mpi_rank0,
               std::ostream *ost);
-    
-bool check_upf_ver2(std::ifstream &ifs, std::ostream *ost);    
-void read_upf_header(std::ifstream &ifs, const bool is_upf_ver2, 
+
+bool check_upf_ver2(std::ifstream &ifs, std::ostream *ost);
+void read_upf_header(std::ifstream &ifs, const std::string &file_name_upf,
+                     const bool is_upf_ver2, 
                      double &Z_valence, int &mesh_size, int &num_projectors,
                      std::ostream *ost);
 void read_upf_mesh(std::ifstream &ifs, std::vector<double> &pseudo_rmesh,
