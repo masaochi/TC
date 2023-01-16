@@ -28,10 +28,16 @@ Author & Contact
 
 History
 -------
+- 2023/1/16 ver.1.2
+
+  + cmake and test are implemented.
+  + A bug in reading upf files is fixed. Some upf files were not readable in old versions of TC++.
+  + Some include files were not properly updated in ver.1.1.
+
 - 2022/12/14 ver.1.1
 
-  + ``mixes_density_matrix`` is implemented, which can improve convergence of calculation (See :doc:`input_in`)
+  + ``mixes_density_matrix`` is implemented, which can improve convergence of calculation (See :doc:`input_in`).
   + A format of the total energies in ``output.out`` is slightly changed in order to track the total-energy convergence easily (e.g., by ``p `< grep "Total energy =" output.out' u 5`` with **gnuplot**).
-  + Some files that are not used are removed (e.g., ``calc_hamiltonian_tc3a2.cpp``)
+  + Some files that are not used are removed (e.g., ``calc_hamiltonian_tc3a2.cpp``).
 
 - 2022/11/18 ver.1.0
