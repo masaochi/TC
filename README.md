@@ -29,6 +29,9 @@ Download the compressed source file and unzip it (see Releases or Tags). Then, t
 - [Eigen3 library](https://eigen.tuxfamily.org/)
 - [Quantum ESPRESSO](https://www.quantum-espresso.org/) (ver.6.2 or newer) is used in precalculation to get several information such as an initial guess of one-electron orbitals. TC++ requires xml and wfc files dumped by QE.
 
+To verify that your installation is successful, a test suite is provided.
+Type `cd test` and copy `tc++` into `test` directory. Then, you can perform a test calculation by typing `python3 test.py`.
+
 ## Documentation
 [User's Guide](https://TCplusplus.readthedocs.io/)
 
