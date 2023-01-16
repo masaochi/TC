@@ -1,0 +1,18 @@
+Copy tc++ (compiled execution file) to this directory and then type
+    python3 test.py
+to verify that your installation was successfully done.
+
+[NOTE]
+python2 is not supported.
+
+[NOTE]
+DO NOT use the input files (including pseudopot.) provided here for your research.
+These were made only for test calculation...
+
+[NOTE]
+test_full.py is given for developers, which will take 10--20 minutes.
+
+[NOTE]
+"reads_binary false" is specified in "input.in" provided here.
+This option is used only for test calculation, where environment-dependent binary files are not appropriate.
+You will not use this option in your research.

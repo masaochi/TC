@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 
     if (am_i_mpi_rank0)
     {
-        *ost << "TC++ ver.1.1" << std::endl;
+        *ost << "TC++ ver.1.2" << std::endl;
         parallelization.print(ost);
         *ost << std::endl;
     }

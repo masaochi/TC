@@ -34,6 +34,11 @@ private:
     std::vector<std::vector<std::vector<std::vector<Eigen::VectorXcd> > > > phik_left_band_; // for method.calc_method_=="BITC"
     std::vector<Eigen::VectorXcd> density_; // 0: up, 1: down. in R-space. Note: complex for BITC method.
 
+    // old wave functions for mixing (mixes_density_matrix==true)
+    std::vector<std::vector<std::vector<std::vector<Eigen::VectorXcd> > > > phik_scf_old_;
+    std::vector<std::vector<std::vector<std::vector<Eigen::VectorXcd> > > > phik_left_scf_old_; // for method.calc_method_=="BITC"
+    std::vector<std::vector<std::vector<double> > > filling_old_;
+
     // called in set_qe_xml()
     void set_num_bands_qe(const std::vector<int> &num_bands_qe,
                           const std::string &calc_mode);
@@ -67,6 +72,9 @@ public:
     const std::vector<std::vector<std::vector<std::vector<Eigen::VectorXcd> > > > &phik_band() const { return phik_band_; }
     const std::vector<std::vector<std::vector<std::vector<Eigen::VectorXcd> > > > &phik_left_band() const { return phik_left_band_; }
     const std::vector<Eigen::VectorXcd> &density() const { return density_; }
+    const std::vector<std::vector<std::vector<std::vector<Eigen::VectorXcd> > > > &phik_scf_old() const { return phik_scf_old_; }
+    const std::vector<std::vector<std::vector<std::vector<Eigen::VectorXcd> > > > &phik_left_scf_old() const { return phik_left_scf_old_; }
+    const std::vector<std::vector<std::vector<double> > > &filling_old() const { return filling_old_; }
 
     BlochStates() : num_electrons_(-1.0), num_bands_qe_{-1}, num_bands_scf_{-1}, num_bands_band_{-1}, 
         density_difference_(0.0) {}
@@ -111,18 +119,24 @@ public:
                                         const std::string &calc_mode);
 
     // [bloch_states_scfloop_filling_density.cpp]
-    // set_filling() & set_density()
+    // set_filling() & mix_density_matrix() & set_density()
 
-    // set fermi_energy_ & filling_ & num_occupied_bands_
+    // set fermi_energy_ & filling_ & filling_old_ & num_occupied_bands_
     // including print eigenvalues_scf_
     void set_filling(const Spin &spin, const Kpoints &kpoints, 
+                     const bool sets_filling_old, const double &mixing_beta,
                      const bool am_i_mpi_rank0, std::ostream *ost);
+
+    // called only when diagonalization.mixes_density_matrix==true && not the first loop
+    void mix_density_matrix(const double &mixing_beta);
+
+    void recover_filling_for_density_matrix(const double &mixing_beta);
 
     // (is_first_iter==false) density mixing is performed.
     // non-collinear calculation is not supported
     void set_density(const CrystalStructure &crystal_structure,
                      const Kpoints &kpoints, PlaneWaveBasis &plane_wave_basis,
-                     const double &mixing_beta,
+                     const bool &mixes_density_matrix, const double &mixing_beta,
                      const bool is_first_iter, const bool is_bitc,
                      const bool am_i_mpi_rank0, std::ostream *ost);
 
@@ -134,9 +148,12 @@ public:
     void reset_phik(const int &ispin, const int &ik,
                     const std::vector<Eigen::VectorXcd> &V,
                     const std::string &right_or_left,
+                    const bool mixes_density_matrix,
                     const std::string &calc_mode);
     void bcast_phik(const bool bcast_phik_left,
-                    const std::string &calc_mode);
+                    const bool mixes_density_matrix,
+                    const std::string &calc_mode,
+                    const bool am_i_mpi_rank0);
 
     // [bloch_states_scfloop_eigenvalues.cpp] 
     // print_band_energies() &

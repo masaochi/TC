@@ -15,6 +15,9 @@ private:
     // [ispin][ik][isym][iband] ispin = spin (1 for no-spin, 2 for spin-polarized), ik = irreducible k-point
     //                          isym = index of symmetrically-equivalent k-point, iband = occupied band
     std::vector<std::vector<std::vector<std::vector<bool> > > > is_assigned_all_kpoints_occupied_bands_; 
+    // same as above but for old wave functions (i.e., those obtained in the previous SCF loop)
+    // necessary for density-matrix mixing (mixes_density_matrix && calc_mode==SCF)
+    std::vector<std::vector<std::vector<std::vector<bool> > > > is_assigned_all_kpoints_occupied_bands_old_; 
     // [ispin][ik][iband] ispin,ik = same as above, iband = every band
     std::vector<std::vector<std::vector<bool> > > is_assigned_irreducible_kpoints_all_bands_;
 
@@ -26,6 +29,8 @@ public:
     bool am_i_mpi_rank0() const { return am_i_mpi_rank0_; }
     const std::vector<std::vector<std::vector<std::vector<bool> > > > &is_assigned_all_kpoints_occupied_bands() const
     { return is_assigned_all_kpoints_occupied_bands_; }
+    const std::vector<std::vector<std::vector<std::vector<bool> > > > &is_assigned_all_kpoints_occupied_bands_old() const
+    { return is_assigned_all_kpoints_occupied_bands_old_; }
     const std::vector<std::vector<std::vector<bool> > > &is_assigned_irreducible_kpoints_all_bands() const
     { return is_assigned_irreducible_kpoints_all_bands_; }
 

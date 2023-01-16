@@ -1,0 +1,11 @@
+calc_method   BITC
+calc_mode     SCF
+pseudo_dir    ./example16
+qe_save_dir   ./example16
+smearing_mode gaussian
+smearing_width 0.1
+mixing_beta 0.3
+mixes_density_matrix true
+max_num_iterations 2
+is_heg true
+reads_binary false

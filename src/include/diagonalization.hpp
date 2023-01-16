@@ -7,10 +7,12 @@
 class Diagonalization
 {
 private:
-    bool restarts_; // restart from the previous calculation.
+    bool restarts_; // restart from the previous run
     double energy_tolerance_; // Total energy for scf convergence, sum of eigenvalues for band convergence (in Hartree)
     double charge_tolerance_; // for scf convergence (in e-)
     int max_num_iterations_; // for scf
+
+    bool mixes_density_matrix_; // for scf. [true] mixes the density matrix [false] mixes the density
     double mixing_beta_; // for scf
 
     // Parameters for block-Davidson algorithm
@@ -34,6 +36,7 @@ public:
     double energy_tolerance() const { return energy_tolerance_; }
     double charge_tolerance() const { return charge_tolerance_; }
     int max_num_iterations() const { return max_num_iterations_; }
+    bool mixes_density_matrix() const {return mixes_density_matrix_; }
     double mixing_beta() const { return mixing_beta_; }
     int num_refresh_david() const { return num_refresh_david_; }
     int max_num_blocks_david() const { return max_num_blocks_david_; }
@@ -43,13 +46,15 @@ public:
         charge_tolerance_(1e-4),
         energy_tolerance_(1e-5),
         max_num_iterations_(-1), // (SCF) 30, (BAND) 15, set in "void set()".
+        mixes_density_matrix_(false),
         mixing_beta_(0.7),
         num_refresh_david_(1),
         max_num_blocks_david_(2) {}
 
     void set(const bool restarts,
              const double &energy_tolerance, const double &charge_tolerance,
-             const int &max_num_iterations, const double &mixing_beta,
+             const int &max_num_iterations,
+             const bool &mixes_density_matrix, const double &mixing_beta,
              const int &num_refresh_david, const int &max_num_blocks_david,
              const std::string &calc_mode, const bool is_heg);
     void bcast(const bool am_i_mpi_rank0);

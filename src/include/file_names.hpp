@@ -7,6 +7,10 @@
 class FileNames
 {
 private:
+    // "reads_binary_" is applied to qe_wfc. When reads_binary_==false, read non-binary files. (default: true)
+    // This variables is prepared only for test calculation where environment-dependent binary files are not appropriate...
+    bool reads_binary_;
+
     const std::string tc_input_;  // TC++ input file name (input.in)
     const std::string tc_output_;  // TC++ output file name (output.out)
 
@@ -37,6 +41,7 @@ private:
     std::vector<std::string> upf_; // e.g. pseudo_dir_ + "Si.upf". upf_[index of atomic species]
 
 public:
+    bool reads_binary() const { return reads_binary_; }
     const std::string &tc_input() const { return tc_input_; }
     const std::string &tc_output() const { return tc_output_; }
     const std::string &tc_wfc_scf() const { return tc_wfc_scf_; }
@@ -54,6 +59,7 @@ public:
     const std::vector<std::string> &upf() const { return upf_; }
 
     FileNames() : 
+        reads_binary_(true),
         tc_input_("input.in"), 
         tc_output_("output.out"), 
         tc_wfc_scf_("tc_wfc_scf.dat"),
@@ -72,6 +78,7 @@ public:
     void set_qe_wfc_file_names(const Spin &spin, const int &num_irreducible_kpoints); // NOTE! should be called after set_qe_save_dir
     void set_pseudo_dir(const std::string &pseudo_dir);
     void set_upf_file_names(const std::vector<std::string> &upf); // NOTE! should be called after set_pseudo_dir
+    void set_reads_binary_false(std::ostream *ost);
 };
 
 #endif // TC_FILE_NAMES_HPP

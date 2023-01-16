@@ -38,6 +38,7 @@ void bcast_qe(const FileNames &file_mames,
 
 // call read_qe_wfc() many times in read_qe_wfcs()
 void read_qe_wfcs(const std::vector<std::vector<std::string> > &qe_wfc,
+                  const bool reads_binary,
                   const std::string &calc_mode,
                   const Symmetry &symmetry,
                   const Spin &spin,
@@ -57,6 +58,16 @@ extern "C"
                      const int &npol,
                      int *mill,
                      Complex *evc);
+
+    // read the QE wfc.dat files (transformed to a non-binary format)
+    void read_qe_wfc_nonbin(const int &nlength,
+                            const char *qe_wfc_char,
+                            const int &ik,
+                            const int &igwx,
+                            const int &nbnd,
+                            const int &npol,
+                            int *mill,
+                            Complex *evc);
 }
 
 // read the QE xml file

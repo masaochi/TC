@@ -1,0 +1,7 @@
+calc_method   HF
+calc_mode     BAND
+pseudo_dir    ./example6
+qe_save_dir   ./example6
+smearing_mode fixed
+max_num_iterations 2
+reads_binary false

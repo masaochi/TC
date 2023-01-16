@@ -35,7 +35,7 @@ void read_qe::read_qe(FileNames &file_names,
         {
             file_names.set_qe_wfc_file_names(spin, kpoints.num_irreducible_kpoints_band());
         }
-        read_qe_wfcs(file_names.qe_wfc(), method.calc_mode(),
+        read_qe_wfcs(file_names.qe_wfc(), file_names.reads_binary(), method.calc_mode(),
                      symmetry, spin, kpoints, plane_wave_basis, bloch_states, ost);
     }
     bcast_qe(file_names, method, crystal_structure, symmetry, potentials, 
@@ -45,6 +45,7 @@ void read_qe::read_qe(FileNames &file_names,
  
 // call read_qe_wfc() many times
 void read_qe::read_qe_wfcs(const std::vector<std::vector<std::string> > &qe_wfc,
+                           const bool reads_binary,
                            const std::string &calc_mode,
                            const Symmetry &symmetry,
                            const Spin &spin,
@@ -75,9 +76,17 @@ void read_qe::read_qe_wfcs(const std::vector<std::vector<std::string> > &qe_wfc,
             std::vector<Complex> evc(npol*npw[ik]*nbnd[ispin]); // evc(npol*igwx, nbnd[is]) in fortran. Wave function at each k-point
                 
             *ost << " Read QE wave functions from " << qe_wfc[ispin][ik] << std::endl;
-            read_qe_wfc(qe_wfc[ispin][ik].length(), qe_wfc[ispin][ik].c_str(),
-                        ik+1, npw[ik], nbnd[ispin], npol, mill.data(), evc.data());
-                
+            if (reads_binary)
+            {
+                read_qe_wfc(qe_wfc[ispin][ik].length(), qe_wfc[ispin][ik].c_str(),
+                            ik+1, npw[ik], nbnd[ispin], npol, mill.data(), evc.data());
+            }
+            else // reads a non-binary format (for test calculation)
+            {
+                read_qe_wfc_nonbin(qe_wfc[ispin][ik].length(), qe_wfc[ispin][ik].c_str(),
+                                   ik+1, npw[ik], nbnd[ispin], npol, mill.data(), evc.data());
+            }
+
             // set TC++ variables (Gvector_at_k & phik) from QE variables (mill & evc)
             plane_wave_basis.set_Gvector_at_k(symmetry, kpoints, ispin, ik, mill, calc_mode);
             bloch_states.set_phik_qe(ispin, ik, evc, calc_mode);

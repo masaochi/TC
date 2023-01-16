@@ -65,3 +65,10 @@ void FileNames::set_upf_file_names(const std::vector<std::string> &upf)
         upf_[iatomic_species] = pseudo_dir_ + "/" + upf[iatomic_species];
     }
 }
+
+void FileNames::set_reads_binary_false(std::ostream *ost)
+{
+    reads_binary_ = false;
+    *ost << "  WARNING: reads_binary = false was set. You should know what you are doing." << std::endl;
+}
+

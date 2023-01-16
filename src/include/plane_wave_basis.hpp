@@ -56,8 +56,7 @@ public:
 
     // convert phi on "reduced G-vector grid on each k-point" to orbital on "FFT grid"
     // non-collinear calc. not supported
-    void get_orbital_FFTgrid(const int &ispin, const int &ik, 
-                             const int &isym, const int &iband,
+    void get_orbital_FFTgrid(const int &ispin, const int &ik, const int &isym,
                              const bool is_time_reversal_used_at_k,
                              const Eigen::VectorXcd &phi,
                              Eigen::VectorXcd &orbital_FFTgrid,

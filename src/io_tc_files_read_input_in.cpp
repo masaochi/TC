@@ -78,8 +78,10 @@ void io_tc_files::read_input_in(FileNames &file_names,
 
         std::vector<std::vector<double> > A_long = potentials.jastrow.A_long();
 
+        bool reads_binary = file_names.reads_binary();
+
         std::string sline, s1, s2;
-        std::vector<bool> is_already_set(20, false); // 20 = total num. of the input keywords
+        std::vector<bool> is_already_set(21, false); // 21 = total num. of the input keywords
         while (std::getline(ifs, sline))
         {
             std::stringstream ss{sline};
@@ -200,6 +202,12 @@ void io_tc_files::read_input_in(FileNames &file_names,
                 mixes_density_matrix = read_bool(s1,s2); 
                 is_already_set[19] = true;
             }
+            else if (s1=="reads_binary") 
+            {
+                if (is_already_set[20]) { already_set_error(s1, ost); }
+                reads_binary = read_bool(s1,s2);
+                is_already_set[20] = true;
+            }
             else if (s1!="" && s1.c_str()[0]!='#' && s1!="num_bands_tc") // neither a void line nor a comment line
             {
                 *ost << "Error in reading input.in. Your keyword " << s1 << " is not valid. " << std::endl;
@@ -242,6 +250,7 @@ void io_tc_files::read_input_in(FileNames &file_names,
         potentials.set_includes_div_correction(includes_div_correction);
         potentials.set_is_heg(is_heg);
         potentials.jastrow.set(A_long);
+        if (!reads_binary) { file_names.set_reads_binary_false(ost); }
 
         // Show parameters set here (if not specified in the input file, a default value is shown)
         *ost << "  calc_method = " << method.calc_method() << std::endl;
@@ -273,7 +282,11 @@ void io_tc_files::read_input_in(FileNames &file_names,
             *ost << "  A_dn_up (unit: sqrt(V/(4piN)) ) = " << potentials.jastrow.A_long()[1][0] << std::endl;
             *ost << "  A_dn_dn (unit: sqrt(V/(4piN)) ) = " << potentials.jastrow.A_long()[1][1] << std::endl;
         }
-    
+        if (!reads_binary)
+        {
+            *ost << "  reads_binary = " << file_names.reads_binary() << std::endl;
+        }
+
         *ost << std::endl;
     } // am_i_mpi_rank0
 

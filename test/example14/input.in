@@ -1,0 +1,9 @@
+calc_method   HF
+calc_mode     SCF
+pseudo_dir    ./example14
+qe_save_dir   ./example14
+smearing_mode gaussian
+max_num_iterations 50
+num_bands_tc 8
+is_heg true
+reads_binary false
