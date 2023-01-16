@@ -36,7 +36,7 @@ Type `cd test` and copy `tc++` into `test` directory. Then, you can perform a te
 [User's Guide](https://TCplusplus.readthedocs.io/)
 
 ## License
-Copyright (c) 2022 Masayuki Ochi
+Copyright (c) 2022--2023 Masayuki Ochi
 
 Released under the MIT license. See [`LICENSE`](./LICENSE).
 
