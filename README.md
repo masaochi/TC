@@ -18,7 +18,7 @@ Download the compressed source file and unzip it (see Releases or Tags). Then, t
 
 (1) `cd src` and edit [`Makefile`](./src/Makefile) to specify the following compilers and libraries except Quantum ESPRESSO. Finally, typing `make` will create an execution file named `tc++` in `src`.
 
-(2) `cmake` is also available for installation. Type `mkdir build && cd build`, `cmake ..`, `make`, and `make install` to create an execution file named `tc++`. For several options for `cmake`, please see [User's Guide](https://TCplusplus.readthedocs.io/).
+(2) `cmake` is also available for installation. Type `mkdir build && cd build`, `cmake ..`, `make`, and `make install` to create an execution file named `tc++`. For several options for `cmake`, please see [User's Guide](https://TCplusplus.readthedocs.io/). For example, `cmake -DCMAKE_CXX_COMPILER=icpc -DCMAKE_Fortran_COMPILER=ifort -DEIGEN3_INCLUDE=/usr/local/eigen-3.4.0 -DFFTW_INCLUDE=/usr/local/fftw-3.3.10/include -DFFTW_LIB=/usr/local/fftw-3.3.10/lib -DCMAKE_INSTALL_PREFIX=/home/ochi/TC++ ..` will create `tc++` in `/home/ochi/TC++/bin` (NOTE: `bin` is added to CMAKE_INSTALL_PREFIX).
 
 ### Prerequisites
 - C++ compiler (C++11 or newer)
