@@ -31,7 +31,7 @@ History
 - 2023/1/16 ver.1.2
 
   + cmake and test are implemented.
-  + A bug in reading upf files is fixed. Some upf files were not readable in old versions of TC++.
+  + A bug in reading upf files is fixed. Some upf files were not readable in older versions of TC++.
   + Some include files were not properly updated in ver.1.1.
 
 - 2022/12/14 ver.1.1

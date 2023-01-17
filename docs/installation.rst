@@ -50,7 +50,7 @@ The other way for installation is using cmake. Unzip the downloaded compressed s
    $ make install
 
 will create an execution file named ``tc++``. Make sure that ``CMakeLists.txt`` exists in ``../`` when you type ``cmake ..``.
-Here, you might need to specify some options for ``cmake``. Available options are shown below:
+Here, you might need to specify some options for ``cmake`` when some compilers or libraries are not properly set by ``cmake``. Available options are shown below:
 
 - CMAKE_CXX_COMPILER= *(C++ compiler name)*
 - CMAKE_Fortran_COMPILER= *(Fortran90 comipler name)*
@@ -73,8 +73,7 @@ Note that MPI is automatically searched by ``cmake``, so please do not specify, 
 Test
 ----
 
-You can verify that your installation was successfully done by performing test calculation.
-A test suite is provided in the ``test`` directory. Type
+To verify that your installation was successfully done, a test suite is provided in the ``test`` directory. Type
 
 ::
 
