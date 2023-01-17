@@ -268,7 +268,7 @@ void read_qe::read_qe_xml(FileNames &file_names,
     // Jastrow parameters normalization using the cell volume and the num. of electrons
     if (method.calc_method()=="TC" || method.calc_method()=="BITC") 
     {
-        potentials.jastrow.normalize_A_long(crystal_structure, bloch_states, spin); 
+        potentials.jastrow.unnormalize_A_long(crystal_structure, bloch_states, spin, ost); 
     }
 
     *ost << std::endl;
