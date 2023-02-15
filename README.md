@@ -36,9 +36,11 @@ Type `cd test` and copy `tc++` into `test` directory. Then, you can perform a te
 [User's Guide](https://TCplusplus.readthedocs.io/)
 
 ## License
-Copyright (c) 2022--2023 Masayuki Ochi
+(c) 2022--2023 Masayuki Ochi. Released under the MIT license. See [`LICENSE`](./LICENSE).
 
-Released under the MIT license. See [`LICENSE`](./LICENSE).
+Please cite the following paper in all publications resulting from your use of TC++.
+
+- M. Ochi: "TC++: First-principles calculation code for solids using the transcorrelated method", [Comput. Phys. Commun. **287**, 108687 (2023)](https://doi.org/10.1016/j.cpc.2023.108687).
 
 ## Author & Contact
 [Masayuki Ochi](http://ann.phys.sci.osaka-u.ac.jp/ochi/ochi_en.html) (Osaka University, Japan)
