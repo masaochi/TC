@@ -93,7 +93,7 @@ and copy ``tc++`` compiled above to the ``test`` directory. Then, test calculati
 
 .. note::
 
-   DO NOT use the input files (including pseudopot.) provided here for your research. There were made only for test calculation.
+   DO NOT use the input files (including pseudopot.) provided here for your research. They were made only for test calculation.
 
 .. note::
 
