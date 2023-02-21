@@ -131,7 +131,7 @@ Optional keywords
 | *Default:* true                    | true, false                                                                                                            |
 +------------------------------------+------------------------------------------------------------------------------------------------------------------------+
 | | Whether the divergence correction in the reciprocal space is included. See our paper:                                                                     |
-| | M. Ochi, `Comput. Phys. Commun. 287, 108687 (2023) <https://doi.org/10.1016/j.cpc.2023.108687>`_ . `Preprint (arXiv) <http://arxiv.org/abs/2302.07420>`_  |
+| | M. Ochi, `Comput. Phys. Commun. 287, 108687 (2023) <https://doi.org/10.1016/j.cpc.2023.108687>`_ . [`arXiv <http://arxiv.org/abs/2302.07420>`_]           |
 +-------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. _is_heg:

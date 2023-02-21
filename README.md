@@ -40,7 +40,7 @@ Type `cd test` and copy `tc++` into `test` directory. Then, you can perform a te
 
 Please cite the following paper in all publications resulting from your use of TC++.
 
-- M. Ochi: "TC++: First-principles calculation code for solids using the transcorrelated method", [Comput. Phys. Commun. **287**, 108687 (2023)](https://doi.org/10.1016/j.cpc.2023.108687).
+- M. Ochi: "TC++: First-principles calculation code for solids using the transcorrelated method", [Comput. Phys. Commun. **287**, 108687 (2023)](https://doi.org/10.1016/j.cpc.2023.108687).  [arXiv](https://arxiv.org/abs/2302.07420)
 
 ## Author & Contact
 [Masayuki Ochi](http://ann.phys.sci.osaka-u.ac.jp/ochi/ochi_en.html) (Osaka University, Japan)
