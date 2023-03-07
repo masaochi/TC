@@ -26,7 +26,9 @@ private:
     // bool uses_RPA_jastrow_; // false then u_long calc will be skipped
 
     // initialization, called in set()
-    void set_A_long_unnormalized(const std::vector<std::vector<double> > &A_long);
+    void set_A_long_normalized(const std::vector<std::vector<double> > &A_long);
+    // initialization, called in unnormalize_A_long()
+    void print_RPAjastrow(std::ostream *ost);
 
 public:
     const std::vector<std::vector<double> > &A_long() const { return A_long_; }
@@ -38,9 +40,10 @@ public:
 
     // initialization
     void set(const std::vector<std::vector<double> > &A_long);
-    void normalize_A_long(const CrystalStructure &crystal_structure,
-                          const BlochStates &bloch_states,
-                          const Spin &spin);
+    void unnormalize_A_long(const CrystalStructure &crystal_structure,
+                            const BlochStates &bloch_states,
+                            const Spin &spin,
+                            std::ostream *ost);
     void bcast();
 
     // returns a value of the Jastrow function
