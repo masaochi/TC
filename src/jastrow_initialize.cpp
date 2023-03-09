@@ -10,7 +10,7 @@
 // F_long_ is also initialized there.
 void Jastrow::set_A_long_normalized(const std::vector<std::vector<double> > &A_long)
 {
-    assert(A_long_.size()==2 && A_long_[0].size()==2 && A_long_[1].size()==2);
+    assert(A_long.size()==2 && A_long[0].size()==2 && A_long[1].size()==2);
     assert(std::abs(A_long[0][1] - A_long[1][0])<1e-8); // A_long_up_dn = A_long_dn_up
     A_long_ = A_long;
 }

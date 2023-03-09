@@ -7,7 +7,7 @@
 bool Diagonalization::Gram_Schmidt(std::vector<Eigen::VectorXcd> &vectors, const int &target_band,
                                    Eigen::VectorXcd &target_vector)
 {
-    assert(target_band < vectors.size());
+    assert(target_band <= vectors.size());
     Eigen::VectorXcd coeff(target_band);
 
     for (int iband=0; iband<target_band; iband++) 

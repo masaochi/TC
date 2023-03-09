@@ -212,7 +212,7 @@ void BlochStates::set_filling(const Spin &spin, const Kpoints &kpoints,
 // called only when diagonalization.mixes_density_matrix_==true && not the first loop.
 void BlochStates::mix_density_matrix(const double &mixing_beta)
 {
-    assert(filling_.size() == filling_old.size());
+    assert(filling_.size() == filling_old_.size());
     assert(filling_[0].size() == filling_old_[0].size());
 
     for (int ispin=0; ispin<filling_.size(); ispin++)
@@ -233,7 +233,7 @@ void BlochStates::mix_density_matrix(const double &mixing_beta)
 
 void BlochStates::recover_filling_for_density_matrix(const double &mixing_beta)
 {
-    assert(filling_.size() == filling_old.size());
+    assert(filling_.size() == filling_old_.size());
     assert(filling_[0].size() == filling_old_[0].size());
 
     for (int ispin=0; ispin<filling_.size(); ispin++)
