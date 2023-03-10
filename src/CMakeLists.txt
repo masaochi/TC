@@ -1,5 +1,5 @@
 ## Configure main executable
-target_sources(TCpp PRIVATE
+target_sources(TCpp_tc++ PRIVATE
   			 my_clock.cpp
 			 error_messages.cpp
 			 parallelization.cpp
@@ -45,20 +45,20 @@ target_sources(TCpp PRIVATE
 			 main.cpp
 			 read_qe_wfc.f90
 )
-target_include_directories(TCpp PRIVATE include)
+target_include_directories(TCpp_tc++ PRIVATE include)
 
 ## Link external libraries
-target_link_libraries(TCpp PRIVATE FFTW_Target)
+target_link_libraries(TCpp_tc++ PRIVATE ${FFTW_Target})
 if (TCPP_WITH_Boost)
-	target_link_libraries(TCpp PRIVATE Boost::boost)
+	target_link_libraries(TCpp_tc++ PRIVATE Boost::boost)
 endif ()
 if (TCPP_WITH_MPI)
-	target_link_libraries(TCpp PRIVATE MPI::MPI_CXX MPI::MPI_Fortran)
+	target_link_libraries(TCpp_tc++ PRIVATE MPI::MPI_CXX MPI::MPI_Fortran)
 endif ()
 iF (TCPP_WITH_Eigen3)
-	target_link_libraries(TCpp PRIVATE Eigen3::Eigen)
+	target_link_libraries(TCpp_tc++ PRIVATE Eigen3::Eigen)
 endif ()
 
 ## Install
-install(TARGETS TCpp
+install(TARGETS TCpp_tc++
 		DESTINATION ${CMAKE_INSTALL_BINDIR})

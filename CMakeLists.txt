@@ -81,10 +81,11 @@ endif ()
 
 if (TCPP_WITH_FFTW3)
 	if (FFTW_INCLUDE AND FFTW_LIB)
-		add_library(FFTW_Target INTERFACE IMPORTED)
-		set_target_properties(FFTW_Target PROPERTIES
-						  INTERFACE_INCLUDE_DIRECTORIES ${FFTW_INCLUDE}
-						  INTERFACE_LINK_LIBRARIES "${FFTW_LIB}/libfftw3.a")
+		add_library(FFTW_Target_temp INTERFACE IMPORTED)
+		set_target_properties(FFTW_Target_temp PROPERTIES
+						       INTERFACE_INCLUDE_DIRECTORIES ${FFTW_INCLUDE}
+						       INTERFACE_LINK_LIBRARIES ${FFTW_LIB}/libfftw3.a)
+ 		set(FFTW_Target "FFTW_Target_temp")
 	else ()
 		find_package(FFTW)
     		if (FFTW_FOUND)
@@ -108,9 +109,9 @@ if (NOT TCPP_WITH_FFTW3)
 endif ()
 
 # Main binary target
-add_executable(TCpp)
-add_executable(TCpp::tc++ ALIAS TCpp)
-set_target_properties(TCpp PROPERTIES
+add_executable(TCpp_tc++)
+add_executable(TCpp::tc++ ALIAS TCpp_tc++)
+set_target_properties(TCpp_tc++ PROPERTIES
 				     EXPORT_NAME tc++
 				     OUTPUT_NAME tc++)
 add_subdirectory(src)
