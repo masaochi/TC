@@ -114,6 +114,10 @@ void calc_hamiltonian::tc3a3b3b4b6(const Parallelization &parallelization,
     for (int ispin=0; ispin<num_independent_spins; ispin++) // = spin index of x1
     {
         /*** [3a3,b3] ***/
+        for (int idim=0; idim<3; idim++)
+        {
+            dnu[idim] = Eigen::VectorXcd::Zero(plane_wave_basis.size_FFT_grid());
+        }
         for (int ispin3=0; ispin3<2; ispin3++) // spin index of x3                                                      
         {
             orbital = bloch_states.density()[ispin3]; // density(R). Name "orbital" is meaningless here

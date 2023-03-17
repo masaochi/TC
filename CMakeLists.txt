@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 project(Tcpp
-		VERSION 1.3
+		VERSION 1.2.2
 		LANGUAGES CXX Fortran)
 
 ## Project options
