@@ -22,7 +22,7 @@ Download the compressed source file and unzip it (see Releases or Tags). Then, t
 
 ### Prerequisites
 - C++ compiler (C++11 or newer)
-- Fortran compiler (Fortran90 or newer)
+- Fortran compiler (Fortran 2003 or newer)
 - MPI library
 - [Boost C++ library](https://www.boost.org/)
 - [FFTW3 library](https://www.fftw.org/) (Note: If you compiled FFTW with the Intel compiler, please compile TC++ with the Intel compiler to avoid some errors.)

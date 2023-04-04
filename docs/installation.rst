@@ -12,7 +12,7 @@ Prerequisites
 -------------
 
 - C++ compiler (C++11 or newer)
-- Fortran compiler (Fortran90 or newer)
+- Fortran compiler (Fortran 2003 or newer)
 - MPI library
 - `Boost C++ library <https://www.boost.org/>`_
 - `FFTW3 library <https://www.fftw.org/>`_ (Note: if you compiled FFTW with the Intel compiler, please compile TC++ with the Intel compiler to avoid some errors.)
