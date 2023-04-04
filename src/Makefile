@@ -11,7 +11,7 @@ SRC_F90 = read_qe_wfc.f90
 
 ## gcc + openmpi compiler
 #CXX = mpicxx
-#F90 = mpif90
+#F90 = mpifort
 #COMP_LINK = ${CXX}
 #OPT_CXX = -O2 
 #OPT_F90 = -O2
