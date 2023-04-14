@@ -30,6 +30,15 @@ void error_messages::inappropriate_argument(const std::string &keyword, const in
     if (condition!="") { s += "\nCondition: " + condition; }
     stop(s);
 }
+void error_messages::inappropriate_argument(const std::string &keyword, const double &input, const std::string &condition)
+{
+    //    std::string s = "Error: inappropriate name for " + keyword + "\nYour input: " + std::to_string(input);
+    std::ostringstream oss;
+    oss << input;
+    std::string s = "Error: inappropriate name for " + keyword + "\nYour input: " + oss.str();
+    if (condition!="") { s += "\nCondition: " + condition; }
+    stop(s);
+}
 
 void error_messages::not_found(const std::string &what, const std::string &where)
 {

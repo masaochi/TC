@@ -14,6 +14,7 @@ void compare_list(const std::string &keyword, const std::string &input, const st
 //   optional: "condition" is also displayed if condition!=""
 void inappropriate_argument(const std::string &keyword, const std::string &input, const std::string &condition);
 void inappropriate_argument(const std::string &keyword, const int &input, const std::string &condition);
+void inappropriate_argument(const std::string &keyword, const double &input, const std::string &condition);
 
 // Print an error message: "what" (keyword) is not found in "where" (file name), and stop the program
 void not_found(const std::string &what, const std::string &where);
