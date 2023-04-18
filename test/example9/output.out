@@ -2,6 +2,7 @@ TC++ ver.1.2
 Num. of MPI Processes = 1
 
  Read TC input (input.in)
+  WARNING: reads_binary = false was set. You should know what you are doing.
   calc_method = BITC
   calc_mode = BAND
   qe_save_dir = ./example9
@@ -22,6 +23,7 @@ Num. of MPI Processes = 1
   A_up_dn (unit: sqrt(V/(4piN)) ) = 0.8
   A_dn_up (unit: sqrt(V/(4piN)) ) = 0.8
   A_dn_dn (unit: sqrt(V/(4piN)) ) = 0.4
+  reads_binary = 0
 
  Bcast TC input (input.in)
 
@@ -365,6 +367,13 @@ Num. of MPI Processes = 1
   qes:espresso.output.total_energy.ewald =  0.000000000000000e0
   qes:espresso.output.algorithmic_info.uspp =  false
   qes:espresso.output.algorithmic_info.paw =  false
+  RPA-type Jastrow parameters in atomic unit
+   A_up_up = 0.6555428899
+   F_up_up = 1.145026541
+   A_up_dn = A_dn_up = 1.31108578
+   F_up_dn = F_dn_up = 1.145026541
+   A_dn_dn = 0.6555428899
+   F_dn_dn = 1.145026541
 
  Read QE wave functions from ./example9/wfc1.dat
  Read QE wave functions from ./example9/wfc2.dat
@@ -447,7 +456,7 @@ Num. of MPI Processes = 1
    9 23.35478783 0
 
   bloch_states.set_density()
-   num. of electrons (spin up) = (4,8.915698041e-17) , num. of electrons (spin down) = (4,8.915698041e-17)
+   num. of electrons (spin up) = (4,1.747703544e-16) , num. of electrons (spin down) = (4,1.747703544e-16)
    total magnetization = (0,0)
    num. of electrons inside a sphere with a radius r around each atom
     Atom 0: 
@@ -553,27 +562,27 @@ Num. of MPI Processes = 1
 
    k-vector   0   0 0.1
    (band index, energy (eV))
-   0 -11.30170829
-   1 3.221333431
-   2 3.621587244
-   3 3.687875116
-   4 11.41687725
-   5 12.07216094
-   6 12.12975618
-   7 13.7292125
-   8 17.36692445
-   9 17.83380141
+   0 -11.2771372
+   1 3.228286361
+   2 3.646270039
+   3 3.646459315
+   4 11.63218357
+   5 12.08883329
+   6 12.08956065
+   7 13.64401074
+   8 17.82399235
+   9 17.82410901
 
  Iteration 1
   calc_hamiltonian
   cf. dimension of subspace (up, ik=0) = 10
  Time for calculating the one-body terms = 0 days 0 h 0 m 0 s
  Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 0 s
- Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 0 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 1 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 1 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 1 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 2 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (preconditioning & Gram-Schmidt) = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (Bcast) = 0 days 0 h 0 m 0 s
@@ -581,11 +590,11 @@ Num. of MPI Processes = 1
   cf. dimension of subspace (up, ik=0) = 10
  Time for calculating the one-body terms = 0 days 0 h 0 m 0 s
  Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 0 s
- Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 0 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 1 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
- Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 1 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 1 s
+ Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 2 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 2 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
   diagonalize subspace Hamiltonian
  Time for diagonalizing subspace Hamiltonian = 0 days 0 h 0 m 0 s
@@ -614,28 +623,28 @@ Num. of MPI Processes = 1
 
    k-vector   0   0 0.1
    (band index, energy (eV))
-   0 -11.2658636
-   1 3.369435284
-   2 3.650546309
-   3 3.658583766
-   4 11.82763395
-   5 12.02524047
-   6 12.03208078
-   7 14.2366666
-   8 17.82424246
-   9 18.18743662
+   0 -11.30915945
+   1 3.294187644
+   2 3.683211369
+   3 3.683452332
+   4 11.58183997
+   5 12.04406826
+   6 12.04478346
+   7 13.62640494
+   8 17.82566735
+   9 17.82576853
 
-   mean absolute energy difference from the previous loop = 0.005433286438 Ht.
+   mean absolute energy difference from the previous loop = 0.0006430594377 Ht.
  Iteration 2
   calc_hamiltonian
   cf. dimension of subspace (up, ik=0) = 10
  Time for calculating the one-body terms = 0 days 0 h 0 m 0 s
  Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 0 s
- Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 0 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 1 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
- Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 1 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 1 s
+ Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 2 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 2 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (preconditioning & Gram-Schmidt) = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (Bcast) = 0 days 0 h 0 m 0 s
@@ -643,11 +652,11 @@ Num. of MPI Processes = 1
   cf. dimension of subspace (up, ik=0) = 10
  Time for calculating the one-body terms = 0 days 0 h 0 m 0 s
  Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 0 s
- Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 0 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 1 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 1 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 1 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 2 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
   diagonalize subspace Hamiltonian
  Time for diagonalizing subspace Hamiltonian = 0 days 0 h 0 m 0 s
@@ -676,16 +685,16 @@ Num. of MPI Processes = 1
 
    k-vector   0   0 0.1
    (band index, energy (eV))
-   0 -11.29304233
-   1 3.214564032
-   2 3.713163735
-   3 3.716207548
-   4 11.52912645
-   5 12.04992426
-   6 12.0592436
-   7 13.67917091
-   8 17.84732635
-   9 17.94383715
+   0 -11.29476401
+   1 3.34747703
+   2 3.705700607
+   3 3.705911087
+   4 11.54506374
+   5 12.02332724
+   6 12.02404576
+   7 13.60527254
+   8 17.82338949
+   9 17.82349829
 
  CAUTION!! convergence is not achieved...
- Total time = 0 days 0 h 0 m 21 s
+ Total time = 0 days 0 h 0 m 25 s

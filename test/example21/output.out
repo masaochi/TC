@@ -652,8 +652,8 @@ Num. of MPI Processes = 1
  Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 3 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
- Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 5 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 6 s
+ Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 6 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 7 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (preconditioning & Gram-Schmidt) = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (Bcast) = 0 days 0 h 0 m 0 s
@@ -664,8 +664,8 @@ Num. of MPI Processes = 1
  Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 3 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
- Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 5 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 6 s
+ Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 6 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 7 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
   diagonalize subspace Hamiltonian
  Time for diagonalizing subspace Hamiltonian = 0 days 0 h 0 m 0 s
@@ -695,16 +695,16 @@ Num. of MPI Processes = 1
 
    k-vector   0   0 0.1
    (band index, energy (eV))
-   0 -11.85825468
-   1 2.146729301
-   2 2.147788928
-   3 2.318378024
-   4 13.73772476
-   5 13.76894855
-   6 13.80784453
-   7 15.50392351
-   8 18.89326799
-   9 19.34174432
+   0 -11.88118795
+   1 2.1736445
+   2 2.174088171
+   3 2.413132902
+   4 13.57981547
+   5 13.76292007
+   6 13.76303097
+   7 15.19033582
+   8 18.91187611
+   9 18.91196453
 
    Spin 1
    k-vector 0 0 0
@@ -722,18 +722,18 @@ Num. of MPI Processes = 1
 
    k-vector   0   0 0.1
    (band index, energy (eV))
-   0 -12.06685422
-   1 1.937202601
-   2 1.949656428
-   3 2.218483668
-   4 14.08147976
-   5 14.19639415
-   6 14.22886813
-   7 15.78184716
-   8 19.29532971
-   9 19.39256293
+   0 -12.03148294
+   1 1.952244881
+   2 1.952995501
+   3 2.219855637
+   4 14.10235497
+   5 14.24404929
+   6 14.24420909
+   7 15.69087553
+   8 19.30661269
+   9 19.30672112
 
-   mean absolute energy difference from the previous loop = 0.1414899179 Ht.
+   mean absolute energy difference from the previous loop = 0.140373071 Ht.
  Iteration 2
   calc_hamiltonian
   cf. dimension of subspace (up, ik=0) = 10
@@ -742,8 +742,8 @@ Num. of MPI Processes = 1
  Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 3 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
- Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 5 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 6 s
+ Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 6 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 7 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (preconditioning & Gram-Schmidt) = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (Bcast) = 0 days 0 h 0 m 0 s
@@ -754,7 +754,7 @@ Num. of MPI Processes = 1
  Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 3 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
- Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 5 s
+ Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 6 s
  Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 6 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
   diagonalize subspace Hamiltonian
@@ -785,16 +785,16 @@ Num. of MPI Processes = 1
 
    k-vector   0   0 0.1
    (band index, energy (eV))
-   0 -11.87472539
-   1 4.330125103
-   2 4.828027461
-   3 4.921865419
-   4 12.49641589
-   5 12.55695381
-   6 13.04110339
-   7 14.72019889
-   8 18.90642061
-   9 19.29877922
+   0 -11.86931912
+   1 4.416755913
+   2 4.903602377
+   3 4.904006079
+   4 12.56265728
+   5 13.01615717
+   6 13.01628418
+   7 14.72620238
+   8 18.89284348
+   9 18.89293005
 
    Spin 1
    k-vector 0 0 0
@@ -812,16 +812,16 @@ Num. of MPI Processes = 1
 
    k-vector   0   0 0.1
    (band index, energy (eV))
-   0 -12.03780273
-   1 4.46767555
-   2 4.959737163
-   3 4.993316189
-   4 12.63712267
-   5 13.45342612
-   6 13.50415147
-   7 15.12846211
-   8 19.28426439
-   9 19.40406669
+   0 -12.02279093
+   1 4.455352968
+   2 4.982015763
+   3 4.982729707
+   4 12.99084637
+   5 13.4254921
+   6 13.42565495
+   7 15.16259981
+   8 19.28184171
+   9 19.28194862
 
  CAUTION!! convergence is not achieved...
- Total time = 0 days 0 h 1 m 10 s
+ Total time = 0 days 0 h 1 m 14 s

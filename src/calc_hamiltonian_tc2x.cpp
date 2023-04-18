@@ -417,16 +417,21 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                              bloch_states.phik_left_scf_old()[ispin][ik][-1-ibandk][0]);
                         
                         Complex prod = chik_ref.dot(phi[ispin][ik][jband][0]); // conj(phii)*phij
-                        prod *= div_corr; // [2a_x]
-                        
-                        if (kVaux.squaredNorm() > 1e-8) // \sum \nabla u correction (e.g. not required for non-zero k-weight in SCF)
+
+			if (kVaux.squaredNorm() > 1e-8) // \sum \nabla u correction (e.g. not required for non-zero k-weight in SCF)
                         {
                             for (int ipw_at_k=0; ipw_at_k<num_G_at_k; ipw_at_k++)
                             {
                                 // NOTE! function in k-space
                                 H2phi[ispin][ik][jband][0](ipw_at_k) 
-                                    -= div_corr_2bx1_ref(Gindex_at_k(ipw_at_k)); // [2b_x1] I^2 = -1
+                                    -= div_corr_2bx1_ref(Gindex_at_k(ipw_at_k)) * prod; // [2b_x1] I^2 = -1
                             }
+                        } // if (||kVaux||^2 > 1e-8)
+
+			prod *= div_corr; // [2a_x]
+                        
+                        if (kVaux.squaredNorm() > 1e-8) // \sum \nabla u correction (e.g. not required for non-zero k-weight in SCF)
+                        {
                             for (int idim=0; idim<3; idim++)
                             {
                                 // NOTE! inner product in k-space

@@ -759,11 +759,11 @@ Num. of MPI Processes = 1
   cf. dimension of subspace (up, ik=0) = 9
  Time for calculating the one-body terms = 0 days 0 h 0 m 3 s
  Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 0 s
- Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 9 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 10 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
- Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 16 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 19 s
+ Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 17 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 20 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (preconditioning & Gram-Schmidt) = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (Bcast) = 0 days 0 h 0 m 0 s
@@ -771,11 +771,11 @@ Num. of MPI Processes = 1
   cf. dimension of subspace (up, ik=0) = 9
  Time for calculating the one-body terms = 0 days 0 h 0 m 3 s
  Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 0 s
- Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 9 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 10 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
- Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 15 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 18 s
+ Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 17 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 20 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
   diagonalize subspace Hamiltonian
  Time for diagonalizing subspace Hamiltonian = 0 days 0 h 0 m 0 s
@@ -839,15 +839,15 @@ Num. of MPI Processes = 1
 
    k-vector   0 0.4   0
    (band index, energy (eV), filling)
-   0 -10.3338477 0
-   1 -4.757719791 0
-   2 3.069072923 0
-   3 3.158636647 0
-   4 9.919074495 0
-   5 13.19398229 0
-   6 13.35467228 0
-   7 17.91783102 0
-   8 20.54031266 0
+   0 -9.981321745 0
+   1 -4.388169006 0
+   2 3.102976888 0
+   3 3.103925474 0
+   4 10.14495401 0
+   5 13.19699989 0
+   6 13.19786031 0
+   7 18.03490981 0
+   8 20.37965879 0
 
    Spin 1
    k-vector 0 0 0
@@ -900,15 +900,15 @@ Num. of MPI Processes = 1
 
    k-vector   0 0.4   0
    (band index, energy (eV), filling)
-   0 -9.90537943 0
-   1 -4.259800344 0
-   2 3.087820259 0
-   3 3.156398338 0
-   4 10.37088729 0
-   5 13.55785738 0
-   6 13.57010276 0
-   7 18.39157153 0
-   8 20.90305108 0
+   0 -10.11469234 0
+   1 -4.468648297 0
+   2 3.123186353 0
+   3 3.123898604 0
+   4 10.42162967 0
+   5 13.56280305 0
+   6 13.56359491 0
+   7 18.43140753 0
+   8 20.7830141 0
 
    Total energy (Ewald energy) = -8.4004648 Ht.
    Total energy (1-body terms) = ( 2.508449 , 3.318279207e-09 ) Ht.
@@ -1013,11 +1013,11 @@ Num. of MPI Processes = 1
   cf. dimension of subspace (up, ik=0) = 9
  Time for calculating the one-body terms = 0 days 0 h 0 m 3 s
  Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 0 s
- Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 7 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 8 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
- Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 11 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 16 s
+ Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 13 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 17 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (preconditioning & Gram-Schmidt) = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (Bcast) = 0 days 0 h 0 m 0 s
@@ -1025,10 +1025,10 @@ Num. of MPI Processes = 1
   cf. dimension of subspace (up, ik=0) = 9
  Time for calculating the one-body terms = 0 days 0 h 0 m 3 s
  Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 0 s
- Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 7 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 9 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
- Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 11 s
+ Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 12 s
  Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 16 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
   diagonalize subspace Hamiltonian
@@ -1093,15 +1093,15 @@ Num. of MPI Processes = 1
 
    k-vector   0 0.4   0
    (band index, energy (eV), filling)
-   0 -9.488572674 0
-   1 -3.83688428 0
-   2 2.108123683 0
-   3 2.264885403 0
-   4 11.5567309 0
-   5 13.65357713 0
-   6 13.73792025 0
-   7 18.29874042 0
-   8 20.91984038 0
+   0 -9.817988789 0
+   1 -4.256668974 0
+   2 2.188408499 0
+   3 2.195565222 0
+   4 11.37466825 0
+   5 13.65547432 0
+   6 13.66109908 0
+   7 18.2059143 0
+   8 20.54731687 0
 
    Spin 1
    k-vector 0 0 0
@@ -1154,15 +1154,15 @@ Num. of MPI Processes = 1
 
    k-vector   0 0.4   0
    (band index, energy (eV), filling)
-   0 -10.15097428 0
-   1 -4.524064198 0
-   2 2.079191306 0
-   3 2.176434178 0
-   4 11.67173654 0
-   5 14.05281879 0
-   6 14.17104525 0
-   7 18.69555921 0
-   8 21.08639428 0
+   0 -9.946835897 0
+   1 -4.323112307 0
+   2 2.121447013 0
+   3 2.132216568 0
+   4 11.80338047 0
+   5 14.048854 0
+   6 14.05531497 0
+   7 18.62584874 0
+   8 20.94798653 0
 
    Total energy (Ewald energy) = -8.4004648 Ht.
    Total energy (1-body terms) = ( 2.463887596 , 1.361633729e-07 ) Ht.
@@ -1172,4 +1172,4 @@ Num. of MPI Processes = 1
    Total energy (sigma->0) = ( -7.631434344 , -1.926593254e-06 ) Ht.
    Total energy difference from the previous loop = ( -0.08890221529 , -1.845927331e-06 ) Ht.
  CAUTION!! convergence is not achieved...
- Total time = 0 days 0 h 2 m 55 s
+ Total time = 0 days 0 h 3 m 9 s
