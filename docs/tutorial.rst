@@ -50,7 +50,7 @@ To obtain a band structure, we also need to perform band calculation using QE.
 
    For QE band-structure calculation, please copy the directory where QE SCF calculation was performed, and perform QE band calculation there.
    Namely, SCF and band calculations of QE should be performed in different directories (e.g., ``qescf`` directory and ``qeband`` directory).
-   This is to prevent output files from being overwritten. Thus, if you explicitly specify different ``outdir``, you can use the same directory.
+   This is to prevent output files from being overwritten. Thus, if you explicitly specify different ``outdir``, you can use the same directory instead.
    
 QE band calculation is performed with the following input file (e.g., ``band.in``):
 
