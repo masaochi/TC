@@ -149,7 +149,7 @@ changing the choice of the band k-points (See :doc:`tips_and_faq`). The calculat
 .. image:: ./Si_bands.png
    :scale: 40%
 
-For plotting these band structures, we used **gnuplot** and type ``EF = 4.....`` (please fill in the value of the Fermi energy (EF) shown in ``tc_bandplot.dat``) and ``p 'tc_bandplot.dat' u 4:($5-EF) w linesp``.
+For plotting these band structures, we used **gnuplot** and typed ``EF = 4.....`` (please fill in the value of the Fermi energy (EF) shown in ``tc_bandplot.dat``) and ``p 'tc_bandplot.dat' u 4:($5-EF) w linesp``.
 Here, EF was subtracted from the band eigenvalues. When ``smearing_mode = fixed`` is used, EF is the valence-band maximum energy.
 When ``smearing_mode = gaussian`` is used, EF is the chemical potential (Fermi level) used for the Gaussian smearing.
 
