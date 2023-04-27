@@ -91,6 +91,7 @@ The following output files are obtained by TC++ calculation:
   ``p 'tc_bandplot.dat' u 4:5 w l``
   with **gnuplot** will show the band structure. The Fermi energy obtained by SCF calculation is also shown in this file.
   These information are also shown in ``output.out``.
+  For spin-polarized calculation, ``tc_bandplot_up.dat`` and ``tc_bandplot_dn.dat`` are dumped instead.
 
 The following binary files are dumped in TC++ calculation.
 Users will not read them but some subsequent TC++ calculations need them.
