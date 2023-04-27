@@ -87,11 +87,11 @@ and copy ``tc++`` compiled above to the ``test`` directory. Then, test calculati
 
 , which will take one or few minutes.
 
-.. note::
+.. warning::
 
    python2 is not supported.
 
-.. note::
+.. warning::
 
    DO NOT use the input files (including pseudopot.) provided here for your research. They were made only for test calculation.
 
