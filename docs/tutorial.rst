@@ -126,7 +126,7 @@ Band structures shown later were obtained without taking these ways or restartin
 
 .. warning::
 
-   For TC++ band-structure calculation, please copy the directory where TC++ SCF calculation was performed and perform TC++ band calculation there.
+   For TC++ band-structure calculation, please copy the directory where TC++ SCF calculation was performed, and perform TC++ band calculation there.
    SCF and band calculations of TC++ should also be performed in different directories because the input and output file names, ``input.in`` and ``output.out``, are in common between two calculations.
 
 Required ``input.in`` for band calculation is as follows,
