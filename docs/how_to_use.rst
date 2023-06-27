@@ -66,7 +66,6 @@ Since TC++ does not use OpenMP parallelization, please set **OMP_NUM_THREADS** t
 
    If you find that the memory requirement is too demanding for your machines, it is possible to specify a larger value for **OMP_NUM_THREADS**,
    which reduces the memory requirement **per node** in parallelized calculation.
-   Also, it might be possible to apply OpenMP parallelization only for calculations done by the external libraries just by editting ``Makefile`` (while I have not tried).
 
 .. _output_files:
 
