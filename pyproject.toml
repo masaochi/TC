@@ -1,0 +1,8 @@
+[project]
+name = "tcpp"
+version = "1.3.0"
+
+[project.optional-dependencies]
+docs = [
+     "sphinx-rtd-theme",
+]

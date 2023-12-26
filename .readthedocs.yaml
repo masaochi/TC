@@ -7,3 +7,10 @@ build:
 
 sphinx:
   configuration: docs/conf.py
+
+python:
+  - method: pip
+    path: .
+    extra_requirements:
+    - docs
+    
