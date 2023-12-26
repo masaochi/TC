@@ -8,16 +8,11 @@ calc_mode SCF   # SCF or BAND
 qe_save_dir /home/user/QE/Si/scf/test.save    # place data-file-schema.xml and wfc*.dat in this directory
 pseudo_dir /home/user/QE/pseudo_potentials    # place *.upf that were used in QE calculation in this directory
 
-## Required in TC or BITC calc
-A_up_up 1.0 # (default: 1.0)
-A_up_dn 1.0 # = A_dn_up (default: 1.0)
-A_dn_dn 1.0 # (default: 1.0)
-
 ## Optional keywords
 #num_bands_tc 11        # (SCF, BAND) num. of bands used in TC++ (default: nbnd in QE). 1 <= num_bands_tc <= "nbnd in QE"
 
 smearing_mode gaussian  # (SCF, BAND) fixed or gaussian (default: gaussian)
-smearing_width 0.025    # (SCF, BAND) in Hartree (default: 0.01) not used when smearing_mode = fixed. negative value will be ignored.
+smearing_width 0.025    # (SCF, BAND) in Hartree (default: 0.01) not used when smearing_mode = fixed. A negative value will be ignored.
 
 #restarts true          # (SCF, BAND) restart from the previous TC++ run (default: false)
 #includes_div_correction true   # (SCF, BAND) Gygi-Baldereschi treatment of potential divergences (default: true) cf. exx_div_treatment in QE
@@ -28,7 +23,16 @@ smearing_width 0.025    # (SCF, BAND) in Hartree (default: 0.01) not used when s
 #mixes_density_matrix true # (SCF) mixes the density matrix (true) or the density (false) (default: false)
 #mixing_beta 0.5        # (SCF) coefficient of the new electron density in linear mixing (default: 0.7). should >=0.0
 
-#num_refresh_david 2    # (SCF, BAND) Trial vectors are updated by "num_refresh_david"-times for each update of the Fock operator (default: 1). should >=1
+#num_refresh_david 1    # (SCF, BAND) Trial vectors are updated by "num_refresh_david"-times for each update of the Fock operator (default: 1). should >=1
 #max_num_blocks_david 3 # (SCF, BAND) determines a size of subspace dimension (see "diago_david_ndim" in QE) (default: 2). should >=2
 
 #is_heg false           # (SCF, BAND) homogeneous-electron-gas mode for is_heg==true, where pseudopot. and Ewald energy are ignored.
+
+#force_tolerance 1e-2   # (SCF) convergence criteria for the force (NOTE! in eV/ang) (default: 1e-2)
+#max_num_ionic_steps 0  # (SCF) maximum num. of ionic steps for structural optimization (default: 0)
+
+#dumps_pwfn false       # (SCF, BAND) dumps pwfn.data for CASINO (default: false)
+
+#A_up_up 1.0            # (SCF, BAND) for TC or BITC only. Jastrow A parameter (default: 1.0)
+#A_up_dn 1.0
+#A_dn_dn 1.0
