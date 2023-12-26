@@ -17,7 +17,14 @@ void error_messages::compare_list(const std::string &keyword, const std::string 
 // "condition": condition that "keyword" should satisfy    
 void error_messages::inappropriate_argument(const std::string &keyword, const std::string &input, const std::string &condition)
 {
-    std::string s = "Error: inappropriate name for " + keyword + "\nYour input: " + input;
+    std::string s = "Error: inappropriate argument for " + keyword + "\nYour input: " + input;
+    if (condition!="") { s += "\nCondition: " + condition; }
+    stop(s);
+}
+void error_messages::inappropriate_argument(const std::string &keyword, const bool &input, const std::string &condition)
+{
+    std::string input_string = input ? "true" : "false";
+    std::string s = "Error: inappropriate argument for " + keyword + "\nYour input: " + input_string;
     if (condition!="") { s += "\nCondition: " + condition; }
     stop(s);
 }
@@ -26,7 +33,7 @@ void error_messages::inappropriate_argument(const std::string &keyword, const in
     //    std::string s = "Error: inappropriate name for " + keyword + "\nYour input: " + std::to_string(input);
     std::ostringstream oss;
     oss << input;
-    std::string s = "Error: inappropriate name for " + keyword + "\nYour input: " + oss.str();
+    std::string s = "Error: inappropriate argument for " + keyword + "\nYour input: " + oss.str();
     if (condition!="") { s += "\nCondition: " + condition; }
     stop(s);
 }
@@ -35,7 +42,7 @@ void error_messages::inappropriate_argument(const std::string &keyword, const do
     //    std::string s = "Error: inappropriate name for " + keyword + "\nYour input: " + std::to_string(input);
     std::ostringstream oss;
     oss << input;
-    std::string s = "Error: inappropriate name for " + keyword + "\nYour input: " + oss.str();
+    std::string s = "Error: inappropriate argument for " + keyword + "\nYour input: " + oss.str();
     if (condition!="") { s += "\nCondition: " + condition; }
     stop(s);
 }

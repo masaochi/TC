@@ -155,20 +155,19 @@ void calc_hamiltonian::tc2h(const Parallelization &parallelization,
             for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
             {
                 // [2a_h] sum_q <*,q| tc_2body(1,2) |*,q>
-                V_2body[ispin](ipw) += 
-                    potentials.jastrow.tc_2body(Gvect[ipw], ispin, jspin) * orbital(ipw);
+                V_2body[ispin](ipw) += potentials.jastrow.tc_2body(Gvect[ipw], ispin, jspin) * orbital(ipw);
 
-                double uk = potentials.jastrow.uk(Gvect[ipw], ispin, jspin);
+                double uk_value = potentials.jastrow.uk(Gvect[ipw], ispin, jspin);
                 for (int idim=0; idim<3; idim++)
                 {
 
                     // [2b_h2] sum_q <*,q| \nabla_2 u_21 \nabla_2 |*,q>
                     V_2body[ispin](ipw) += 
-                        uk * Gvect[ipw](idim) * phiq_gphiq[jspin_ref][idim](ipw) / spin_factor;
+                        uk_value * Gvect[ipw](idim) * phiq_gphiq[jspin_ref][idim](ipw) / spin_factor;
 
                     // [2b_h1] sum_q <*,q| \nabla_1 u_12 |*,q>
                     dnu[ispin][idim](ipw) +=
-                        uk * Gvect[ipw](idim) * orbital(ipw);
+                        uk_value * Gvect[ipw](idim) * orbital(ipw);
                 }
             }
         }

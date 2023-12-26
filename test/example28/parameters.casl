@@ -1,0 +1,53 @@
+JASTROW:
+  Title: solid
+  TERM 1:
+    Rank: [ 2, 0 ]
+    Rules: [ 1-1=2-2 ]
+    e-e basis:
+      Type: natural power
+      Order: 16
+    e-e cutoff:
+      Type: polynomial
+      Constants:
+        C: 3
+      Parameters:
+        Channel 1-1:
+          L: [ 9.00000000000000, fixed, limits: [ 0.500000000000000, 
+               9.00000000000000 ] ]
+        Channel 1-2:
+          L: [ 9.00000000000000, fixed, limits: [ 0.500000000000000, 
+               9.00000000000000 ] ]
+    e-e cusp: T
+    Linear parameters:
+      Channel 1-1:
+        c_2: [ 2.390771021374967E-002, optimizable ]
+        c_3: [ 2.450561377415704E-002, optimizable ]
+        c_4: [ -2.070476654043657E-002, optimizable ]
+        c_5: [ 4.674401199118619E-003, optimizable ]
+        c_6: [ -9.483346843025661E-005, optimizable ]
+        c_7: [ -1.191642718452877E-004, optimizable ]
+        c_8: [ 2.463546335679504E-009, optimizable ]
+        c_9: [ 2.373885103459086E-006, optimizable ]
+        c_10: [ 2.505376317563294E-007, optimizable ]
+        c_11: [ -1.871657253474533E-008, optimizable ]
+        c_12: [ -7.649840918132316E-009, optimizable ]
+        c_13: [ -6.227193924443082E-010, optimizable ]
+        c_14: [ 9.179563954914902E-011, optimizable ]
+        c_15: [ 2.504971567812912E-011, optimizable ]
+        c_16: [ -2.349416179210985E-012, optimizable ]
+      Channel 1-2:
+        c_2: [ 0.169748798873572, optimizable ]
+        c_3: [ -4.386688354737892E-002, optimizable ]
+        c_4: [ 1.201402370838731E-002, optimizable ]
+        c_5: [ -4.174387432779520E-003, optimizable ]
+        c_6: [ 3.426314824349446E-004, optimizable ]
+        c_7: [ 5.842588529460826E-005, optimizable ]
+        c_8: [ -3.842295704933314E-006, optimizable ]
+        c_9: [ -1.085075780303108E-006, optimizable ]
+        c_10: [ -3.540636918712481E-008, optimizable ]
+        c_11: [ 1.096441036133839E-008, optimizable ]
+        c_12: [ 1.589353167855717E-009, optimizable ]
+        c_13: [ 4.165025727228960E-011, optimizable ]
+        c_14: [ -1.397668243244339E-011, optimizable ]
+        c_15: [ -1.239162396896073E-012, optimizable ]
+        c_16: [ -3.263109448618107E-015, optimizable ]

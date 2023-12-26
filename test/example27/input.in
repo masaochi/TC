@@ -1,0 +1,7 @@
+calc_method   HF
+calc_mode     SCF
+pseudo_dir    ./example27
+qe_save_dir   ./example27
+smearing_mode fixed
+max_num_iterations 2
+reads_binary false

@@ -55,6 +55,9 @@ private:
                                  const Kpoints &kpoints, const PlaneWaveBasis &plane_wave_basis,
                                  std::ostream *ost);
 
+    // called in switch_left_right_orbitals()
+    void switch_left_right_orbitals_each(const std::string &calc_mode);
+
 public:
     double num_electrons() const { return num_electrons_; }
     double fermi_energy() const { return fermi_energy_; }
@@ -95,7 +98,9 @@ public:
                         const std::string &calc_mode);
     void set_phik_qe(const int ispin, const int ik, 
                      const std::vector<Complex> &evc,
-                     const std::string &calc_mode);
+                     const std::string &calc_mode,
+                     const bool gamma_only,
+                     const int zero_index);
     void bcast_qe_input(const PlaneWaveBasis &plane_wave_basis,
                         const bool is_spinor,
                         const std::string &calc_mode,
@@ -124,7 +129,7 @@ public:
     // set fermi_energy_ & filling_ & filling_old_ & num_occupied_bands_
     // including print eigenvalues_scf_
     void set_filling(const Spin &spin, const Kpoints &kpoints, 
-                     const bool sets_filling_old, const double &mixing_beta,
+                     const bool sets_filling_old,
                      const bool am_i_mpi_rank0, std::ostream *ost);
 
     // called only when diagonalization.mixes_density_matrix==true && not the first loop
@@ -141,7 +146,7 @@ public:
                      const bool am_i_mpi_rank0, std::ostream *ost);
 
     // [bloch_states_scfloop_phik.cpp]
-    // reset_phik() & bcast_phik()
+    // reset_phik() & bcast_phik() & switch_left_right_orbitals()
 
     // reset phik_scf/band in diagonalization
     // non-collinear calculation is not supported
@@ -154,6 +159,7 @@ public:
                     const bool mixes_density_matrix,
                     const std::string &calc_mode,
                     const bool am_i_mpi_rank0);
+    void switch_left_right_orbitals(const std::string &calc_mode);
 
     // [bloch_states_scfloop_eigenvalues.cpp] 
     // print_band_energies() &

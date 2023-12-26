@@ -17,6 +17,7 @@ private:
     // pseudopotential (pp) data for each atomic species using upf-radial grid
     std::vector<std::vector<double> > pseudo_rmesh_; // radial grid (r value) [iatomic_species][imesh]
     std::vector<std::vector<double> > pseudo_weight_rmesh_; // weight for integration on the radial grid [iatomic_species][imesh]
+    std::vector<std::vector<double> > pseudo_local_; // local potential for each atom [iatomic_species][imesh]
     std::vector<std::vector<std::vector<double> > > pseudo_beta_; // Kleinman-Bylander projectors [iatomic_species][iproj][imesh]
 
     // pseudopotential (pp) data for each atomic species
@@ -33,11 +34,13 @@ private:
 
     // called in set_upf()
     void set_unit(std::vector<std::vector<double> > &pseudo_local,
-                  std::vector<Eigen::MatrixXd> &pseudo_dij);
-    void set_Vpp_local(const std::vector<double> &Z_valence,
-                       const std::vector<std::vector<double> > &pseudo_local,
-                       const CrystalStructure &crystal_structure,
+                  std::vector<Eigen::MatrixXd> &pseudo_dij) const;
+    void set_Vpp_local(const CrystalStructure &crystal_structure,
                        PlaneWaveBasis &plane_wave_basis);
+    void set_Vpp_local_atom(const CrystalStructure &crystal_structure,
+                            PlaneWaveBasis &plane_wave_basis,
+                            Eigen::VectorXcd &Vpp_local_atom_G,
+                            const int &iatomic_species) const;
 
     // Simpson's rule integration on the pseudo-potential radial mesh. Integrate "function".
     double simpson(const std::vector<double> &function, const int &iatomic_species) const;
@@ -94,8 +97,7 @@ public:
         MPI_Bcast(&includes_div_correction_, 1, MPI_CXX_BOOL, 0, MPI_COMM_WORLD);
     }
 
-    void set_upf(const std::vector<double> &Z_valence,
-                 const std::vector<std::vector<double> > &rmesh,
+    void set_upf(const std::vector<std::vector<double> > &rmesh,
                  const std::vector<std::vector<double> > &weight_rmesh,
                  std::vector<std::vector<double> > &pseudo_local,
                  const std::vector<std::vector<std::vector<double> > > &pseudo_beta,
@@ -110,7 +112,6 @@ public:
                                                      const Eigen::VectorXi &Gindex_at_k,
                                                      const Eigen::Vector3d &kvector,
                                                      const std::vector<std::vector<Eigen::VectorXcd> > &ylm,
-                                                     const int &ispin, const int &ik,
                                                      const int &iatomic_species, const int &iproj) const;
 
     // for divergence correction (Coulomb potential)
@@ -118,6 +119,16 @@ public:
                          const Method &method,
                          const CrystalStructure &crystal_structure,
                          const Kpoints &kpoints);
+
+    // for Hellmann-Feynman force
+    void differentiate_local_potential(const CrystalStructure &crystal_structure,
+                                       PlaneWaveBasis &plane_wave_basis,
+                                       std::vector<std::vector<Eigen::VectorXcd> > &derivative_pseudo_local) const;
+
+    // for structural optimization (i.e. when a crystal structure changes)
+    void reset_Vpp_local(const CrystalStructure &crystal_structure,
+                         PlaneWaveBasis &plane_wave_basis,
+                         const bool am_i_mpi_rank0);
 };
 
 #endif // TC_POTENTIALS_HPP

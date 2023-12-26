@@ -1,4 +1,4 @@
-TC++ ver.1.2
+TC++ ver.1.3
 Num. of MPI Processes = 1
 
  Read TC input (input.in)
@@ -19,10 +19,6 @@ Num. of MPI Processes = 1
   num_refresh_david = 1
   max_num_blocks_david = 2
   is_heg = false
-  A_up_up (unit: sqrt(V/(4piN)) ) = 0.8
-  A_up_dn (unit: sqrt(V/(4piN)) ) = 0.7
-  A_dn_up (unit: sqrt(V/(4piN)) ) = 0.7
-  A_dn_dn (unit: sqrt(V/(4piN)) ) = 0.8
   reads_binary = 0
 
  Bcast TC input (input.in)
@@ -479,15 +475,9 @@ Num. of MPI Processes = 1
   qes:espresso.output.basis_set.fft_grid.<xmlattr>.nr2 =  20
   qes:espresso.output.basis_set.fft_grid.<xmlattr>.nr3 =  20
   qes:espresso.output.total_energy.ewald =  -8.400464800476435e0
+  qes:espresso.output.basis_set.gamma_only =  false
   qes:espresso.output.algorithmic_info.uspp =  false
   qes:espresso.output.algorithmic_info.paw =  false
-  RPA-type Jastrow parameters in atomic unit
-   A_up_up = 1.31108578
-   F_up_up = 1.619312064
-   A_up_dn = A_dn_up = 1.147200057
-   F_up_dn = F_dn_up = 1.071074254
-   A_dn_dn = 1.31108578
-   F_dn_dn = 1.619312064
 
  Read QE wave functions from ./example12/wfc1.dat
  Read QE wave functions from ./example12/wfc2.dat
@@ -507,6 +497,9 @@ Num. of MPI Processes = 1
    UPF.PP_HEADER.<xmlattr>.core_correction =  false
    UPF.PP_HEADER.<xmlattr>.z_valence =  4.00000000000000
    Z_valence = 4
+   UPF.PP_HEADER.<xmlattr>.element =  Si
+   element_name = Si
+   atomic number = 14
    UPF.PP_HEADER.<xmlattr>.mesh_size =  1141
    mesh_size = 1141
    UPF.PP_HEADER.<xmlattr>.number_of_proj =  2
@@ -514,8 +507,19 @@ Num. of MPI Processes = 1
     angular momentum = 0
     angular momentum = 1
  set_upf
+ set_atomic_number
+ Bcast upf variables
 
- Bcast_upf
+ Read Jastrow parameters from parameters.casl
+  RPA-type Jastrow parameters in atomic unit
+   A_up_up = 1.31108578
+   F_up_up = 1.619312064
+   A_up_dn = A_dn_up = 1.147200058
+   F_up_dn = F_dn_up = 1.071074254
+   A_dn_dn = 1.31108578
+   F_dn_dn = 1.619312064
+
+ Dump jastrow.plt for plotting a Jastrow function using gnuplot (jastrow.plt)
 
  Time for initialization = 0 days 0 h 0 m 0 s
  Dump SCF informations (tc_scfinfo.dat)
@@ -682,11 +686,11 @@ Num. of MPI Processes = 1
   cf. dimension of subspace (up, ik=0) = 9
  Time for calculating the one-body terms = 0 days 0 h 0 m 1 s
  Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 0 s
- Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 5 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 4 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 8 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 10 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 9 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (preconditioning & Gram-Schmidt) = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (Bcast) = 0 days 0 h 0 m 0 s
@@ -694,11 +698,11 @@ Num. of MPI Processes = 1
   cf. dimension of subspace (up, ik=0) = 9
  Time for calculating the one-body terms = 0 days 0 h 0 m 1 s
  Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 0 s
- Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 5 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 4 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 8 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 10 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 9 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
   diagonalize subspace Hamiltonian
  Time for diagonalizing subspace Hamiltonian = 0 days 0 h 0 m 0 s
@@ -706,6 +710,7 @@ Num. of MPI Processes = 1
  Time for diagonalization = 0 days 0 h 0 m 0 s
  Dump SCF wave functions (tc_wfc_scf.dat)
  Dump SCF orbital energies (tc_energy_scf.dat)
+ Dump pwfn.data for CASINO (pwfn.data)
  Time for dumping wave functions etc. = 0 days 0 h 0 m 0 s
 
   bloch_states.set_filling()
@@ -717,44 +722,44 @@ Num. of MPI Processes = 1
    0 -11.42718171 2
    1 5.257490763 1.313908155
    2 5.257507536 1.313901745
-   3 5.257507949 1.313901587
-   4 10.2817736 0.02731228808
-   5 10.28177381 0.02731228029
-   6 10.28178736 0.02731178847
-   7 11.25903965 0.006629095672
-   8 16.18995635 1.308937949e-07
+   3 5.257507948 1.313901587
+   4 10.2817736 0.02731228812
+   5 10.28177381 0.02731228033
+   6 10.28178736 0.0273117885
+   7 11.25903965 0.006629095685
+   8 16.18995635 1.308937954e-07
 
    k-vector   0   0 0.5
    (band index, energy (eV), filling)
-   0 -8.333226571 2
-   1 -4.589554071 1.999999966
+   0 -8.33322657 2
+   1 -4.58955407 1.999999966
    2 3.161071891 1.864746593
    3 3.161073338 1.864746396
-   4 8.826294537 0.1468933307
-   5 11.51222933 0.004420129527
-   6 11.51224895 0.004419987983
-   7 16.17945982 1.348458392e-07
+   4 8.826294536 0.1468933308
+   5 11.51222933 0.004420129535
+   6 11.51224895 0.004419987992
+   7 16.17945982 1.348458397e-07
    8 20.30966095 1.183497744e-13
 
    k-vector   0 0.5 0.5
    (band index, energy (eV), filling)
-   0 -5.835539068 1.999999999
-   1 -5.835514609 1.999999999
-   2 0.6990449098 1.99445009
-   3 0.7097348496 1.994354599
-   4 7.61907955 0.4104021217
-   5 7.619090849 0.410398783
+   0 -5.835539067 1.999999999
+   1 -5.835514608 1.999999999
+   2 0.6990449106 1.99445009
+   3 0.7097348504 1.994354599
+   4 7.619079549 0.4104021218
+   5 7.619090848 0.4103987831
    6 19.40545412 3.685940442e-12
    7 19.40546093 3.685829419e-12
    8 21.40004894 1.443289932e-15
 
    k-vector   0 0.5   0
    (band index, energy (eV), filling)
-   0 -8.333331771 0
-   1 -4.589541012 0
-   2 3.161062284 0
-   3 3.161070659 0
-   4 8.826294707 0
+   0 -8.33333177 0
+   1 -4.589541011 0
+   2 3.161062285 0
+   3 3.16107066 0
+   4 8.826294706 0
    5 11.51221217 0
    6 11.51222385 0
    7 16.17912823 0
@@ -762,25 +767,25 @@ Num. of MPI Processes = 1
 
    k-vector   0 0.4   0
    (band index, energy (eV), filling)
-   0 -9.397072627 0
+   0 -9.397072626 0
    1 -4.027862403 0
    2 2.93848155 0
    3 2.938725392 0
-   4 8.830398465 0
+   4 8.830398464 0
    5 11.55883996 0
    6 11.55933139 0
    7 16.30322289 0
    8 18.57453488 0
 
    Total energy (Ewald energy) = -8.4004648 Ht.
-   Total energy (1-body terms) = ( 2.519617679 , -5.031762099e-07 ) Ht.
-   Total energy (2-body terms) = ( -2.32015905 , 4.773914087e-07 ) Ht.
-   Total energy (3-body terms) = ( 0.5619209458 , 2.481643324e-09 ) Ht.
+   Total energy (1-body terms) = ( 2.519617679 , -5.0317621e-07 ) Ht.
+   Total energy (2-body terms) = ( -2.320159051 , 4.773914087e-07 ) Ht.
+   Total energy (3-body terms) = ( 0.5619209462 , 2.481643351e-09 ) Ht.
    Total energy = ( -7.639085226 , -2.330315792e-08 ) Ht.
    Total energy (sigma->0) = ( -7.668359 , -2.144419251e-08 ) Ht.
    Total energy difference from the previous loop = ( -7.639085226 , -2.330315792e-08 ) Ht.
   bloch_states.set_density()
-   num. of electrons (spin up) = (4,3.170650595e-17) , num. of electrons (spin down) = (4,3.170650595e-17)
+   num. of electrons (spin up) = (4,4.885657855e-17) , num. of electrons (spin down) = (4,4.885657855e-17)
    total magnetization = (0,0)
    num. of electrons inside a sphere with a radius r around each atom
     Atom 0: 
@@ -798,7 +803,7 @@ Num. of MPI Processes = 1
     1.1  0.09540858591  0.09540858591  0  0.1908171718
     1.2  0.1154863728  0.1154863728  0  0.2309727456
     1.3  0.1599046504  0.1599046504  0  0.3198093008
-    1.4  0.2285072865  0.2285072865  0  0.457014573
+    1.4  0.2285072865  0.2285072865  0  0.4570145731
     1.5  0.3380431104  0.3380431104  0  0.6760862209
     1.6  0.4427358528  0.4427358528  0  0.8854717057
     1.7  0.5155375006  0.5155375006  0  1.031075001
@@ -827,9 +832,9 @@ Num. of MPI Processes = 1
     4  4.13957915  4.13957915  0  8.2791583
     Atom 1: 
     r (Bohr),  up,  down,  up - down,  up + down
-    0.1  1.821959086e-05  1.821959086e-05  0  3.643918171e-05
-    0.2  1.821959086e-05  1.821959086e-05  0  3.643918171e-05
-    0.3  1.821959086e-05  1.821959086e-05  0  3.643918171e-05
+    0.1  1.821959086e-05  1.821959086e-05  0  3.643918172e-05
+    0.2  1.821959086e-05  1.821959086e-05  0  3.643918172e-05
+    0.3  1.821959086e-05  1.821959086e-05  0  3.643918172e-05
     0.4  0.001335102725  0.001335102725  0  0.002670205451
     0.5  0.001335102725  0.001335102725  0  0.002670205451
     0.6  0.00256496758  0.00256496758  0  0.00512993516
@@ -860,7 +865,7 @@ Num. of MPI Processes = 1
     3.1  2.583466038  2.583466038  0  5.166932077
     3.2  2.714926255  2.714926255  0  5.429852509
     3.3  2.850823244  2.850823244  0  5.701646488
-    3.4  3.06192265  3.06192265  0  6.1238453
+    3.4  3.06192265  3.06192265  0  6.123845299
     3.5  3.265482697  3.265482697  0  6.530965393
     3.6  3.401920475  3.401920475  0  6.80384095
     3.7  3.613595013  3.613595013  0  7.227190026
@@ -891,7 +896,7 @@ Num. of MPI Processes = 1
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 7 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 8 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 9 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
   diagonalize subspace Hamiltonian
  Time for diagonalizing subspace Hamiltonian = 0 days 0 h 0 m 0 s
@@ -899,6 +904,7 @@ Num. of MPI Processes = 1
  Time for diagonalization = 0 days 0 h 0 m 0 s
  Dump SCF wave functions (tc_wfc_scf.dat)
  Dump SCF orbital energies (tc_energy_scf.dat)
+ Dump pwfn.data for CASINO (pwfn.data)
  Time for dumping wave functions etc. = 0 days 0 h 0 m 0 s
 
   bloch_states.set_filling()
@@ -908,69 +914,69 @@ Num. of MPI Processes = 1
    k-vector 0 0 0
    (band index, energy (eV), filling)
    0 -11.10782399 2
-   1 4.964037544 1.513051412
+   1 4.964037545 1.513051412
    2 4.964295393 1.512967437
    3 4.964491836 1.512903455
-   4 10.92416331 0.01628833071
-   5 10.92550381 0.0162573318
-   6 10.92561382 0.01625479001
-   7 12.04066987 0.002857608069
-   8 16.38383363 1.607013268e-07
+   4 10.92416331 0.01628833074
+   5 10.92550381 0.01625733183
+   6 10.92561382 0.01625479003
+   7 12.04066986 0.002857608076
+   8 16.38383363 1.607013275e-07
 
    k-vector   0   0 0.5
    (band index, energy (eV), filling)
-   0 -8.033456115 2
-   1 -4.279402369 1.999999962
-   2 2.913561964 1.921732988
-   3 2.913872597 1.921705651
-   4 9.632909972 0.08339689793
-   5 11.98445696 0.003142542932
-   6 11.98472631 0.003141117942
-   7 16.37812521 1.633049858e-07
+   0 -8.033456114 2
+   1 -4.279402368 1.999999962
+   2 2.913561965 1.921732988
+   3 2.913872598 1.921705651
+   4 9.63290997 0.08339689805
+   5 11.98445695 0.003142542939
+   6 11.98472631 0.003141117948
+   7 16.37812521 1.633049863e-07
    8 20.56419205 1.240119119e-13
 
    k-vector   0 0.5 0.5
    (band index, energy (eV), filling)
-   0 -5.554851302 1.999999999
-   1 -5.552903548 1.999999999
-   2 0.7766867951 1.995913352
-   3 0.7789196401 1.995898323
-   4 8.363738667 0.2838540327
-   5 8.366048477 0.2833150211
-   6 19.86171196 1.823430296e-12
+   0 -5.554851301 1.999999999
+   1 -5.552903547 1.999999999
+   2 0.7766867963 1.995913352
+   3 0.7789196412 1.995898323
+   4 8.363738665 0.283854033
+   5 8.366048476 0.2833150214
+   6 19.86171195 1.823430296e-12
    7 19.86640397 1.791788939e-12
    8 21.61682667 1.776356839e-15
 
    k-vector   0 0.5   0
    (band index, energy (eV), filling)
-   0 -8.034588437 0
-   1 -4.276817626 0
-   2 2.914763072 0
-   3 2.914831311 0
-   4 9.632420855 0
-   5 11.98063158 0
+   0 -8.034588436 0
+   1 -4.276817625 0
+   2 2.914763073 0
+   3 2.914831312 0
+   4 9.632420854 0
+   5 11.98063157 0
    6 11.98161495 0
    7 16.37684099 0
    8 20.56233193 0
 
    k-vector   0 0.4   0
    (band index, energy (eV), filling)
-   0 -9.081312663 0
-   1 -3.733289179 0
+   0 -9.081312662 0
+   1 -3.733289178 0
    2 2.685323207 0
-   3 2.688359451 0
-   4 9.706072632 0
+   3 2.688359452 0
+   4 9.706072631 0
    5 12.03703048 0
    6 12.04181071 0
    7 16.51290184 0
    8 18.86233849 0
 
    Total energy (Ewald energy) = -8.4004648 Ht.
-   Total energy (1-body terms) = ( 2.479585843 , -3.796553318e-07 ) Ht.
-   Total energy (2-body terms) = ( -2.353561517 , -6.784870313e-07 ) Ht.
-   Total energy (3-body terms) = ( 0.6010150401 , 1.869531999e-08 ) Ht.
+   Total energy (1-body terms) = ( 2.479585843 , -3.796553321e-07 ) Ht.
+   Total energy (2-body terms) = ( -2.353561518 , -6.784870305e-07 ) Ht.
+   Total energy (3-body terms) = ( 0.6010150405 , 1.869531993e-08 ) Ht.
    Total energy = ( -7.673425434 , -1.039447043e-06 ) Ht.
    Total energy (sigma->0) = ( -7.695818432 , -1.261259955e-06 ) Ht.
-   Total energy difference from the previous loop = ( -0.03434020845 , -1.016143885e-06 ) Ht.
+   Total energy difference from the previous loop = ( -0.03434020839 , -1.016143885e-06 ) Ht.
  CAUTION!! convergence is not achieved...
  Total time = 0 days 0 h 1 m 37 s

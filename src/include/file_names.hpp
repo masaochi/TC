@@ -24,6 +24,14 @@ private:
     const std::string tc_bandplot_up_; // for up-band
     const std::string tc_bandplot_dn_; // for down-band
 
+    const std::string tc_casl_; // TC++ input (parameters.casl in CASINO)
+    const std::string tc_casl_dump_; // TC++ output (parametsr.casl.dump)
+    const std::string tc_pwfn_; // TC++ output (pwfn.data in CASINO)
+    const std::string tc_jastrow_plt_; // TC++ output (jastrow.plt for plotting a Jastrow function)
+
+    // TC++ input & output (optimized crystsal structure) file name (tc_crystal_structure.dat)
+    const std::string tc_crystal_structure_;
+
     // Address of the QE (quantum-espresso) "save" directory. e.g. "/home/hoge/QE/Si/prefix.save"
     // xml and wfc files are placed in the QE "save" directory specified here.
     std::string qe_save_dir_;
@@ -52,6 +60,11 @@ public:
     const std::string &tc_bandplot() const { return tc_bandplot_; }
     const std::string &tc_bandplot_up() const { return tc_bandplot_up_; }
     const std::string &tc_bandplot_dn() const { return tc_bandplot_dn_; }
+    const std::string &tc_casl() const { return tc_casl_; }
+    const std::string &tc_casl_dump() const { return tc_casl_dump_; }
+    const std::string &tc_pwfn() const { return tc_pwfn_; }
+    const std::string &tc_jastrow_plt() const { return tc_jastrow_plt_; }
+    const std::string &tc_crystal_structure() const { return tc_crystal_structure_; }
     const std::string &qe_save_dir() const { return qe_save_dir_; }
     const std::string &qe_xml() const { return qe_xml_; }
     const std::vector<std::vector<std::string> > &qe_wfc() const { return qe_wfc_; }
@@ -70,6 +83,11 @@ public:
         tc_bandplot_("tc_bandplot.dat"),
         tc_bandplot_up_("tc_bandplot_up.dat"),
         tc_bandplot_dn_("tc_bandplot_dn.dat"),
+        tc_casl_("parameters.casl"),
+        tc_casl_dump_("parameters.casl.dump"),
+        tc_pwfn_("pwfn.data"),
+        tc_jastrow_plt_("jastrow.plt"),
+        tc_crystal_structure_("tc_crystal_structure.dat"),
         qe_save_dir_(""),
         pseudo_dir_("") { }
 

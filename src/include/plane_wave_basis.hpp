@@ -19,13 +19,19 @@ private:
     std::vector<int> size_FFT_grid_vec_; // size_FFT_grid_vec_[0:2]: size of the plane-wave grid for FFT e.g. 24 x 24 x 12 then {24,24,12}
     int size_FFT_grid_; // size_FFT_grid_ = size_FFT_grid_vec_[0]*size_FFT_grid_vec_[1]*size_FFT_grid_vec_[2]
 
+    bool gamma_only_; // memory saving in QE. need to make f(-G) from f(G).
+
     bool are_FFTarrays_initialized_;
-    fftw_plan plan_forward;
-    fftw_plan plan_backward;
-    Complex* in_forward;
-    Complex* out_forward;
-    Complex* in_backward;
-    Complex* out_backward;
+    fftw_plan plan_forward_;
+    fftw_plan plan_backward_;
+    Complex* in_forward_;
+    Complex* out_forward_;
+    Complex* in_backward_;
+    Complex* out_backward_;
+
+    // called from set_Gvector_at_k()
+    void set_G_from_mill(const int ipw_at_k, const int npw_at_k_org, const std::vector<int> &mill,
+                         Eigen::Vector3i &Gvector, int &icount, int &zero_index);
 
 public:
     const std::vector<int> &num_G_at_k_scf() const { return num_G_at_k_scf_; }
@@ -35,21 +41,56 @@ public:
     const std::vector<std::vector<std::vector<Eigen::VectorXcd> > > &phase_factor_at_k() const { return phase_factor_at_k_; }
     const std::vector<int> &size_FFT_grid_vec() const { return size_FFT_grid_vec_; }
     int size_FFT_grid() const { return size_FFT_grid_; }
+    bool gamma_only() const { return gamma_only_; }
+    bool are_FFTarrays_initialized() const { return are_FFTarrays_initialized_; }
 
-    PlaneWaveBasis() : size_FFT_grid_(0), are_FFTarrays_initialized_(false) {}
-    
+    PlaneWaveBasis() : size_FFT_grid_(0), gamma_only_(false), are_FFTarrays_initialized_(false) {}
+    PlaneWaveBasis(const PlaneWaveBasis &pw)
+    {
+        num_G_at_k_scf_ = pw.num_G_at_k_scf();
+        num_G_at_k_band_ = pw.num_G_at_k_band();
+        Gindex_at_k_scf_ = pw.Gindex_at_k_scf();
+        Gindex_at_k_band_ = pw.Gindex_at_k_band();
+        phase_factor_at_k_ = pw.phase_factor_at_k();
+        gamma_only_ = pw.gamma_only();
+
+        are_FFTarrays_initialized_ = false;
+        if (pw.are_FFTarrays_initialized())
+        {
+            setup_FFT(pw.size_FFT_grid_vec()[0], pw.size_FFT_grid_vec()[1], pw.size_FFT_grid_vec()[2]);
+        }
+    }
+
+    PlaneWaveBasis& operator=(const PlaneWaveBasis &pw)
+    {
+        num_G_at_k_scf_ = pw.num_G_at_k_scf();
+        num_G_at_k_band_ = pw.num_G_at_k_band();
+        Gindex_at_k_scf_ = pw.Gindex_at_k_scf();
+        Gindex_at_k_band_ = pw.Gindex_at_k_band();
+        phase_factor_at_k_ = pw.phase_factor_at_k();
+        gamma_only_ = pw.gamma_only();
+
+        are_FFTarrays_initialized_ = false;
+        if (pw.are_FFTarrays_initialized())
+        {
+            setup_FFT(pw.size_FFT_grid_vec()[0], pw.size_FFT_grid_vec()[1], pw.size_FFT_grid_vec()[2]);
+        }
+        return *this;
+    }
+
     // set the size of num_G_at_k_ and Gvector_at_k_
     void resize_G_at_k(const int num_independent_spins, const int num_irreducible_kpoints, const std::string &calc_mode);
     void set_num_G_at_k(const std::vector<int> num_G_at_k, const std::string &calc_mode);
     void set_Gvector_at_k(const Symmetry &symmetry, const Kpoints &kpoints,
                           const int ispin, const int ik, const std::vector<int> &mill,
-                          const std::string &calc_mode); // mill = QE variable
+                          int &zero_index, const std::string &calc_mode); // mill = QE variable
     void set_scfinfo(const std::vector<int> &num_G_at_k_scf,
                      const std::vector<std::vector<std::vector<Eigen::VectorXi> > > &Gindex_at_k_scf,
                      const std::vector<std::vector<std::vector<Eigen::VectorXcd> > > &phase_factor_at_k);
         
     // set size_FFT_grid_vec_, size_FFT_grid_, and FFT variables
     void setup_FFT(const int nr1, const int nr2, const int nr3);
+    void set_gamma_only(const bool gamma_only);
 
     // ipw -> (i1, i2, i3)
     Eigen::Vector3i get_Gvector(const int &ipw) const;

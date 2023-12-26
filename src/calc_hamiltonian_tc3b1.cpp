@@ -60,11 +60,11 @@ void calc_hamiltonian::tc3b1(const Parallelization &parallelization,
             // set \sum_q2 <*,*,q2| \nabla_2 u_23 |*,*,q2>
             for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
             {
-                double uk = potentials.jastrow.uk(Gvect[ipw], ispin2, ispin3);
+                double uk_value = potentials.jastrow.uk(Gvect[ipw], ispin2, ispin3);
                 for (int idim=0; idim<3; idim++)
                 {
                     dnu[ispin2][idim](ipw) +=
-                        uk * Gvect[ipw](idim) * orbital(ipw);
+                        uk_value * Gvect[ipw](idim) * orbital(ipw);
                 }
             }
         }
@@ -90,11 +90,11 @@ void calc_hamiltonian::tc3b1(const Parallelization &parallelization,
             int ispin2_ref = num_independent_spins==1 ? 0 : ispin2;
             for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
             {
-                double uk = potentials.jastrow.uk(Gvect[ipw], ispin1, ispin2);
+                double uk_value = potentials.jastrow.uk(Gvect[ipw], ispin1, ispin2);
                 for (int idim=0; idim<3; idim++)
                 {
                     V_3body[ispin1](ipw) +=
-                        uk * Gvect[ipw](idim) * dnu[ispin2_ref][idim](ipw);
+                        uk_value * Gvect[ipw](idim) * dnu[ispin2_ref][idim](ipw);
                 }
             }
         }

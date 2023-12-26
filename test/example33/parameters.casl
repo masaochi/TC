@@ -1,0 +1,83 @@
+JASTROW:
+  Title: solid
+  TERM 1:
+    Rank: [ 2, 0 ]
+    Rules: [ ]
+    e-e basis:
+      Type: RPA
+      Order: 1
+      Parameters:
+        Channel 1-1:
+          F: [ 1.81044592600000, fixed, limits: [ 1.000000000000000E-007, +Inf
+               ] ]
+        Channel 1-2:
+          F: [ 1.28017859100000, fixed, limits: [ 1.000000000000000E-007, +Inf
+               ] ]
+        Channel 2-2:
+          F: [ 1.71044592600000, fixed, limits: [ 1.000000000000000E-007, +Inf
+               ] ]
+    e-e cutoff:
+      Type: spline
+      Constants:
+        C: 2
+      Parameters:
+        Channel 1-1:
+          L: [ 14.5000000000000, fixed, limits: [ 0.500000000000000, 
+               14.5000000000000 ] ]
+          x: [ 0.500000000000000, fixed, limits: [ 5.000000000000000E-002, 
+               0.950000000000000 ] ]
+        Channel 1-2:
+          L: [ 14.5000000000000, fixed, limits: [ 0.500000000000000, 
+               14.5000000000000 ] ]
+          x: [ 0.500000000000000, fixed, limits: [ 5.000000000000000E-002, 
+               0.950000000000000 ] ]
+        Channel 2-2:
+          L: [ 14.5000000000000, fixed, limits: [ 0.500000000000000, 
+               14.5000000000000 ] ]
+          x: [ 0.500000000000000, fixed, limits: [ 5.000000000000000E-002, 
+               0.950000000000000 ] ]
+    e-e cusp: T
+    Linear parameters:
+      Channel 1-1: [ ]
+      Channel 1-2: [ ]
+      Channel 2-2: [ ]
+  TERM 2:
+    Rank: [ 2, 0 ]
+    Rules: [ ]
+    e-e basis:
+      Type: natural power
+      Order: 6
+    e-e cutoff:
+      Type: polynomial
+      Constants:
+        C: 3
+      Parameters:
+        Channel 1-1:
+          L: [ 7.00000000000000, fixed, limits: [ 0.500000000000000, 
+               7.00000000000000 ] ]
+        Channel 1-2:
+          L: [ 6.50000000000000, fixed, limits: [ 0.500000000000000, 
+               7.00000000000000 ] ]
+        Channel 2-2:
+          L: [ 6.00000000000000, fixed, limits: [ 0.500000000000000, 
+               7.00000000000000 ] ]
+    e-e cusp: F
+    Linear parameters:
+      Channel 1-1:
+        c_2: [ -4.980896681492419E-002, optimizable ]
+        c_3: [ -7.273309665004447E-002, optimizable ]
+        c_4: [ 0.132006986395339, optimizable ]
+        c_5: [ -0.103571391868898, optimizable ]
+        c_6: [ 3.843613773913510E-002, optimizable ]
+      Channel 1-2:
+        c_2: [ -2.673225553705504E-002, optimizable ]
+        c_3: [ 2.167855385077608E-003, optimizable ]
+        c_4: [ -7.415351876944942E-004, optimizable ]
+        c_5: [ -8.170853810114386E-003, optimizable ]
+        c_6: [ 6.458321908122147E-003, optimizable ]
+      Channel 2-2:
+        c_2: [ -5.980896681492419E-002, optimizable ]
+        c_3: [ -8.273309665004447E-002, optimizable ]
+        c_4: [ 0.232006986395339, optimizable ]
+        c_5: [ -0.153571391868898, optimizable ]
+        c_6: [ 4.843613773913510E-002, optimizable ]

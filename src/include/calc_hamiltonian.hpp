@@ -128,6 +128,16 @@ void tc3a2a4b2b5(const Parallelization &parallelization,
                  const std::vector<std::vector<std::vector<std::vector<Eigen::VectorXcd> > > > &phi,
                  std::vector<std::vector<std::vector<std::vector<Eigen::VectorXcd> > > > &H3phi,
                  std::ostream *ost);
+    
+std::vector<Eigen::Vector3cd> force(const Parallelization &parallelization, 
+                                    const Method &method,
+                                    const CrystalStructure &crystal_structure,
+                                    const Potentials &potentials,
+                                    const Spin &spin, const Kpoints &kpoints,
+                                    PlaneWaveBasis &plane_wave_basis,
+                                    const BlochStates &bloch_states,
+                                    const TotalEnergy &total_energy, 
+                                    std::ostream *ost);
 } // namespace calc_hamiltonian
 
 #endif // TC_CALC_HAMILTONIAN_HPP

@@ -72,10 +72,24 @@ void Kpoints::set_kvectors_by_symmetry(const Spin &spin, const Symmetry &symmetr
     } // ik
 
     num_kpoints_ = 0; // total num. of non-zero-weight k-points
+    num_kpoints_all_scf_ = 0; // total num. of k-points including zero-weight ones
     for (int ik=0; ik<num_irreducible_kpoints_scf_; ik++) 
     {
         if (kweight_scf_[ik] > 1e-8) { num_kpoints_ += kvectors_scf_[ik].size(); } // non-zero k-weight
+        num_kpoints_all_scf_ += kvectors_scf_[ik].size();
     }
+
+    index_all_kscf_.resize(num_kpoints_all_scf_);
+    int ik_isymk = 0;
+    for (int ik=0; ik<num_irreducible_kpoints_scf_; ik++) 
+    {
+        for (int isymk=0; isymk<kvectors_scf_[ik].size(); isymk++)
+        {
+            index_all_kscf_[ik_isymk] = {ik, isymk}; // i.e. index_all_kscf_[ik_isymk][0 or 1] = ik or isymk
+            ik_isymk++;
+        }
+    }
+    assert(ik_isymk == num_kpoints_all_scf_);
     
     // check consistency with k_weight
     double fact = (spin.num_independent_spins()==1 && !spin.is_spinor()) ? 2.0 : 1.0; // 2 for no-spin
@@ -95,7 +109,7 @@ void Kpoints::set_kvectors_by_symmetry(const Spin &spin, const Symmetry &symmetr
 }
 
 // called in set_kvectors_by_symmetry() (SCF calc. only)
-void Kpoints::show_kvectors(const Symmetry &symmetry, std::ostream *ost)
+void Kpoints::show_kvectors(const Symmetry &symmetry, std::ostream *ost) const
 {
     *ost << "  Print symmetrically-repiclated kvectors:" << std::endl;
 
@@ -178,7 +192,7 @@ void Kpoints::set_qe_input(const Spin &spin, const Symmetry &symmetry,
         }
 
         // In the following, we assume that rotation[0] = identity matrix
-        const Eigen::Matrix3i id = Eigen::Matrix3i::Identity(3,3);
+        const Eigen::Matrix3i id = Eigen::Matrix3i::Identity();
         for (int i=0; i<3; i++)
         {
             for (int j=0; j<3; j++)
@@ -200,7 +214,7 @@ void Kpoints::set_qe_input(const Spin &spin, const Symmetry &symmetry,
         }
 
         // make symmetrically-equivalent k-points
-        // num_kpoints_ is also set here.
+        // num_kpoints_ & num_kpoints_all_scf_ & index_all_kscf_ are also set here.
         set_kvectors_by_symmetry(spin, symmetry, ost);
     }
     else if (calc_mode=="BAND")
@@ -224,10 +238,18 @@ void Kpoints::bcast_qe_input(const std::string &calc_mode,
                              const bool am_i_mpi_rank0)
 {
     assert(calc_mode == "SCF" || calc_mode == "BAND");
-    MPI_Bcast(&num_kpoints_, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
     if (calc_mode=="SCF")
     {
+        MPI_Bcast(&num_kpoints_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        MPI_Bcast(&num_kpoints_all_scf_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        
+        if (!am_i_mpi_rank0) { index_all_kscf_.resize(num_kpoints_all_scf_); }
+        for (int ik_isymk=0; ik_isymk<num_kpoints_all_scf_; ik_isymk++) 
+        {
+            if (!am_i_mpi_rank0) { index_all_kscf_[ik_isymk].resize(2); }
+            MPI_Bcast(&index_all_kscf_[ik_isymk][0], 2, MPI_INT, 0, MPI_COMM_WORLD);
+        }
+
         MPI_Bcast(&num_irreducible_kpoints_scf_, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
         if (!am_i_mpi_rank0) { kvectors_scf_.resize(num_irreducible_kpoints_scf_); }
@@ -301,12 +323,26 @@ void Kpoints::set_scfinfo(const std::vector<double> &kweight_scf,
     index_of_rotation_at_k_ = index_of_rotation_at_k;
     is_time_reversal_used_at_k_ = is_time_reversal_used_at_k;
 
-    // also set num_kpoints
+    // also set num_kpoints & num_kpoints_all_scf_
     num_kpoints_ = 0; // total num. of non-zero-weight k-points
+    num_kpoints_all_scf_ = 0; // total num. of scf k-points including zero-weight ones
     for (int ik=0; ik<num_irreducible_kpoints_scf_; ik++) 
     {
         if (kweight_scf_[ik] > 1e-8) { num_kpoints_ += kvectors_scf_[ik].size(); }
+        num_kpoints_all_scf_ += kvectors_scf_[ik].size();
     }
+
+    index_all_kscf_.resize(num_kpoints_all_scf_);
+    int ik_isymk = 0;
+    for (int ik=0; ik<num_irreducible_kpoints_scf_; ik++) 
+    {
+        for (int isymk=0; isymk<kvectors_scf_[ik].size(); isymk++)
+        {
+            index_all_kscf_[ik_isymk] = {ik, isymk}; // i.e. index_all_kscf_[ik_isymk][0 or 1] = ik or isymk
+            ik_isymk++;
+        }
+    }
+    assert(ik_isymk == num_kpoints_all_scf_);
 }
 
 // return band filling including the spin factor

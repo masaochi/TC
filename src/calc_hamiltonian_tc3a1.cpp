@@ -60,11 +60,11 @@ void calc_hamiltonian::tc3a1(const Parallelization &parallelization,
 
             for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
             {
-                double uk = potentials.jastrow.uk(Gvect[ipw], ispin, jspin);
+                double uk_value = potentials.jastrow.uk(Gvect[ipw], ispin, jspin);
                 for (int idim=0; idim<3; idim++)
                 {
                     dnu[ispin][idim](ipw) +=
-                        uk * Gvect[ipw](idim) * orbital(ipw);
+                        uk_value * Gvect[ipw](idim) * orbital(ipw);
                 }
             }
         }

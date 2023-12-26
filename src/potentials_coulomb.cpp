@@ -13,8 +13,12 @@ void Potentials::set_sum_of_Vaux(const Parallelization &parallelization,
 {
     if (method.calc_method()=="FREE") { return; } // free-electron mode: no interaction
 
-    // not used in HF-BAND.
-    if (!(method.calc_method()=="HF" && method.calc_mode()=="BAND"))
+    // divergence corrction is considered only for Coulomb interaction.
+    const bool is_coulomb_only =
+        (method.calc_method()=="HF" || jastrow.is_A_zero()) ? true : false;
+
+    // not used in HF-BAND
+    if (!(is_coulomb_only && method.calc_mode()=="BAND"))
     {
         set_sum_of_Vaux_each(parallelization,
                              crystal_structure,
@@ -23,7 +27,7 @@ void Potentials::set_sum_of_Vaux(const Parallelization &parallelization,
                              sum_of_Vaux_scf_);
 
         // used only when (BI)TC && SCF
-        if ((method.calc_method()=="TC" || method.calc_method()=="BITC") && method.calc_mode()=="SCF")
+        if (!is_coulomb_only && method.calc_mode()=="SCF")
         {
             set_sum_of_kVaux_each(parallelization,
                                   crystal_structure,
@@ -40,7 +44,7 @@ void Potentials::set_sum_of_Vaux(const Parallelization &parallelization,
                              kpoints.kvectors_band(),
                              sum_of_Vaux_band_);
 
-        if (method.calc_method()=="TC" || method.calc_method()=="BITC")
+        if (!is_coulomb_only)
         {
             // used only when (BI)TC && BAND
             set_sum_of_kVaux_each(parallelization,

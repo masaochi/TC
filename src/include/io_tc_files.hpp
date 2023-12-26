@@ -95,6 +95,16 @@ void dump_bandplot_each(const std::string &tc_bandplot,
                         const Kpoints &kpoints,
                         const BlochStates &bloch_states,
                         std::ostream *ost);
+
+// read & dump crystal structure (mainly for restarting structural opt., but can always be used)
+void read_crystal_structure(const FileNames &file_names,
+                            CrystalStructure &crystal_structure,
+                            const bool am_i_mpi_rank0,
+                            std::ostream *ost);
+void dump_crystal_structure(const FileNames &file_names,
+                            const CrystalStructure &crystal_structure,
+                            std::ostream *ost);
+
 } // namespace io_tc_files
 
 #endif // TC_IO_TC_FILES_HPP

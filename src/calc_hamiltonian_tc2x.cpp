@@ -25,6 +25,7 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
     const int num_irreducible_kpoints_scf = kpoints.num_irreducible_kpoints_scf();
     const int num_irreducible_kpoints_ref = method.calc_mode()=="SCF" ? // kpoints for "phi"
         kpoints.num_irreducible_kpoints_scf() : kpoints.num_irreducible_kpoints_band();
+    const int num_kpoints_all_scf = kpoints.num_kpoints_all_scf();
     const std::vector<int> num_bands_tc = method.calc_mode()=="SCF" ?
         bloch_states.num_bands_scf() : bloch_states.num_bands_band();
 
@@ -92,6 +93,18 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
     {
         for (int ik=0; ik<num_irreducible_kpoints_ref; ik++)
         {
+            // skipped if no (ispin, ik, jband) is assigned to this MPI process
+            bool is_assigned = false;
+            for (int jband=0; jband<H2phi[ispin][ik].size(); jband++)
+            {
+                if (parallelization.is_assigned_irreducible_kpoints_all_bands()[ispin][ik][jband]) 
+                { 
+                    is_assigned = true;
+                    break;
+                }
+            }
+            if (!is_assigned) { continue; }
+
             const Eigen::Vector3d kvector_ref = method.calc_mode()=="SCF" ? 
                 kpoints.kvectors_scf()[ik][0] : kpoints.kvectors_band()[ik][0];
             const int num_G_at_k = method.calc_mode()=="SCF" ?
@@ -102,7 +115,7 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
             kvect = crystal_structure.reciprocal_vectors().transpose() * kvector_ref;
 
             // divergence correction for \nabla u
-            if (potentials.includes_div_correction()) 
+            if (potentials.includes_div_correction() && !potentials.jastrow.is_A_zero())
             {
                 kVaux = method.calc_mode()=="BAND" ?
                     potentials.sum_of_kVaux_band()[ik] / (kpoints.num_kpoints()*crystal_structure.unit_cell_volume()) :
@@ -198,7 +211,7 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
 
                             plane_wave_basis.get_orbital_FFTgrid(ispin, ik, 0, false,
                                                                  chik_ref, chiq, method.calc_mode());
-                        }                        
+                        }
                         for (int idim=0; idim<3; idim++)
                         {
                             div_corr_2bx2_ref[idim] = 
@@ -208,58 +221,83 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                 } // if (kVaux != 0 )
             } // if (includes_div_correction)
 
-            for (int jband=0; jband<H2phi[ispin][ik].size(); jband++)
+            // Set (iq,isymq) to be the outer loops (Not jband!) (while (ik, jband) are paired indices),
+            // to avoid expensive evaluation of the Jastrow function in a deeply nested loop.
+            // Note: Jastrow function depends on wave vectors, not on band indices.
+
+#ifdef _OPENMP
+            #pragma omp parallel firstprivate(qvect, kqvect, qGvect, kqGvect, V_2body, duk, phij, grad_phij, Hphij_sub, phiq, chiq, grad_phiq, phiqj, phi_grad_phi, temp)
             {
-                if (!parallelization.is_assigned_irreducible_kpoints_all_bands()[ispin][ik][jband]) { continue; }
-                // calculate phij and grad_phij
-                plane_wave_basis.get_orbital_FFTgrid(ispin, ik, 0, // isym = 0
-                                                     false, // time-rersal not used for isym=0
-                                                     phi[ispin][ik][jband][0], phij,
-                                                     method.calc_mode());
-                for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
+                PlaneWaveBasis plane_wave_basis_thread;
+                #pragma omp critical // making a plan in FFTW is not thread-safe.
                 {
-                    for (int idim=0; idim<3; idim++)
+                    plane_wave_basis_thread = plane_wave_basis;
+                }
+
+                #pragma omp for
+#else
+                PlaneWaveBasis& plane_wave_basis_thread = plane_wave_basis;
+#endif
+                for (int iq_isymq=0; iq_isymq<num_kpoints_all_scf; iq_isymq++)
+                {
+                    // We use a "iq_isymq" loop instead of "iq" & "isymq" double loops
+                    // for OpenMP parallelization with better efficiency.
+                    int iq = kpoints.index_all_kscf()[iq_isymq][0];
+                    int isymq = kpoints.index_all_kscf()[iq_isymq][1];
+                    
+                    assert(iq>=0 && iq<num_irreducible_kpoints_scf); 
+                    assert(isymq>=0 && isymq<kpoints.kvectors_scf()[iq].size());
+                    
+                    if (bloch_states.num_occupied_bands()[ispin][iq]==0) { continue; }
+                    
+                    qvect = crystal_structure.reciprocal_vectors().transpose() *
+                        kpoints.kvectors_scf()[iq][isymq];
+                    kqvect = kvect - qvect;
+                    for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
                     {
-                        grad_phij[idim](ipw) = (kvect(idim) + Gvect[ipw](idim)) * phij(ipw);
+                        for (int idim=0; idim<3; idim++)
+                        {
+                            qGvect[idim](ipw) = qvect(idim) + Gvect[ipw](idim); // NOTE: order of (ipw,idim)
+                            kqGvect[idim](ipw) = kqvect(idim) + Gvect[ipw](idim);
+                        }
                     }
-                }
-                for (int idim=0; idim<3; idim++)
-                {
-                    plane_wave_basis.FFT_backward(grad_phij[idim], grad_phij[idim]);
-                }
-                plane_wave_basis.FFT_backward(phij, phij);
-                
-                Hphij_sub = Eigen::VectorXcd::Zero(plane_wave_basis.size_FFT_grid());
-                for (int iq=0; iq<num_irreducible_kpoints_scf; iq++)
-                {
-                    for (int isymq=0; isymq<kpoints.kvectors_scf()[iq].size(); isymq++)
+                    
+                    // calculate Jastrow
+                    for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
                     {
-                        if (bloch_states.num_occupied_bands()[ispin][iq]==0) { continue; }
-
-                        qvect = crystal_structure.reciprocal_vectors().transpose() *
-                            kpoints.kvectors_scf()[iq][isymq];
-                        kqvect = kvect - qvect;
-                        for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
-                        {
-                            for (int idim=0; idim<3; idim++)
-                            {
-                                qGvect[idim](ipw) = qvect(idim) + Gvect[ipw](idim); // NOTE: order of (ipw,idim)
-                                kqGvect[idim](ipw) = kqvect(idim) + Gvect[ipw](idim);
-                            }
-                        }
-
-                        // calculate Jastrow
-                        for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
-                        {
-                            V_2body(ipw)
-                                = potentials.jastrow.tc_2body(kqvect + Gvect[ipw], ispin, ispin);
+                        V_2body(ipw)
+                            = potentials.jastrow.tc_2body(kqvect + Gvect[ipw], ispin, ispin);
                         
-                            double uk = potentials.jastrow.uk(kqvect + Gvect[ipw], ispin, ispin);
+                        double uk_value = potentials.jastrow.uk(kqvect + Gvect[ipw], ispin, ispin);
+                        for (int idim=0; idim<3; idim++)
+                        {
+                            duk[idim](ipw) = kqGvect[idim](ipw) * uk_value;
+                        }
+                    }
+                    
+                    // Note that a jband loop is inside the (iq,isymq) loops
+                    for (int jband=0; jband<H2phi[ispin][ik].size(); jband++)
+                    {
+                        if (!parallelization.is_assigned_irreducible_kpoints_all_bands()[ispin][ik][jband]) { continue; }
+                        // calculate phij and grad_phij
+                        plane_wave_basis.get_orbital_FFTgrid(ispin, ik, 0, // isym = 0
+                                                             false, // time-rersal not used for isym=0
+                                                             phi[ispin][ik][jband][0], phij,
+                                                             method.calc_mode());
+                        for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
+                        {
                             for (int idim=0; idim<3; idim++)
                             {
-                                duk[idim](ipw) = kqGvect[idim](ipw) * uk;
+                                grad_phij[idim](ipw) = (kvect(idim) + Gvect[ipw](idim)) * phij(ipw);
                             }
                         }
+                        for (int idim=0; idim<3; idim++)
+                        {
+                            plane_wave_basis_thread.FFT_backward(grad_phij[idim], grad_phij[idim]);
+                        }
+                        plane_wave_basis_thread.FFT_backward(phij, phij);
+                        
+                        Hphij_sub = Eigen::VectorXcd::Zero(plane_wave_basis.size_FFT_grid());
 
                         const int nbands_old = bloch_states.filling_old()[ispin][iq].size();
                         for (int ibandq=-nbands_old; ibandq<bloch_states.num_occupied_bands()[ispin][iq]; ibandq++)
@@ -298,27 +336,26 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                                                                          bloch_states.phik_left_scf_old()[ispin][iq][-1-ibandq][0], chiq,
                                                                          "SCF");
                                 }
-                                plane_wave_basis.FFT_backward(chiq, chiq);
+                                plane_wave_basis_thread.FFT_backward(chiq, chiq);
                             }
 
                             for (int idim=0; idim<3; idim++)
                             {
                                 grad_phiq[idim] = qGvect[idim].array() * phiq.array();
-                                plane_wave_basis.FFT_backward(grad_phiq[idim], grad_phiq[idim]);
+                                plane_wave_basis_thread.FFT_backward(grad_phiq[idim], grad_phiq[idim]);
                             }
-                            plane_wave_basis.FFT_backward(phiq, phiq);
+                            plane_wave_basis_thread.FFT_backward(phiq, phiq);
 
                             // [2a_x & 2b_x1]
                             phiqj = chiq_ref.conjugate().array() * phij.array(); // in R-space
-                            plane_wave_basis.FFT_forward(phiqj, phiqj); // -> phiqj(G)
+                            plane_wave_basis_thread.FFT_forward(phiqj, phiqj); // -> phiqj(G)
 
                             // [2b_x1] <*,q| \nabla_1 u_12 |*,j>
                            for (int idim=0; idim<3; idim++)
                             {
                                 phi_grad_phi[idim] = phiqj.array() * duk[idim].array(); // note: meaningless name "phi_grad_phi"
-                                plane_wave_basis.FFT_backward(phi_grad_phi[idim], phi_grad_phi[idim]);
+                                plane_wave_basis_thread.FFT_backward(phi_grad_phi[idim], phi_grad_phi[idim]);
                             }
-
 
                            double filq = ibandq>=0 ? bloch_states.filling()[ispin][iq][ibandq] 
                                : bloch_states.filling_old()[ispin][iq][-1-ibandq];
@@ -335,7 +372,7 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                             for (int idim=0; idim<3; idim++)
                             {
                                 phi_grad_phi[idim] = chiq_ref.conjugate().array() * grad_phij[idim].array();
-                                plane_wave_basis.FFT_forward(phi_grad_phi[idim], phi_grad_phi[idim]);
+                                plane_wave_basis_thread.FFT_forward(phi_grad_phi[idim], phi_grad_phi[idim]);
                             }
 
                             // [2a_x] <*,q| V_2body |j,*>
@@ -346,34 +383,60 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                                 phiqj = phiqj.array() +
                                     phi_grad_phi[idim].array() * duk[idim].array(); // in G-space
                             }
-                            plane_wave_basis.FFT_backward(phiqj, phiqj); // -> (R)
+                            plane_wave_basis_thread.FFT_backward(phiqj, phiqj); // -> (R)
                             Hphij_sub = Hphij_sub.array() +
                                 filq * phiqj.array() * phiq.array(); // in R-space
                         } // ibandq
-                    } // isymq
-                } // iq
-                plane_wave_basis.FFT_forward(Hphij_sub, Hphij_sub);
-                for (int ipw_at_k=0; ipw_at_k<num_G_at_k; ipw_at_k++)
-                {
-                    H2phi[ispin][ik][jband][0](ipw_at_k) += two_body_factor * Hphij_sub(Gindex_at_k(ipw_at_k));
-                }
 
-                // Divergence correction
-                if (potentials.includes_div_correction())
+                        plane_wave_basis_thread.FFT_forward(Hphij_sub, Hphij_sub);
+
+#ifdef _OPENMP
+                        #pragma omp critical
+#endif
+                        {
+                            for (int ipw_at_k=0; ipw_at_k<num_G_at_k; ipw_at_k++)
+                            {
+                                H2phi[ispin][ik][jband][0](ipw_at_k) += two_body_factor * Hphij_sub(Gindex_at_k(ipw_at_k));
+                            }
+                        }
+                    } // jband
+                } // iq_isymq
+#ifdef _OPENMP
+            } // pragma omp parallel
+#endif
+
+            // Divergence correction
+            if (potentials.includes_div_correction())
+            {
+                // \int d^3q/(2pi)^3 4pi*exp(-alpha q^2)/q^2 = 2/pi \int dq_0^infty exp(-alpha q^2)/q^2 = 1/sqrt(pi*alpha)
+                double div_corr = 1.0/std::sqrt(PI*potentials.alpha_Vaux());
+                if (method.calc_mode()=="SCF") 
                 {
-                    // \int d^3q/(2pi)^3 4pi*exp(-alpha q^2)/q^2 = 2/pi \int dq_0^infty exp(-alpha q^2)/q^2 = 1/sqrt(pi*alpha)
-                    double div_corr = 1.0/std::sqrt(PI*potentials.alpha_Vaux());
-                    if (method.calc_mode()=="SCF") 
+                    div_corr -= potentials.sum_of_Vaux_scf()[ik]/(kpoints.num_kpoints()*crystal_structure.unit_cell_volume());
+                }
+                else if (method.calc_mode()=="BAND") 
+                {
+                    div_corr -= potentials.sum_of_Vaux_band()[ik]/(kpoints.num_kpoints()*crystal_structure.unit_cell_volume());
+                }
+                div_corr *= (-1); // "-": exchange (same as two_body_factor)
+                if (num_independent_spins==1) { div_corr /= 2.0; } // same as two_body_factor
+                
+                for (int jband=0; jband<H2phi[ispin][ik].size(); jband++)
+                {
+                    if (!parallelization.is_assigned_irreducible_kpoints_all_bands()[ispin][ik][jband]) { continue; }
+                    // calculate phij and grad_phij
+                    plane_wave_basis.get_orbital_FFTgrid(ispin, ik, 0, // isym = 0
+                                                         false, // time-rersal not used for isym=0
+                                                         phi[ispin][ik][jband][0], phij,
+                                                         method.calc_mode());
+                    for (int ipw=0; ipw<plane_wave_basis.size_FFT_grid(); ipw++)
                     {
-                        div_corr -= potentials.sum_of_Vaux_scf()[ik]/(kpoints.num_kpoints()*crystal_structure.unit_cell_volume());
+                        for (int idim=0; idim<3; idim++)
+                        {
+                            grad_phij[idim](ipw) = (kvect(idim) + Gvect[ipw](idim)) * phij(ipw);
+                        }
                     }
-                    else if (method.calc_mode()=="BAND") 
-                    {
-                        div_corr -= potentials.sum_of_Vaux_band()[ik]/(kpoints.num_kpoints()*crystal_structure.unit_cell_volume());
-                    }
-                    div_corr *= (-1); // "-": exchange (same as two_body_factor)
-                    if (num_independent_spins==1) { div_corr /= 2.0; } // same as two_body_factor
-                    
+    
                     const int nbands_old = 
                         method.calc_mode()=="BAND" ? 0 : bloch_states.filling_old()[ispin][ik].size();
                     for (int ibandk=-nbands_old; ibandk<num_bands_tc[ispin]; ibandk++)
@@ -397,7 +460,6 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                                                                 bloch_states.num_electrons(), ibandk);
                             }
                         }
-
                         if (filling_ibandk < 1e-8) { continue; } // no filling then no correction                        
 
                         Eigen::VectorXcd &div_corr_2bx1_ref =
@@ -418,33 +480,37 @@ void calc_hamiltonian::tc2x(const Parallelization &parallelization,
                         
                         Complex prod = chik_ref.dot(phi[ispin][ik][jband][0]); // conj(phii)*phij
 
-			if (kVaux.squaredNorm() > 1e-8) // \sum \nabla u correction (e.g. not required for non-zero k-weight in SCF)
-                        {
-                            for (int ipw_at_k=0; ipw_at_k<num_G_at_k; ipw_at_k++)
+                        if (!potentials.jastrow.is_A_zero())
+                        {                        
+                            if (kVaux.squaredNorm() > 1e-8) // \sum \nabla u correction (e.g. not required for non-zero k-weight in SCF)
                             {
-                                // NOTE! function in k-space
-                                H2phi[ispin][ik][jband][0](ipw_at_k) 
-                                    -= div_corr_2bx1_ref(Gindex_at_k(ipw_at_k)) * prod; // [2b_x1] I^2 = -1
-                            }
-                        } // if (||kVaux||^2 > 1e-8)
+                                for (int ipw_at_k=0; ipw_at_k<num_G_at_k; ipw_at_k++)
+                                {
+                                    // NOTE! function in k-space
+                                    H2phi[ispin][ik][jband][0](ipw_at_k) 
+                                        -= div_corr_2bx1_ref(Gindex_at_k(ipw_at_k)) * prod; // [2b_x1] I^2 = -1
+                                }
+                            } // if (||kVaux||^2 > 1e-8)
+                        }
 
-			prod *= div_corr; // [2a_x]
-                        
-                        if (kVaux.squaredNorm() > 1e-8) // \sum \nabla u correction (e.g. not required for non-zero k-weight in SCF)
-                        {
-                            for (int idim=0; idim<3; idim++)
+                        prod *= div_corr; // [2a_x]
+
+                        if (!potentials.jastrow.is_A_zero())
+                        {                        
+                            if (kVaux.squaredNorm() > 1e-8) // \sum \nabla u correction (e.g. not required for non-zero k-weight in SCF)
                             {
-                                // NOTE! inner product in k-space
-                                plane_wave_basis.FFT_forward(grad_phij[idim], grad_phiq[idim]); // save in "grad_phiq" (meaningless name)
-                                prod += div_corr_2bx2_ref[idim].dot(grad_phiq[idim]); // [2b_x2] I^2 * convolution = +1. conj(div)*gphij
-                            }
-                        } // if (||kVaux||^2 > 1e-8)
-                        
+                                for (int idim=0; idim<3; idim++)
+                                {
+                                    // NOTE! inner product in k-space
+                                    prod += div_corr_2bx2_ref[idim].dot(grad_phij[idim]); // [2b_x2] I^2 * convolution = +1. conj(div)*gphij
+                                }
+                            } // if (||kVaux||^2 > 1e-8)
+                        }
                         prod *= filling_ibandk;
                         H2phi[ispin][ik][jband][0] += prod * phik_ref;
                     } // ibandk
-                } // divergence correction
-            } // jband
+                } // jband
+            } // divergence correction
         } // ik
     } // ispin
 }

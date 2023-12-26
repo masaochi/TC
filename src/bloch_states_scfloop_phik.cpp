@@ -3,6 +3,63 @@
 
 #include "include/header.hpp"
 
+// private
+
+void BlochStates::switch_left_right_orbitals_each(const std::string &calc_mode)
+{
+    assert(calc_mode=="SCF" || calc_mode=="BAND");
+    std::vector<std::vector<std::vector<std::vector<Eigen::VectorXcd> > > > &phik_ref_ =
+        calc_mode=="SCF" ? phik_scf_ : phik_band_;
+    std::vector<std::vector<std::vector<std::vector<Eigen::VectorXcd> > > > &phik_left_ref_ =
+        calc_mode=="SCF" ? phik_left_scf_ : phik_left_band_;
+
+    for (int ispin=0; ispin<phik_ref_.size(); ispin++)
+    {
+        for (int ik=0; ik<phik_ref_[ispin].size(); ik++)
+        {
+            for (int iband=0; iband<phik_ref_[ispin][ik].size(); iband++)
+            {
+                for (int ispinor=0; ispinor<phik_ref_[ispin][ik][iband].size(); ispinor++)
+                {
+                    Eigen::VectorXcd &right_vec = phik_ref_[ispin][ik][iband][ispinor];
+                    Eigen::VectorXcd &left_vec = phik_left_ref_[ispin][ik][iband][ispinor];
+
+                    assert(right_vec.size() == left_vec.size());
+                    Eigen::VectorXcd temp_vec = right_vec;
+                    right_vec = left_vec;
+                    left_vec = temp_vec;
+                } // ispinor
+            } // iband
+        } // ik
+    } // ispin
+
+    // phik_old
+    if (calc_mode=="SCF")
+    {
+        for (int ispin=0; ispin<phik_scf_old_.size(); ispin++)
+        {
+            for (int ik=0; ik<phik_scf_old_[ispin].size(); ik++)
+            {
+                for (int iband=0; iband<phik_scf_old_[ispin][ik].size(); iband++)
+                {
+                    for (int ispinor=0; ispinor<phik_scf_old_[ispin][ik][iband].size(); ispinor++)
+                    {
+                        Eigen::VectorXcd &right_vec = phik_scf_old_[ispin][ik][iband][ispinor];
+                        Eigen::VectorXcd &left_vec = phik_left_scf_old_[ispin][ik][iband][ispinor];
+
+                        assert(right_vec.size() == left_vec.size());
+                        Eigen::VectorXcd temp_vec = right_vec;
+                        right_vec = left_vec;
+                        left_vec = temp_vec;
+                    } // ispinor
+                } // iband
+            } // ik
+        } // ispin
+    }
+}
+
+// public
+
 // non-collinear calculation not supported
 void BlochStates::reset_phik(const int &ispin, const int &ik,
                              const std::vector<Eigen::VectorXcd> &V,
@@ -136,4 +193,12 @@ void BlochStates::bcast_phik(const bool bcast_phik_left,
             } // ik
         } // ispin
     } // SCF
+}
+
+void BlochStates::switch_left_right_orbitals(const std::string &calc_mode)
+{
+    assert(calc_mode=="SCF" || calc_mode=="BAND");
+
+    switch_left_right_orbitals_each("SCF"); // SCF orbitals are switched
+    if (calc_mode=="BAND") { switch_left_right_orbitals_each("BAND"); } // BAND orbitals are switched
 }

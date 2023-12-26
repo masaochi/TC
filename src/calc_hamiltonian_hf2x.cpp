@@ -22,6 +22,7 @@ void calc_hamiltonian::hf2x(const Parallelization &parallelization,
     const int num_irreducible_kpoints_scf = kpoints.num_irreducible_kpoints_scf();
     const int num_irreducible_kpoints_ref = method.calc_mode()=="SCF" ? // kpoints for "phi"
         kpoints.num_irreducible_kpoints_scf() : kpoints.num_irreducible_kpoints_band();
+    const int num_kpoints_all_scf = kpoints.num_kpoints_all_scf();
     const std::vector<int> num_bands_tc = method.calc_mode()=="SCF" ?
         bloch_states.num_bands_scf() : bloch_states.num_bands_band();
 
@@ -61,12 +62,31 @@ void calc_hamiltonian::hf2x(const Parallelization &parallelization,
                                                      phi[ispin][ik][jband][0], phij,
                                                      method.calc_mode());
                 plane_wave_basis.FFT_backward(phij, phij);
-                
+  
                 Hphij_sub = Eigen::VectorXcd::Zero(plane_wave_basis.size_FFT_grid());
-                for (int iq=0; iq<num_irreducible_kpoints_scf; iq++)
+#ifdef _OPENMP
+                #pragma omp parallel firstprivate(kqvect, V_coulomb, phiq, phiqj)
                 {
-                    for (int isymq=0; isymq<kpoints.kvectors_scf()[iq].size(); isymq++)
+                    PlaneWaveBasis plane_wave_basis_thread;
+                    #pragma omp critical // making a plan in FFTW is not thread-safe.
                     {
+                        plane_wave_basis_thread = plane_wave_basis; 
+                    }
+                    
+                    #pragma omp for
+#else
+                    PlaneWaveBasis& plane_wave_basis_thread = plane_wave_basis;
+#endif
+                    for (int iq_isymq=0; iq_isymq<num_kpoints_all_scf; iq_isymq++)
+                    {
+                        // We use a "iq_isymq" loop instead of "iq" & "isymq" double loops
+                        // for OpenMP parallelization with better efficiency. 
+                        int iq = kpoints.index_all_kscf()[iq_isymq][0];
+                        int isymq = kpoints.index_all_kscf()[iq_isymq][1];
+
+                        assert(iq>=0 && iq<num_irreducible_kpoints_scf);
+                        assert(isymq>=0 && isymq<kpoints.kvectors_scf()[iq].size());
+
                         if (bloch_states.num_occupied_bands()[ispin][iq]==0) { continue; }
                         kqvect = crystal_structure.reciprocal_vectors().transpose()
                             * (kvector_ref - kpoints.kvectors_scf()[iq][isymq]);
@@ -82,7 +102,7 @@ void calc_hamiltonian::hf2x(const Parallelization &parallelization,
                                 V_coulomb(ipw) = 1.0/tmp;
                             }
                         } // ipw
-
+                        
                         const int nbands_old = bloch_states.filling_old()[ispin][iq].size();
                         for (int ibandq=-nbands_old; ibandq<bloch_states.num_occupied_bands()[ispin][iq]; ibandq++)
                         {
@@ -100,17 +120,26 @@ void calc_hamiltonian::hf2x(const Parallelization &parallelization,
                                                                      bloch_states.phik_scf_old()[ispin][iq][-1-ibandq][0], phiq,
                                                                      "SCF");
                             }
-                            plane_wave_basis.FFT_backward(phiq, phiq);
+                            plane_wave_basis_thread.FFT_backward(phiq, phiq);
                             phiqj = phiq.conjugate().array() * phij.array(); // in R-space
-                            plane_wave_basis.FFT_forward(phiqj, phiqj);
+                            plane_wave_basis_thread.FFT_forward(phiqj, phiqj);
                             phiqj = phiqj.array() * V_coulomb.array(); // in G-space
-                            plane_wave_basis.FFT_backward(phiqj, phiqj);
-
+                            plane_wave_basis_thread.FFT_backward(phiqj, phiqj);
+                            
                             double filq = ibandq>=0 ? bloch_states.filling()[ispin][iq][ibandq] : bloch_states.filling_old()[ispin][iq][-1-ibandq];
-                            Hphij_sub = Hphij_sub.array() + filq * phiqj.array() * phiq.array(); // in R-space
-                        } // ibandq
-                    } // isymq
-                } // iq
+#ifdef _OPENMP
+                            #pragma omp critical
+#endif
+                            {
+                                Hphij_sub = Hphij_sub.array() + filq * phiqj.array() * phiq.array(); // in R-space
+                            }
+                        } // iband
+                    } // iq_isymq
+                
+#ifdef _OPENMP
+                } // pragma omp parallel
+#endif
+
                 plane_wave_basis.FFT_forward(Hphij_sub, Hphij_sub);
                 for (int ipw_at_k=0; ipw_at_k<num_G_at_k; ipw_at_k++)
                 {

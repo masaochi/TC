@@ -42,11 +42,6 @@ void TotalEnergy::resize_energy(const int &num_independent_spins,
 
 // public
 
-void TotalEnergy::set_ewald_energy(const bool is_heg, const double &ewald_energy)
-{
-    if (!is_heg) { ewald_energy_ = ewald_energy; } // ewald_energy = 0 for is_heg==true
-}
-
 void TotalEnergy::bcast_qe_input(const int &num_independent_spins,
                                  const int &num_irreducible_kpoints,
                                  const std::vector<int> &num_bands_scf,
@@ -116,8 +111,7 @@ void TotalEnergy::calc_total_energy(const Spin &spin,
     const int num_irreducible_kpoints_scf = filling[0].size();
     const double spin_factor = (num_independent_spins==1 && !spin.is_spinor()) ? 2.0 : 1.0; // 2 for no-spin
 
-    Complex total_energy_sigma0 = 0.0; // Total energy with sigma=0
-
+    total_energy_sigma0_ = 0.0; // Total energy with sigma=0
     total_energy_1body_ = 0.0;
     total_energy_2body_ = 0.0;
     total_energy_3body_ = 0.0;
@@ -140,9 +134,9 @@ void TotalEnergy::calc_total_energy(const Spin &spin,
 
                         double filling_sigma0 = eigenvalues_scf[ispin][ik][iband].real() < fermi_energy + 1e-8 ?
                                                                                            spin_factor : 0.0; // fully-occupied or empty
-                        total_energy_sigma0 += filling_sigma0 * (energy_1body_[ispin][ik][iband] +
+                        total_energy_sigma0_ += filling_sigma0 * (energy_1body_[ispin][ik][iband] +
                                                                  energy_2body_[ispin][ik][iband] / 2.0);
-                        if (uses_3body) { total_energy_sigma0 += filling_sigma0 * energy_3body_[ispin][ik][iband] / 3.0; }
+                        if (uses_3body) { total_energy_sigma0_ += filling_sigma0 * energy_3body_[ispin][ik][iband] / 3.0; }
                     }
                 }
                 else
@@ -155,9 +149,9 @@ void TotalEnergy::calc_total_energy(const Spin &spin,
 
                         double filling_sigma0 = eigenvalues_scf[ispin][ik][iband].real() < fermi_energy + 1e-8 ?
                                                                                            spin_factor : 0.0; // fully-occupied or empty
-                        total_energy_sigma0 += filling_sigma0 * (std::conj(energy_1body_[ispin][ik][iband]) +
+                        total_energy_sigma0_ += filling_sigma0 * (std::conj(energy_1body_[ispin][ik][iband]) +
                                                                  std::conj(energy_2body_[ispin][ik][iband]) / 2.0);
-                        if (uses_3body) { total_energy_sigma0 += filling_sigma0 * std::conj(energy_3body_[ispin][ik][iband]) / 3.0; }                    
+                        if (uses_3body) { total_energy_sigma0_ += filling_sigma0 * std::conj(energy_3body_[ispin][ik][iband]) / 3.0; }                    
                     }
                 }
             }
@@ -166,8 +160,8 @@ void TotalEnergy::calc_total_energy(const Spin &spin,
     total_energy_1body_ /= kpoints.num_kpoints();
     total_energy_2body_ /= kpoints.num_kpoints();
     total_energy_3body_ /= kpoints.num_kpoints();
-    total_energy_sigma0 /= kpoints.num_kpoints();
-    total_energy_sigma0 += ewald_energy_;
+    total_energy_sigma0_ /= kpoints.num_kpoints();
+    total_energy_sigma0_ += ewald_energy_;
 
     total_energy_difference_ = 
         ewald_energy_ + total_energy_1body_ + total_energy_2body_ + total_energy_3body_ - total_energy_;
@@ -175,7 +169,7 @@ void TotalEnergy::calc_total_energy(const Spin &spin,
 
     if (am_i_mpi_rank0) 
     {
-        *ost << "   Total energy (Ewald energy) = " << ewald_energy_ << " Ht." << std::endl; 
+        *ost << "   Total energy (Ewald energy) = " << ewald_energy_ << " Ht." << std::endl;
         *ost << "   Total energy (1-body terms) = ( " << total_energy_1body_.real() << " , "  <<  total_energy_1body_.imag() << " ) Ht." << std::endl; 
         *ost << "   Total energy (2-body terms) = ( " << total_energy_2body_.real() << " , "  <<  total_energy_2body_.imag() << " ) Ht." << std::endl; 
         if (uses_3body) 
@@ -185,9 +179,25 @@ void TotalEnergy::calc_total_energy(const Spin &spin,
         *ost << "   Total energy = ( " << total_energy_.real() << " , " << total_energy_.imag() << " ) Ht." << std::endl; 
         if (kpoints.smearing_mode()=="gaussian") 
         {
-            *ost << "   Total energy (sigma->0) = ( " << ((total_energy_ + total_energy_sigma0)/2.0).real()
-                 << " , " << ((total_energy_ + total_energy_sigma0)/2.0).imag() << " ) Ht." << std::endl; }
+            *ost << "   Total energy (sigma->0) = ( " << ((total_energy_ + total_energy_sigma0_)/2.0).real()
+                 << " , " << ((total_energy_ + total_energy_sigma0_)/2.0).imag() << " ) Ht." << std::endl; 
+        }
         *ost << "   Total energy difference from the previous loop = ( " << total_energy_difference_.real() 
              << " , " << total_energy_difference_.imag() << " ) Ht." << std::endl; 
+    }
+}
+
+void TotalEnergy::print_total_energy_final_loop(const Kpoints &kpoints,
+                                                std::ostream *ost) const
+{
+    *ost << "   Total energy (final loop) = ( " << total_energy_.real() << " , " << total_energy_.imag() << " ) Ht.";
+    if (kpoints.smearing_mode()=="gaussian") 
+    {
+        *ost << ",   Total energy (sigma->0) = ( " << ((total_energy_ + total_energy_sigma0_)/2.0).real()
+             << " , " << ((total_energy_ + total_energy_sigma0_)/2.0).imag() << " ) Ht." << std::endl; 
+    }
+    else
+    {
+        *ost << std::endl;
     }
 }

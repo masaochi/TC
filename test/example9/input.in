@@ -4,8 +4,5 @@ pseudo_dir    ./example9
 qe_save_dir   ./example9
 smearing_mode fixed
 max_num_iterations 2
-A_up_up 0.4
-A_up_dn 0.8
-A_dn_dn 0.4
 restarts true
 reads_binary false

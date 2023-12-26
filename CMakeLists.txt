@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.13)
 
 project(Tcpp
-		VERSION 1.2.2
+		VERSION 1.3.0
 		LANGUAGES CXX Fortran)
 
 ## Project options
 option(TCPP_WITH_MPI "TCpp: Build with MPI support" ON)
+option(TCPP_WITH_OpenMP "TCpp: Build with OpenMP support" ON)
 option(TCPP_WITH_Boost "TCpp: Build with Boost support" ON)
 option(TCPP_WITH_Eigen3 "TCpp: Build with Eigen3 support" ON)
 option(TCPP_WITH_FFTW3 "TCpp: Build with FFTW3 support" ON)
@@ -36,6 +37,16 @@ if (TCPP_WITH_MPI)
 	find_package(MPI REQUIRED)
 else ()
 	message(FATAL_ERROR "Currently TC++ requires MPI")
+endif ()
+
+if (TCPP_WITH_OpenMP)
+	find_package(OpenMP)
+	if (OpenMP_FOUND)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+	else()
+		message(FATAL_ERROR "OpenMP was not found.\n"
+				    "You can make tc++ without OpenMP by specifying -DTCPP_WITH_OpenMP=OFF")
+	endif ()
 endif ()
 
 if (TCPP_WITH_Boost)

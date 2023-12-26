@@ -13,6 +13,7 @@ void compare_list(const std::string &keyword, const std::string &input, const st
 // Print an error message: an inappropriate argument is specified for "keyword", and stop the program
 //   optional: "condition" is also displayed if condition!=""
 void inappropriate_argument(const std::string &keyword, const std::string &input, const std::string &condition);
+void inappropriate_argument(const std::string &keyword, const bool &input, const std::string &condition);
 void inappropriate_argument(const std::string &keyword, const int &input, const std::string &condition);
 void inappropriate_argument(const std::string &keyword, const double &input, const std::string &condition);
 

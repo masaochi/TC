@@ -11,6 +11,9 @@ private:
     int num_irreducible_kpoints_band_; // since band k-points do not use symmetry, this is equivalent to num. kpoints for bands
     int num_kpoints_; // total num. of non-zero-weight k-points (i.e. k-points on the SCF k-mesh. 4x4x4 then 64)
 
+    int num_kpoints_all_scf_; // total num. of all scf k-points including zero-weight ones (cf. fakescf calculation with band k-points)
+    std::vector<std::vector<int> > index_all_kscf_; // index_all_kscf_[iq_isymq][0] = iq, index_all_kscf_[iq_isymq][1] = isymq for 0 <= iq_isymq < num_kpoints_all_scf_.
+
     // k-point weight for irreducible k-points (QE variable)
     // summation of kweight_ = 2 for no-spin, 1 for spin-polarized or non-collinear calculations.
     // Information of kweight is taken into account by bloch_states.filling_ in TC++ calculation.
@@ -34,12 +37,14 @@ private:
 
     // called in set() 
     void set_kvectors_by_symmetry(const Spin &spin, const Symmetry &symmetry, std::ostream *ost);
-    void show_kvectors(const Symmetry &symmetry, std::ostream *ost);
+    void show_kvectors(const Symmetry &symmetry, std::ostream *ost) const;
 
 public:
     int num_irreducible_kpoints_scf() const { return num_irreducible_kpoints_scf_; }
     int num_irreducible_kpoints_band() const { return num_irreducible_kpoints_band_; }
     int num_kpoints() const { return num_kpoints_; }
+    int num_kpoints_all_scf() const { return num_kpoints_all_scf_; }
+    const std::vector<std::vector<int> > &index_all_kscf() const { return index_all_kscf_; }
     const std::vector<double> &kweight_scf() const { return kweight_scf_; }
     const std::vector<std::vector<Eigen::Vector3d> > &kvectors_scf() const { return kvectors_scf_; }
     const std::vector<std::vector<Eigen::Vector3d> > &kvectors_band() const { return kvectors_band_; }
@@ -49,7 +54,7 @@ public:
     double smearing_width() const { return smearing_width_; }
 
     Kpoints() : num_irreducible_kpoints_scf_(-1), num_irreducible_kpoints_band_(-1),
-                num_kpoints_(-1), smearing_mode_("gaussian"), smearing_width_(0.01) {}
+                num_kpoints_(-1), num_kpoints_all_scf_(-1), smearing_mode_("gaussian"), smearing_width_(0.01) {}
 
     void set_tc_input(const std::string &smearing_mode, const double &smearing_width);
     void bcast_tc_input(const bool am_i_mpi_rank0);

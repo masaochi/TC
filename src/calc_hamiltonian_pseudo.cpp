@@ -112,7 +112,7 @@ void calc_hamiltonian::pseudo(const Parallelization &parallelization,
                                 = potentials.projector_nonlocal(crystal_structure, plane_wave_basis,
                                                                 Gindex_at_k,
                                                                 kvector, ylm,
-                                                                ispin, ik, iatomic_species, iproj);
+                                                                iatomic_species, iproj);
                         }
                     }
                     projector_calculated = true;
@@ -129,8 +129,10 @@ void calc_hamiltonian::pseudo(const Parallelization &parallelization,
                         phase_atom.resize(num_G_at_k);
                         for (int ipw_at_k=0; ipw_at_k<num_G_at_k; ipw_at_k++) 
                         {
+                            // Although named "kGvect", kvector is not considered here because exp(ikr)*exp(-ikr) = 1 (always canceled with complex conjugate).
                             kGvect = crystal_structure.reciprocal_vectors().transpose()
-                                *(kvector + plane_wave_basis.get_Gvector(Gindex_at_k(ipw_at_k)).cast<double>());
+                                * plane_wave_basis.get_Gvector(Gindex_at_k(ipw_at_k)).cast<double>();
+//                                *(kvector + plane_wave_basis.get_Gvector(Gindex_at_k(ipw_at_k)).cast<double>());
                             double phase = kGvect.transpose() * crystal_structure.atomic_position_cartesian()[iatom];
 
                             phase_atom(ipw_at_k) = std::cos(phase) + I*std::sin(phase);

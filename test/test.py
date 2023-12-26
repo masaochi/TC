@@ -21,7 +21,7 @@ def check_tc(output, output_ref, checks_totE):
         subprocess.run('./tc++', shell=True, check=True)
     except subprocess.CalledProcessError:
         print('Error: Failed to run ./tc++')
-        print('Please copy tc++ and required input files into the parent directory.')
+        print('See output.out (if exists), make sure that tc++ is present in the current directory (i.e., test/tc++).')
         exit()
 
     with open(output) as f:
@@ -74,9 +74,31 @@ def check_tc(output, output_ref, checks_totE):
         exit()
 
 
+def remove_temporary_files():
+    print('Remove temporary files')
+    subprocess.run('rm ./tc_energy_scf.dat', shell=True)
+    subprocess.run('rm example*/tc_energy_scf.dat', shell=True)
+    subprocess.run('rm ./tc_wfc_scf.dat', shell=True)
+    subprocess.run('rm example*/tc_wfc_scf.dat', shell=True)
+    subprocess.run('rm ./tc_energy_band.dat', shell=True)
+    subprocess.run('rm ./tc_wfc_band.dat', shell=True)
+    subprocess.run('rm ./tc_scfinfo.dat', shell=True)
+    subprocess.run('rm example*/tc_scfinfo.dat', shell=True)
+    subprocess.run('rm ./tc_bandplot.dat', shell=True)
+    subprocess.run('rm ./input.in', shell=True)
+    subprocess.run('rm ./output.out', shell=True)
+#    subprocess.run('rm ./pwfn.data', shell=True)
+    subprocess.run('rm ./parameters.casl', shell=True)
+#    subprocess.run('rm ./parameters.casl.dump', shell=True)
+    subprocess.run('rm ./jastrow.plt', shell=True)
+    print('\n')
+
+
 print('\033[35m'+'Start test calculations (will take few minutes).'+'\033[0m')
 print('\033[31m'+'Note! DO NOT use the input files (including pseudopot.) provided here for your research.')
 print('These were made only for test calculation...'+'\033[0m'+'\n')
+
+#remove_temporary_files()
 
 # common in the following examples
 output = './output.out'
@@ -94,12 +116,14 @@ copy_scfoutput('./example6')
 ## Example 2
 print('\033[35m'+'Test 2/5'+'\033[0m'+': TC SCF calculation for bulk Si')
 copy_file('./example2/input.in')
+copy_file('./example2/parameters.casl')
 check_tc(output, './example2/output.out', True)
 print('\033[35m'+'Test 2/5'+'\033[32m'+' passed.'+'\033[0m'+'\n')
 
 ## Example 3
 print('\033[35m'+'Test 3/5'+'\033[0m'+': BITC SCF calculation for bulk Si')
 copy_file('./example3/input.in')
+copy_file('./example3/parameters.casl')
 check_tc(output, './example3/output.out', True)
 print('\033[35m'+'Test 3/5'+'\033[32m'+' passed.'+'\033[0m'+'\n')
 
@@ -112,7 +136,7 @@ copy_file('./example4/tc_scfinfo.dat')
 check_tc(output, './example4/output.out', True)
 print('\033[35m'+'Test 4/5'+'\033[32m'+' passed.'+'\033[0m'+'\n')
 
-## Example 6
+## Example 5
 print('\033[35m'+'Test 5/5'+'\033[0m'+': HF BAND calculation for bulk Si')
 copy_file('./example6/input.in')
 copy_file('./example6/tc_energy_scf.dat')
@@ -121,18 +145,7 @@ copy_file('./example6/tc_scfinfo.dat')
 check_tc(output, './example6/output.out', False)
 print('\033[35m'+'Test 5/5'+'\033[32m'+' passed.'+'\033[0m'+'\n')
 
-print('Remove temporary files...')
-subprocess.run('rm ./tc_energy_scf.dat', shell=True)
-subprocess.run('rm example*/tc_energy_scf.dat', shell=True)
-subprocess.run('rm ./tc_wfc_scf.dat', shell=True)
-subprocess.run('rm example*/tc_wfc_scf.dat', shell=True)
-subprocess.run('rm ./tc_energy_band.dat', shell=True)
-subprocess.run('rm ./tc_wfc_band.dat', shell=True)
-subprocess.run('rm ./tc_scfinfo.dat', shell=True)
-subprocess.run('rm example*/tc_scfinfo.dat', shell=True)
-subprocess.run('rm ./tc_bandplot.dat', shell=True)
-subprocess.run('rm ./input.in', shell=True)
-subprocess.run('rm ./output.out', shell=True)
+remove_temporary_files()
 
 print('\033[35m'+'Since these tests are done in serial calculation, it is recommended to check MPI parallelization does not change the results by yourself...'+'\033[0m')
 

@@ -7,7 +7,7 @@
 
 // set fermi_energy_ & filling_ & filling_old_ & num_occupied_bands_ 
 void BlochStates::set_filling(const Spin &spin, const Kpoints &kpoints, 
-                              const bool sets_filling_old, const double &mixing_beta,
+                              const bool sets_filling_old,
                               const bool am_i_mpi_rank0, std::ostream *ost)
 {
     const int num_independent_spins = filling_.size();

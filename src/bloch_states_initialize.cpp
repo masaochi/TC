@@ -213,10 +213,12 @@ void BlochStates::resize_phik_qe(const PlaneWaveBasis &plane_wave_basis,
     }
 }
 
+// see also plane_wave_basis.set_Gvector_at_k() for gamma_only treatment
 void BlochStates::set_phik_qe(const int ispin, const int ik, const std::vector<Complex> &evc,
-                              const std::string &calc_mode)
+                              const std::string &calc_mode, const bool gamma_only, const int zero_index)
 {
     assert(calc_mode=="SCF" || calc_mode=="BAND");
+    assert(!gamma_only || zero_index>=0); // zero_index should be set (>=0) for gamma_only==true
     std::vector<std::vector<std::vector<std::vector<Eigen::VectorXcd> > > > &phik_ref_
         = calc_mode=="SCF" ? phik_scf_ : phik_band_;
     const std::vector<int> &num_bands_tc_ 
@@ -235,11 +237,27 @@ void BlochStates::set_phik_qe(const int ispin, const int ik, const std::vector<C
         double norm = 0.0;
         for (int ispinor=0; ispinor<num_spinor; ispinor++)
         {
-            int npw_at_k = phik_ref_[ispin][ik][iband][ispinor].size();
-            for (int ipw_at_k=0; ipw_at_k<npw_at_k; ipw_at_k++)
+            int npw_at_k_org = phik_ref_[ispin][ik][iband][ispinor].size();
+            int npw_at_k;
+            if (gamma_only) // u(-G)=u(G)^*
+            {
+                npw_at_k = 2*npw_at_k_org - 1;
+                phik_ref_[ispin][ik][iband][ispinor].resize(npw_at_k);
+            }
+            else
+            {
+                npw_at_k = npw_at_k_org;
+            }
+            for (int ipw_at_k=0; ipw_at_k<npw_at_k_org; ipw_at_k++)
             {
                 phik_ref_[ispin][ik][iband][ispinor](ipw_at_k) = evc[icount]; // evc(npol*igwx, nbnd[is]) in fortran
                 norm += std::norm(evc[icount]);
+                if (gamma_only && ipw_at_k!=zero_index) // gamma_only && G!=(0,0,0)
+                {
+                    int ipw_at_k_minus = ipw_at_k<zero_index ? ipw_at_k + npw_at_k_org : ipw_at_k + npw_at_k_org - 1; // -G index
+                    phik_ref_[ispin][ik][iband][ispinor](ipw_at_k_minus) = std::conj(evc[icount]); // u(-G)=u(G)^*
+                    norm += std::norm(evc[icount]);
+                }
                 ++icount;
             }
         }
@@ -262,7 +280,7 @@ void BlochStates::bcast_qe_input(const PlaneWaveBasis &plane_wave_basis,
     std::vector<int> &num_bands_tc_ 
         = calc_mode=="SCF" ? num_bands_scf_ : num_bands_band_;
 
-    // num_bands_tc & num_bands_qe ... the former can be specified by input.in or initialized by read_qe().
+    // num_bands_tc & num_bands_qe ... the former can be specified by input.in or initialized by io_qe_files::read_qe().
     // Thus, Bcast is performed here.
     int num_independent_spins = num_bands_qe_.size();
     MPI_Bcast(&num_independent_spins, 1, MPI_INT, 0, MPI_COMM_WORLD);

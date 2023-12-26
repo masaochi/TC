@@ -1,0 +1,845 @@
+TC++ ver.1.3
+Num. of MPI Processes = 1
+
+ Read TC input (input.in)
+  WARNING: reads_binary = false was set. You should know what you are doing.
+  calc_method = TC
+  calc_mode = SCF
+  qe_save_dir = .
+  pseudo_dir = .
+  smearing_mode = fixed
+  smearing_width = 0.01
+  restarts = false
+  includes_div_correction = true
+  energy_tolerance = 1e-05
+  charge_tolerance = 0.0001
+  max_num_iterations = 1
+  mixes_density_matrix = false
+  mixing_beta = 0.7
+  num_refresh_david = 1
+  max_num_blocks_david = 2
+  is_heg = false
+  reads_binary = 0
+
+ Bcast TC input (input.in)
+
+ Read QE information from ./data-file-schema.xml
+  qes:espresso.input.control_variables.calculation =  scf
+  qes:espresso.output.atomic_structure.cell.a1 =  -5.130000000000000e0 0.000000000000000e0 5.130000000000000e0
+  qes:espresso.output.atomic_structure.cell.a2 =  0.000000000000000e0 5.130000000000000e0 5.130000000000000e0
+  qes:espresso.output.atomic_structure.cell.a3 =  -5.130000000000000e0 5.130000000000000e0 0.000000000000000e0
+  qes:espresso.output.basis_set.reciprocal_lattice.b1 =  -1.000000000000000e0 -1.000000000000000e0 1.000000000000000e0
+  qes:espresso.output.basis_set.reciprocal_lattice.b2 =  1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+  qes:espresso.output.basis_set.reciprocal_lattice.b3 =  -1.000000000000000e0 1.000000000000000e0 -1.000000000000000e0
+  qes:espresso.output.atomic_structure.<xmlattr>.alat =  1.026000000000e1
+  qes:espresso.output.atomic_species.<xmlattr>.ntyp =  1
+  Species: 0
+   qes:espresso.output.atomic_species.species.<xmlattr>.name =  Si
+   qes:espresso.output.atomic_species.species.pseudo_file =  Si_test.upf
+  qes:espresso.output.atomic_structure.<xmlattr>.nat =  2
+  Atom: 0
+   qes:espresso.output.atomic_structure.atomic_positions.atom.<xmlattr>.name =  Si
+   qes.espresso.output.atomic_structure.atomic_positions.atom = 0 0 0
+  Atom: 1
+   qes:espresso.output.atomic_structure.atomic_positions.atom.<xmlattr>.name =  Si
+   qes.espresso.output.atomic_structure.atomic_positions.atom = 2.565 2.565 2.565
+  qes:espresso.output.magnetization.noncolin =  false
+  qes:espresso.output.magnetization.lsda =  true
+  qes:espresso.output.symmetries.nsym =  48
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 1.000000000000000e0
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          -1.000000000000000e0 -1.000000000000000e0 -1.000000000000000e0
+          1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 1.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          0.000000000000000e0 0.000000000000000e0 -1.000000000000000e0
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+   qes:espresso.output.symmetries.symmetry.rotation =  
+          -1.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+          1.000000000000000e0 1.000000000000000e0 1.000000000000000e0
+          0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+          
+   qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
+  qes:espresso.input.symmetry_flags.no_t_rev =  true
+  qes:espresso.input.symmetry_flags.noinv =  true
+  qes:espresso.output.band_structure.nbnd_up =  10
+  qes:espresso.output.band_structure.nbnd_dw =  10
+  qes:espresso.output.band_structure.nks =  3
+  Irreducible k-point: 0
+   qes:espresso.output.band_structure.ks_energies.k_point =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.band_structure.ks_energies.k_point.<xmlattr>.weight =  1.250000000000e-1
+   qes:espresso.output.band_structure.ks_energies.npw =  259
+   qes::espresso.output.band_structure_ks_energies.eigenvalues.<xmlattr>.size =  20
+   qes:espresso.output.band_structure.ks_energies.eigenvalues =  
+          -2.002458545163782e-1 2.476152217571933e-1 2.476152217578459e-1 2.476152217578464e-1 3.393464428878106e-1
+          3.393464428878112e-1 3.393464428878179e-1 3.664685532008007e-1 5.361280374521435e-1 5.639044770885658e-1
+          -2.002410849377867e-1 2.476187055956048e-1 2.476187055960170e-1 2.476187055960339e-1 3.393505286225939e-1
+          3.393505286225944e-1 3.393505287183256e-1 3.664705299998021e-1 5.361446161518451e-1 5.639098932513682e-1
+          
+  Irreducible k-point: 1
+   qes:espresso.output.band_structure.ks_energies.k_point =  5.000000000000000e-1 -5.000000000000000e-1 5.000000000000000e-1
+   qes:espresso.output.band_structure.ks_energies.k_point.<xmlattr>.weight =  5.000000000000e-1
+   qes:espresso.output.band_structure.ks_energies.npw =  266
+   qes::espresso.output.band_structure_ks_energies.eigenvalues.<xmlattr>.size =  20
+   qes:espresso.output.band_structure.ks_energies.eigenvalues =  
+          -1.137338469276455e-1 -1.768724284466219e-2 1.980323550474302e-1 1.980323550531655e-1 3.052989013871498e-1
+          3.741249685071777e-1 3.741249745261632e-1 5.278522548736991e-1 6.702099141053568e-1 6.752781361623635e-1
+          -1.137302565609222e-1 -1.768163346652197e-2 1.980358395079334e-1 1.980358395094331e-1 3.053041729632469e-1
+          3.741310032209153e-1 3.741310081714516e-1 5.278654797625649e-1 6.702187686964319e-1 6.752052056662389e-1
+          
+  Irreducible k-point: 2
+   qes:espresso.output.band_structure.ks_energies.k_point =  0.000000000000000e0 -1.000000000000000e0 0.000000000000000e0
+   qes:espresso.output.band_structure.ks_energies.k_point.<xmlattr>.weight =  3.750000000000e-1
+   qes:espresso.output.band_structure.ks_energies.npw =  254
+   qes::espresso.output.band_structure_ks_energies.eigenvalues.<xmlattr>.size =  20
+   qes:espresso.output.band_structure.ks_energies.eigenvalues =  
+          -4.640158581634593e-2 -4.640158581615639e-2 1.339355861519507e-1 1.339355861520208e-1 2.749122982109001e-1
+          2.749122983521036e-1 6.200846432675766e-1 6.200846440900767e-1 7.024860434623783e-1 7.024863867082005e-1
+          -4.639792193581514e-2 -4.639792193049308e-2 1.339400648952207e-1 1.339400648954471e-1 2.749213102748747e-1
+          2.749213107582811e-1 6.200865428503533e-1 6.200865428803257e-1 7.024938196508641e-1 7.024943319959691e-1
+          
+  Print symmetrically-repiclated kvectors:
+  Irreducible k-vector (ik = 0) 0 0 0
+   symmetrically-equivalent k-vector (isymk = 0): 0 0 0
+   transformation operator (in k-space, applied to the irreducible k. Transpose of the symmorphic operator in r-space) 
+1 0 0
+0 1 0
+0 0 1
+   time-reversal symmetry = false
+   translation vector (while not applied to the k-vector) = 0 0 0
+
+  Irreducible k-vector (ik = 1) 0 0 -0.5
+   symmetrically-equivalent k-vector (isymk = 0): 0 0 -0.5
+   transformation operator (in k-space, applied to the irreducible k. Transpose of the symmorphic operator in r-space) 
+1 0 0
+0 1 0
+0 0 1
+   time-reversal symmetry = false
+   translation vector (while not applied to the k-vector) = 0 0 0
+
+   symmetrically-equivalent k-vector (isymk = 1): 0.5 0.5 0.5
+   transformation operator (in k-space, applied to the irreducible k. Transpose of the symmorphic operator in r-space) 
+ 0  1 -1
+ 1  0 -1
+ 0  0 -1
+   time-reversal symmetry = false
+   translation vector (while not applied to the k-vector) = 0 0 0
+
+   symmetrically-equivalent k-vector (isymk = 2): 0 -0.5 0
+   transformation operator (in k-space, applied to the irreducible k. Transpose of the symmorphic operator in r-space) 
+-1  0  0
+-1  0  1
+-1  1  0
+   time-reversal symmetry = false
+   translation vector (while not applied to the k-vector) = 0 0 0
+
+   symmetrically-equivalent k-vector (isymk = 3): -0.5 0 0
+   transformation operator (in k-space, applied to the irreducible k. Transpose of the symmorphic operator in r-space) 
+ 0 -1  1
+ 0 -1  0
+ 1 -1  0
+   time-reversal symmetry = false
+   translation vector (while not applied to the k-vector) = 0 0 0
+
+  Irreducible k-vector (ik = 2) 0 -0.5 -0.5
+   symmetrically-equivalent k-vector (isymk = 0): 0 -0.5 -0.5
+   transformation operator (in k-space, applied to the irreducible k. Transpose of the symmorphic operator in r-space) 
+1 0 0
+0 1 0
+0 0 1
+   time-reversal symmetry = false
+   translation vector (while not applied to the k-vector) = 0 0 0
+
+   symmetrically-equivalent k-vector (isymk = 1): 0.5 0 0.5
+   transformation operator (in k-space, applied to the irreducible k. Transpose of the symmorphic operator in r-space) 
+ 0 -1  0
+-1  0  0
+ 0  0 -1
+   time-reversal symmetry = false
+   translation vector (while not applied to the k-vector) = 0.25 0.25 0.25
+
+   symmetrically-equivalent k-vector (isymk = 2): -0.5 -0.5 0
+   transformation operator (in k-space, applied to the irreducible k. Transpose of the symmorphic operator in r-space) 
+-1  1  0
+ 0  1  0
+ 0  1 -1
+   time-reversal symmetry = false
+   translation vector (while not applied to the k-vector) = 0.25 0.25 0.25
+
+
+  qes:espresso.output.band_structure.nelec =  8.000000000000000e0
+  qes:espresso.output.basis_set.fft_grid.<xmlattr>.nr1 =  20
+  qes:espresso.output.basis_set.fft_grid.<xmlattr>.nr2 =  20
+  qes:espresso.output.basis_set.fft_grid.<xmlattr>.nr3 =  20
+  qes:espresso.output.total_energy.ewald =  -8.400464800476435e0
+  qes:espresso.output.basis_set.gamma_only =  false
+  qes:espresso.output.algorithmic_info.uspp =  false
+  qes:espresso.output.algorithmic_info.paw =  false
+
+ Read QE wave functions from ./wfcup1.dat
+ Read QE wave functions from ./wfcup2.dat
+ Read QE wave functions from ./wfcup3.dat
+ Read QE wave functions from ./wfcdw1.dat
+ Read QE wave functions from ./wfcdw2.dat
+ Read QE wave functions from ./wfcdw3.dat
+
+ Bcast QE input variables
+
+ Read_upf
+  Species = 0
+   UPF ver.2
+   UPF.PP_HEADER.<xmlattr>.pseudo_type =  NC
+   UPF.PP_HEADER.<xmlattr>.is_ultrasoft =  false
+   UPF.PP_HEADER.<xmlattr>.is_paw =  false
+   UPF.PP_HEADER.<xmlattr>.is_coulomb =  false
+   UPF.PP_HEADER.<xmlattr>.core_correction =  false
+   UPF.PP_HEADER.<xmlattr>.z_valence =  4.00000000000000
+   Z_valence = 4
+   UPF.PP_HEADER.<xmlattr>.element =  Si
+   element_name = Si
+   atomic number = 14
+   UPF.PP_HEADER.<xmlattr>.mesh_size =  1141
+   mesh_size = 1141
+   UPF.PP_HEADER.<xmlattr>.number_of_proj =  2
+   num. of projectors = 2
+    angular momentum = 0
+    angular momentum = 1
+ set_upf
+ set_atomic_number
+ Bcast upf variables
+
+ Read Jastrow parameters from parameters.casl
+  RPA-type Jastrow parameters in atomic unit
+   A_up_up = 1.638857225
+   F_up_up = 1.810445926
+   A_up_dn = A_dn_up = 1.638857225
+   F_up_dn = F_dn_up = 1.280178591
+   A_dn_dn = 1.462812633
+   F_dn_dn = 1.710445926
+
+  Polynomial Jastrow parameters in atomic unit
+   e-e basis: natural power with deg_poly = 6
+   up-up channel:
+    L_poly = 7
+     for a polynomial cutoff function with C = 3: (1-r/L)^3 * step_function(L-r)
+    c_poly (r^0 term = c_1) = -0.1162209226
+    c_poly (r^1 term = c_2) = -0.04980896681
+    c_poly (r^2 term = c_3) = -0.07273309665
+    c_poly (r^3 term = c_4) = 0.1320069864
+    c_poly (r^4 term = c_5) = -0.1035713919
+    c_poly (r^5 term = c_6) = 0.03843613774
+     Note: these coefficients are defined for J = exp[+u], u = sum c_poly * r^l * cutoff function (see above)
+   up-down channel:
+    L_poly = 6.5
+     for a polynomial cutoff function with C = 3: (1-r/L)^3 * step_function(L-r)
+    c_poly (r^0 term = c_1) = -0.057919887
+    c_poly (r^1 term = c_2) = -0.02673225554
+    c_poly (r^2 term = c_3) = 0.002167855385
+    c_poly (r^3 term = c_4) = -0.0007415351877
+    c_poly (r^4 term = c_5) = -0.00817085381
+    c_poly (r^5 term = c_6) = 0.006458321908
+     Note: these coefficients are defined for J = exp[+u], u = sum c_poly * r^l * cutoff function (see above)
+   down-up channel:
+    L_poly = 6.5
+     for a polynomial cutoff function with C = 3: (1-r/L)^3 * step_function(L-r)
+    c_poly (r^0 term = c_1) = -0.057919887
+    c_poly (r^1 term = c_2) = -0.02673225554
+    c_poly (r^2 term = c_3) = 0.002167855385
+    c_poly (r^3 term = c_4) = -0.0007415351877
+    c_poly (r^4 term = c_5) = -0.00817085381
+    c_poly (r^5 term = c_6) = 0.006458321908
+     Note: these coefficients are defined for J = exp[+u], u = sum c_poly * r^l * cutoff function (see above)
+   down-down channel:
+    L_poly = 6
+     for a polynomial cutoff function with C = 3: (1-r/L)^3 * step_function(L-r)
+    c_poly (r^0 term = c_1) = -0.1196179336
+    c_poly (r^1 term = c_2) = -0.05980896681
+    c_poly (r^2 term = c_3) = -0.08273309665
+    c_poly (r^3 term = c_4) = 0.2320069864
+    c_poly (r^4 term = c_5) = -0.1535713919
+    c_poly (r^5 term = c_6) = 0.04843613774
+     Note: these coefficients are defined for J = exp[+u], u = sum c_poly * r^l * cutoff function (see above)
+
+  RPA + Polynomial Jastrow parameters
+   num_rmesh_J3_integ = 401
+
+ Dump jastrow.plt for plotting a Jastrow function using gnuplot (jastrow.plt)
+
+ Time for initialization = 0 days 0 h 0 m 0 s
+ Dump SCF informations (tc_scfinfo.dat)
+ Time for dumping tc_scfinfo.dat = 0 days 0 h 0 m 0 s
+ Time for setting potentials = 0 days 0 h 0 m 0 s
+
+ Start SCF calculation!
+  bloch_states.set_filling()
+   Fermi energy: 6.738047944 eV
+
+   Spin 0
+   k-vector 0 0 0
+   (band index, energy (eV), filling)
+   0 -5.448967052 1
+   1 6.737953143 1
+   2 6.737953143 1
+   3 6.737953143 1
+   4 9.234086723 0
+   5 9.234086723 0
+   6 9.234086723 0
+   7 9.97211691 0
+   8 14.58878646 0
+   9 15.34462186 0
+
+   k-vector    0    0 -0.5
+   (band index, energy (eV), filling)
+   0 -3.094855502 1
+   1 -0.4812943755 1
+   2 5.388734666 1
+   3 5.388734666 1
+   4 8.307605961 0
+   5 10.18045857 0
+   6 10.18045874 0
+   7 14.36359096 0
+   8 18.23734004 0
+   9 18.37525338 0
+
+   k-vector    0 -0.5 -0.5
+   (band index, energy (eV), filling)
+   0 -1.262651419 1
+   1 -1.262651419 1
+   2 3.644572807 1
+   3 3.644572807 1
+   4 7.480744402 0
+   5 7.480744405 0
+   6 16.87336199 0
+   7 16.87336201 0
+   8 19.11561822 0
+   9 19.11562756 0
+
+   Spin 1
+   k-vector 0 0 0
+   (band index, energy (eV), filling)
+   0 -5.448837265 1
+   1 6.738047944 1
+   2 6.738047944 1
+   3 6.738047944 1
+   4 9.234197901 0
+   5 9.234197901 0
+   6 9.234197904 0
+   7 9.972170701 0
+   8 14.58923759 0
+   9 15.34476924 0
+
+   k-vector    0    0 -0.5
+   (band index, energy (eV), filling)
+   0 -3.094757803 1
+   1 -0.4811417366 1
+   2 5.388829483 1
+   3 5.388829483 1
+   4 8.307749408 0
+   5 10.18062279 0
+   6 10.18062292 0
+   7 14.36395082 0
+   8 18.23758098 0
+   9 18.37326884 0
+
+   k-vector    0 -0.5 -0.5
+   (band index, energy (eV), filling)
+   0 -1.262551719 1
+   1 -1.262551719 1
+   2 3.644694679 1
+   3 3.644694679 1
+   4 7.480989632 0
+   5 7.480989645 0
+   6 16.87341368 0
+   7 16.87341368 0
+   8 19.11582982 0
+   9 19.11584376 0
+
+  bloch_states.set_density()
+   num. of electrons (spin up) = (4,0) , num. of electrons (spin down) = (4,0)
+   total magnetization = (-1.33226763e-15,0)
+   num. of electrons inside a sphere with a radius r around each atom
+    Atom 0: 
+    r (Bohr),  up,  down,  up - down,  up + down
+    0.1  1.292020999e-05  1.292042204e-05  -2.120455997e-10  2.584063204e-05
+    0.2  1.292020999e-05  1.292042204e-05  -2.120455997e-10  2.584063204e-05
+    0.3  1.292020999e-05  1.292042204e-05  -2.120455997e-10  2.584063204e-05
+    0.4  0.001264146564  0.001264158486  -1.192189885e-08  0.00252830505
+    0.5  0.001264146564  0.001264158486  -1.192189885e-08  0.00252830505
+    0.6  0.002457926038  0.00245794916  -2.312216114e-08  0.004915875197
+    0.7  0.009686490155  0.009686578199  -8.80440165e-08  0.01937306835
+    0.8  0.01447220179  0.01447233308  -1.312887044e-07  0.02894453488
+    0.9  0.03074732089  0.03074760244  -2.815454989e-07  0.06149492333
+    1  0.06244013233  0.06244069809  -5.657550254e-07  0.1248808304
+    1.1  0.09480269553  0.09480356978  -8.742476406e-07  0.1896062653
+    1.2  0.1149047803  0.1149058445  -1.064137405e-06  0.2298106248
+    1.3  0.1596507013  0.1596521392  -1.437851862e-06  0.3193028405
+    1.4  0.2287498756  0.2287519439  -2.068272886e-06  0.4575018195
+    1.5  0.3397398416  0.3397428601  -3.018444342e-06  0.6794827017
+    1.6  0.4462233239  0.4462272017  -3.877806388e-06  0.8924505257
+    1.7  0.520475604  0.520480094  -4.489998244e-06  1.040955698
+    1.8  0.6013075066  0.6013126192  -5.112625328e-06  1.202620126
+    1.9  0.8009374668  0.8009439009  -6.434096144e-06  1.601881368
+    2  0.8689463731  0.868953236  -6.862865411e-06  1.737899609
+    2.1  1.041607312  1.041615098  -7.78551754e-06  2.08322241
+    2.2  1.155014554  1.155022774  -8.219544181e-06  2.310037328
+    2.3  1.32446999  1.324478856  -8.865971253e-06  2.648948846
+    2.4  1.47309249  1.473101634  -9.14378677e-06  2.946194123
+    2.5  1.645520796  1.645530138  -9.342578728e-06  3.291050934
+    2.6  1.774903226  1.774912589  -9.363495915e-06  3.549815815
+    2.7  1.962467978  1.962477082  -9.1037988e-06  3.92494506
+    2.8  2.108777894  2.108786882  -8.987519447e-06  4.217564776
+    2.9  2.265619138  2.26562763  -8.491837891e-06  4.531246768
+    3  2.429925578  2.429933556  -7.977574433e-06  4.859859135
+    3.1  2.639109017  2.639116419  -7.402345096e-06  5.278225436
+    3.2  2.769844888  2.769851605  -6.71777764e-06  5.539696493
+    3.3  2.904680906  2.904686925  -6.018976435e-06  5.809367831
+    3.4  3.113466139  3.113471554  -5.415029146e-06  6.226937692
+    3.5  3.312202622  3.312207004  -4.382375129e-06  6.624409626
+    3.6  3.445094835  3.445098784  -3.948907953e-06  6.890193619
+    3.7  3.649459462  3.649462515  -3.052504043e-06  7.298921977
+    3.8  3.813385674  3.813388352  -2.677589918e-06  7.626774027
+    3.9  3.987483066  3.987484739  -1.673339584e-06  7.974967805
+    4  4.150971375  4.150972316  -9.412152435e-07  8.301943692
+    Atom 1: 
+    r (Bohr),  up,  down,  up - down,  up + down
+    0.1  1.292018755e-05  1.292044996e-05  -2.624126027e-10  2.584063751e-05
+    0.2  1.292018755e-05  1.292044996e-05  -2.624126027e-10  2.584063751e-05
+    0.3  1.292018755e-05  1.292044996e-05  -2.624126027e-10  2.584063751e-05
+    0.4  0.001264146136  0.001264159017  -1.288149598e-08  0.002528305153
+    0.5  0.001264146136  0.001264159017  -1.288149598e-08  0.002528305153
+    0.6  0.002457925372  0.002457950007  -2.463573976e-08  0.004915875379
+    0.7  0.009686488457  0.009686580535  -9.207825857e-08  0.01937306899
+    0.8  0.01447219958  0.01447233623  -1.366553691e-07  0.02894453581
+    0.9  0.03074731739  0.03074760783  -2.904449752e-07  0.06149492522
+    1  0.06244012709  0.06244070688  -5.797914848e-07  0.124880834
+    1.1  0.09480268913  0.09480358111  -8.919825276e-07  0.1896062702
+    1.2  0.1149047734  0.1149058571  -1.083762692e-06  0.2298106305
+    1.3  0.1596506933  0.1596521543  -1.461037928e-06  0.3193028476
+    1.4  0.2287498664  0.2287519616  -2.095210083e-06  0.457501828
+    1.5  0.3397398311  0.3397428797  -3.048522814e-06  0.6794827108
+    1.6  0.4462233126  0.4462272217  -3.909085208e-06  0.8924505344
+    1.7  0.5204755921  0.5204801133  -4.521251259e-06  1.040955705
+    1.8  0.6013074941  0.6013126372  -5.14313437e-06  1.202620131
+    1.9  0.8009374529  0.8009439151  -6.462169758e-06  1.601881368
+    2  0.8689463587  0.8689532485  -6.889861107e-06  1.737899607
+    2.1  1.041607296  1.041615106  -7.809619918e-06  2.083222402
+    2.2  1.155014537  1.15502278  -8.242461333e-06  2.310037317
+    2.3  1.324469971  1.324478859  -8.887272658e-06  2.64894883
+    2.4  1.473092469  1.473101633  -9.16380015e-06  2.946194103
+    2.5  1.645520774  1.645530137  -9.363161801e-06  3.291050911
+    2.6  1.774903203  1.774912588  -9.385154249e-06  3.54981579
+    2.7  1.962467953  1.962477079  -9.126084971e-06  3.924945033
+    2.8  2.108777868  2.108786881  -9.013058293e-06  4.217564749
+    2.9  2.265619111  2.265627631  -8.519627666e-06  4.531246742
+    3  2.429925551  2.429933559  -8.007771092e-06  4.85985911
+    3.1  2.639108989  2.639116424  -7.435204592e-06  5.278225413
+    3.2  2.76984486  2.769851613  -6.752390908e-06  5.539696473
+    3.3  2.90468088  2.904686933  -6.05309283e-06  5.809367813
+    3.4  3.113466114  3.113471563  -5.44875068e-06  6.226937677
+    3.5  3.312202599  3.312207017  -4.417598261e-06  6.624409616
+    3.6  3.445094814  3.445098798  -3.98333877e-06  6.890193612
+    3.7  3.649459446  3.649462526  -3.080921154e-06  7.298921972
+    3.8  3.81338566  3.813388366  -2.706674545e-06  7.626774026
+    3.9  3.987483056  3.987484754  -1.697696083e-06  7.974967809
+    4  4.15097137  4.150972329  -9.593504906e-07  8.301943699
+
+ Time for preparation for SCF calc. (set filling and density) = 0 days 0 h 0 m 0 s
+ Iteration 1
+  calc_hamiltonian
+  cf. dimension of subspace (up, ik=0) = 10
+ Time for calculating the one-body terms = 0 days 0 h 0 m 1 s
+ Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 3 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 38 s
+ Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 1 s
+ Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 2 s
+ Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 41 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 43 s
+ Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
+ Time for preparation for the next loop (preconditioning & Gram-Schmidt) = 0 days 0 h 0 m 0 s
+ Time for preparation for the next loop (Bcast) = 0 days 0 h 0 m 0 s
+  calc_hamiltonian
+  cf. dimension of subspace (up, ik=0) = 10
+ Time for calculating the one-body terms = 0 days 0 h 0 m 1 s
+ Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 3 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 38 s
+ Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 1 s
+ Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 2 s
+ Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 41 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 43 s
+ Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
+  diagonalize subspace Hamiltonian
+ Time for diagonalizing subspace Hamiltonian = 0 days 0 h 0 m 0 s
+ Time for diagonalizing subspace Hamiltonian (Bcast) = 0 days 0 h 0 m 0 s
+ Time for diagonalization = 0 days 0 h 0 m 0 s
+ Dump SCF wave functions (tc_wfc_scf.dat)
+ Dump SCF orbital energies (tc_energy_scf.dat)
+ Dump pwfn.data for CASINO (pwfn.data)
+ Time for dumping wave functions etc. = 0 days 0 h 0 m 0 s
+
+  bloch_states.set_filling()
+   CAUTION!! the conduction band minimum = -13.11001139 Hartree is lower than the valence band maximum = -3.08138071 Hartree
+   while the fixed-occupation is applied here.
+   Fermi energy: -83.84863698 eV
+
+   Spin 0
+   k-vector 0 0 0
+   (band index, energy (eV), filling)
+   0 -355.1285331 1
+   1 -355.1285201 1
+   2 -355.1284832 1
+   3 -341.8877793 1
+   4 -339.7218498 0
+   5 -334.101999 0
+   6 -334.1019987 0
+   7 -334.1019918 0
+   8 -334.1019913 0
+   9 -334.1019716 0
+
+   k-vector    0    0 -0.5
+   (band index, energy (eV), filling)
+   0 -367.2572164 1
+   1 -359.7631632 1
+   2 -351.4856754 1
+   3 -348.1308057 1
+   4 -342.6245613 0
+   5 -336.2375363 0
+   6 -336.2373209 0
+   7 -332.8668089 0
+   8 -330.755331 0
+   9 -330.7553305 0
+
+   k-vector    0 -0.5 -0.5
+   (band index, energy (eV), filling)
+   0 -369.6301676 1
+   1 -369.6284595 1
+   2 -356.9463544 1
+   3 -356.946201 1
+   4 -356.7415679 0
+   5 -356.7408803 0
+   6 -335.6940474 0
+   7 -335.6939682 0
+   8 -335.6935547 0
+   9 -335.6934583 0
+
+   Spin 1
+   k-vector 0 0 0
+   (band index, energy (eV), filling)
+   0 -85.42836295 1
+   1 -85.42836168 1
+   2 -85.42836036 1
+   3 -83.84863698 1
+   4 -78.42531283 0
+   5 -78.425312 0
+   6 -78.42531081 0
+   7 -76.03637495 0
+   8 -72.76154473 0
+   9 -49.48041774 0
+
+   k-vector    0    0 -0.5
+   (band index, energy (eV), filling)
+   0 -88.52873604 1
+   1 -87.62701311 1
+   2 -85.81714016 1
+   3 -85.81545721 1
+   4 -76.2478394 0
+   5 -76.14106923 0
+   6 -75.31512229 0
+   7 -67.82320355 0
+   8 -62.1429539 0
+   9 -56.39229126 0
+
+   k-vector    0 -0.5 -0.5
+   (band index, energy (eV), filling)
+   0 -87.46754009 1
+   1 -87.46752288 1
+   2 -85.93392876 1
+   3 -85.93374186 1
+   4 -71.69615269 0
+   5 -71.69615143 0
+   6 -71.68556158 0
+   7 -71.6854038 0
+   8 -67.12809862 0
+   9 -67.12796156 0
+
+   Total energy (Ewald energy) = -8.4004648 Ht.
+   Total energy (1-body terms) = ( 8.496629306 , -2.660632131e-16 ) Ht.
+   Total energy (2-body terms) = ( -32.4459078 , -2.171602591e-06 ) Ht.
+   Total energy (3-body terms) = ( -3.013812934 , -8.513425006e-09 ) Ht.
+   Total energy = ( -35.36355623 , -2.180116016e-06 ) Ht.
+   Total energy difference from the previous loop = ( -35.36355623 , -2.180116016e-06 ) Ht.
+ CAUTION!! convergence is not achieved...
+ Total time = 0 days 0 h 4 m 23 s

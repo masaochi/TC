@@ -12,7 +12,11 @@ void Parallelization::set_mpi()
 
 void Parallelization::print(std::ostream *ost) const
 {
-    *ost << "Num. of MPI Processes = " << num_mpi_processes_ << std::endl;
+    *ost << "Num. of MPI processes = " << num_mpi_processes_ << std::endl;
+
+#ifdef _OPENMP
+    *ost << "Num. of OpenMP threads = " << omp_get_max_threads() << std::endl;    
+#endif
 }
 
 // set is_assigned_...

@@ -4,7 +4,4 @@ pseudo_dir    ./example7
 qe_save_dir   ./example7
 smearing_mode fixed
 max_num_iterations 2
-A_up_up 0.8
-A_up_dn 0.8
-A_dn_dn 0.8
 reads_binary false

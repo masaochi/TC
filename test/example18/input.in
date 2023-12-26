@@ -5,7 +5,4 @@ qe_save_dir   ./example18
 smearing_mode gaussian
 smearing_width 0.1
 max_num_iterations 2
-A_up_up 0.5
-A_up_dn 0.4
-A_dn_dn 0.3
 reads_binary false

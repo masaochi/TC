@@ -16,9 +16,6 @@ private:
     bool is_spinor_;
     int num_independent_spins_; // (no-spin or non-collinear) 1, (spin-polarized spin-collinear) 2
 
-// magnetization
-// constraint?
-
 public:
     bool is_spinor() const { return is_spinor_; }
     int num_independent_spins() const { return num_independent_spins_; }

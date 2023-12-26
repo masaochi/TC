@@ -1,4 +1,4 @@
-TC++ ver.1.2
+TC++ ver.1.3
 Num. of MPI Processes = 1
 
  Read TC input (input.in)
@@ -19,10 +19,6 @@ Num. of MPI Processes = 1
   num_refresh_david = 1
   max_num_blocks_david = 2
   is_heg = false
-  A_up_up (unit: sqrt(V/(4piN)) ) = 0.8
-  A_up_dn (unit: sqrt(V/(4piN)) ) = 0.8
-  A_dn_up (unit: sqrt(V/(4piN)) ) = 0.8
-  A_dn_dn (unit: sqrt(V/(4piN)) ) = 0.8
   reads_binary = 0
 
  Bcast TC input (input.in)
@@ -365,15 +361,9 @@ Num. of MPI Processes = 1
   qes:espresso.output.basis_set.fft_grid.<xmlattr>.nr2 =  20
   qes:espresso.output.basis_set.fft_grid.<xmlattr>.nr3 =  20
   qes:espresso.output.total_energy.ewald =  0.000000000000000e0
+  qes:espresso.output.basis_set.gamma_only =  false
   qes:espresso.output.algorithmic_info.uspp =  false
   qes:espresso.output.algorithmic_info.paw =  false
-  RPA-type Jastrow parameters in atomic unit
-   A_up_up = 1.31108578
-   F_up_up = 1.619312064
-   A_up_dn = A_dn_up = 1.31108578
-   F_up_dn = F_dn_up = 1.145026541
-   A_dn_dn = 1.31108578
-   F_dn_dn = 1.619312064
 
  Read QE wave functions from ./example7/wfc1.dat
  Read QE wave functions from ./example7/wfc2.dat
@@ -390,6 +380,9 @@ Num. of MPI Processes = 1
    UPF.PP_HEADER.<xmlattr>.core_correction =  false
    UPF.PP_HEADER.<xmlattr>.z_valence =  4.00000000000000
    Z_valence = 4
+   UPF.PP_HEADER.<xmlattr>.element =  Si
+   element_name = Si
+   atomic number = 14
    UPF.PP_HEADER.<xmlattr>.mesh_size =  1141
    mesh_size = 1141
    UPF.PP_HEADER.<xmlattr>.number_of_proj =  2
@@ -397,8 +390,19 @@ Num. of MPI Processes = 1
     angular momentum = 0
     angular momentum = 1
  set_upf
+ set_atomic_number
+ Bcast upf variables
 
- Bcast_upf
+ Read Jastrow parameters from parameters.casl
+  RPA-type Jastrow parameters in atomic unit
+   A_up_up = 1.31108578
+   F_up_up = 1.619312064
+   A_up_dn = A_dn_up = 1.31108578
+   F_up_dn = F_dn_up = 1.145026541
+   A_dn_dn = 1.31108578
+   F_dn_dn = 1.619312064
+
+ Dump jastrow.plt for plotting a Jastrow function using gnuplot (jastrow.plt)
 
  Time for initialization = 0 days 0 h 0 m 0 s
  Read SCF informations (tc_scfinfo.dat)
@@ -410,15 +414,15 @@ Num. of MPI Processes = 1
 
  Start BAND calculation!
   bloch_states.set_filling()
-   Fermi energy: 4.512516874 eV
+   Fermi energy: 4.512516875 eV
 
    Spin 0
    k-vector 0 0 0
    (band index, energy (eV), filling)
-   0 -10.49549129 2
-   1 4.501789638 2
-   2 4.501892729 2
-   3 4.512516874 2
+   0 -10.49549128 2
+   1 4.50178964 2
+   2 4.501892731 2
+   3 4.512516875 2
    4 10.9619284 0
    5 10.96493118 0
    6 10.96499114 0
@@ -428,11 +432,11 @@ Num. of MPI Processes = 1
 
    k-vector    0    0 -0.5
    (band index, energy (eV), filling)
-   0 -7.491324078 2
-   1 -3.771445273 2
-   2 3.075340123 2
-   3 3.075479658 2
-   4 9.899957407 0
+   0 -7.491324077 2
+   1 -3.771445272 2
+   2 3.075340124 2
+   3 3.075479659 2
+   4 9.899957405 0
    5 11.94286586 0
    6 11.94687564 0
    7 16.16839817 0
@@ -441,14 +445,14 @@ Num. of MPI Processes = 1
 
    k-vector    0 -0.5 -0.5
    (band index, energy (eV), filling)
-   0 -5.046049947 2
-   1 -5.04055072 2
-   2 1.118543417 2
-   3 1.122504719 2
-   4 8.795118442 0
-   5 8.814074834 0
+   0 -5.046049946 2
+   1 -5.040550719 2
+   2 1.118543419 2
+   3 1.122504721 2
+   4 8.795118441 0
+   5 8.814074832 0
    6 19.86254335 0
-   7 19.86442824 0
+   7 19.86442823 0
    8 21.47460367 0
    9 22.50917506 0
 
@@ -458,24 +462,24 @@ Num. of MPI Processes = 1
    num. of electrons inside a sphere with a radius r around each atom
     Atom 0: 
     r (Bohr),  up,  down,  up - down,  up + down
-    0.1  3.444921834e-05  3.444921834e-05  0  6.889843667e-05
-    0.2  3.444921834e-05  3.444921834e-05  0  6.889843667e-05
-    0.3  3.444921834e-05  3.444921834e-05  0  6.889843667e-05
+    0.1  3.444921834e-05  3.444921834e-05  0  6.889843668e-05
+    0.2  3.444921834e-05  3.444921834e-05  0  6.889843668e-05
+    0.3  3.444921834e-05  3.444921834e-05  0  6.889843668e-05
     0.4  0.001857473908  0.001857473908  0  0.003714947817
     0.5  0.001857473908  0.001857473908  0  0.003714947817
     0.6  0.003458998056  0.003458998056  0  0.006917996112
-    0.7  0.01272259581  0.01272259581  0  0.02544519161
+    0.7  0.01272259581  0.01272259581  0  0.02544519162
     0.8  0.01867045893  0.01867045893  0  0.03734091786
     0.9  0.03835229472  0.03835229472  0  0.07670458945
     1  0.07559529476  0.07559529476  0  0.1511905895
     1.1  0.1126756696  0.1126756696  0  0.2253513392
-    1.2  0.135427126  0.135427126  0  0.2708542521
+    1.2  0.1354271261  0.1354271261  0  0.2708542521
     1.3  0.1857247426  0.1857247426  0  0.3714494852
     1.4  0.26203452  0.26203452  0  0.5240690399
     1.5  0.3824984428  0.3824984428  0  0.7649968857
-    1.6  0.4965706609  0.4965706609  0  0.9931413218
+    1.6  0.4965706609  0.4965706609  0  0.9931413219
     1.7  0.5749248669  0.5749248669  0  1.149849734
-    1.8  0.6596177692  0.6596177692  0  1.319235538
+    1.8  0.6596177693  0.6596177693  0  1.319235539
     1.9  0.8671102486  0.8671102486  0  1.734220497
     2  0.9371223414  0.9371223414  0  1.874244683
     2.1  1.112538773  1.112538773  0  2.225077546
@@ -500,12 +504,12 @@ Num. of MPI Processes = 1
     4  4.145922514  4.145922514  0  8.291845027
     Atom 1: 
     r (Bohr),  up,  down,  up - down,  up + down
-    0.1  3.446612477e-05  3.446612477e-05  0  6.893224953e-05
-    0.2  3.446612477e-05  3.446612477e-05  0  6.893224953e-05
-    0.3  3.446612477e-05  3.446612477e-05  0  6.893224953e-05
-    0.4  0.001857866231  0.001857866231  0  0.003715732462
-    0.5  0.001857866231  0.001857866231  0  0.003715732462
-    0.6  0.003459662283  0.003459662283  0  0.006919324567
+    0.1  3.446612477e-05  3.446612477e-05  0  6.893224954e-05
+    0.2  3.446612477e-05  3.446612477e-05  0  6.893224954e-05
+    0.3  3.446612477e-05  3.446612477e-05  0  6.893224954e-05
+    0.4  0.001857866231  0.001857866231  0  0.003715732463
+    0.5  0.001857866231  0.001857866231  0  0.003715732463
+    0.6  0.003459662284  0.003459662284  0  0.006919324567
     0.7  0.01272465679  0.01272465679  0  0.02544931357
     0.8  0.01867335837  0.01867335837  0  0.03734671674
     0.9  0.03835784734  0.03835784734  0  0.07671569469
@@ -520,7 +524,7 @@ Num. of MPI Processes = 1
     1.8  0.6596834524  0.6596834524  0  1.319366905
     1.9  0.8671896122  0.8671896122  0  1.734379224
     2  0.9372057921  0.9372057921  0  1.874411584
-    2.1  1.112630698  1.112630698  0  2.225261395
+    2.1  1.112630698  1.112630698  0  2.225261396
     2.2  1.228736564  1.228736564  0  2.457473129
     2.3  1.398522579  1.398522579  0  2.797045158
     2.4  1.545214445  1.545214445  0  3.09042889
@@ -575,7 +579,7 @@ Num. of MPI Processes = 1
   cf. dimension of subspace (up, ik=0) = 10
  Time for calculating the one-body terms = 0 days 0 h 0 m 0 s
  Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 0 s
- Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 1 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 1 s
@@ -587,11 +591,11 @@ Num. of MPI Processes = 1
   cf. dimension of subspace (up, ik=0) = 10
  Time for calculating the one-body terms = 0 days 0 h 0 m 0 s
  Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 0 s
- Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 0 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 1 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 1 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 1 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 2 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
   diagonalize subspace Hamiltonian
  Time for diagonalizing subspace Hamiltonian = 0 days 0 h 0 m 0 s
@@ -607,10 +611,10 @@ Num. of MPI Processes = 1
    Spin 0
    k-vector 0 0 0
    (band index, energy (eV))
-   0 -10.32076533
-   1 4.735494063
-   2 4.735503187
-   3 4.740092662
+   0 -10.32076532
+   1 4.735494064
+   2 4.735503188
+   3 4.740092663
    4 11.10660514
    5 11.1087019
    6 11.10871778
@@ -621,9 +625,9 @@ Num. of MPI Processes = 1
    k-vector   0   0 0.1
    (band index, energy (eV))
    0 -10.6710917
-   1 3.529474116
-   2 4.076388688
-   3 4.076431259
+   1 3.529474117
+   2 4.076388689
+   3 4.07643126
    4 11.01234392
    5 11.42059172
    6 11.42078453
@@ -631,7 +635,7 @@ Num. of MPI Processes = 1
    8 17.0561696
    9 17.05618775
 
-   mean absolute energy difference from the previous loop = 0.08665072125 Ht.
+   mean absolute energy difference from the previous loop = 0.08665072121 Ht.
  Iteration 2
   calc_hamiltonian
   cf. dimension of subspace (up, ik=0) = 10
@@ -641,7 +645,7 @@ Num. of MPI Processes = 1
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 1 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 1 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 2 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (preconditioning & Gram-Schmidt) = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (Bcast) = 0 days 0 h 0 m 0 s
@@ -649,11 +653,11 @@ Num. of MPI Processes = 1
   cf. dimension of subspace (up, ik=0) = 10
  Time for calculating the one-body terms = 0 days 0 h 0 m 0 s
  Time for calculating the tc-2body Hartree term = 0 days 0 h 0 m 0 s
- Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 0 s
+ Time for calculating the tc-2body exchange term = 0 days 0 h 0 m 1 s
  Time for calculating the tc-3body term (3a1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3b1) = 0 days 0 h 0 m 0 s
  Time for calculating the tc-3body term (3a2a4b2b5) = 0 days 0 h 0 m 1 s
- Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 1 s
+ Time for calculating the tc-3body term (3a3b3b4b6) = 0 days 0 h 0 m 2 s
  Time for Reduce() Hamiltonian*phi = 0 days 0 h 0 m 0 s
   diagonalize subspace Hamiltonian
  Time for diagonalizing subspace Hamiltonian = 0 days 0 h 0 m 0 s
@@ -670,9 +674,9 @@ Num. of MPI Processes = 1
    k-vector 0 0 0
    (band index, energy (eV))
    0 -10.31407164
-   1 4.755228656
-   2 4.75523763
-   3 4.759745549
+   1 4.755228657
+   2 4.755237632
+   3 4.75974555
    4 11.09786005
    5 11.09995923
    6 11.09997359
@@ -684,14 +688,14 @@ Num. of MPI Processes = 1
    (band index, energy (eV))
    0 -10.62730127
    1 3.720127142
-   2 4.194678444
+   2 4.194678445
    3 4.194767912
    4 10.86782595
-   5 11.31013265
+   5 11.31013264
    6 11.31027973
-   7 12.98347666
-   8 17.04817459
-   9 17.04818809
+   7 12.98347665
+   8 17.04817458
+   9 17.04818808
 
  CAUTION!! convergence is not achieved...
- Total time = 0 days 0 h 0 m 20 s
+ Total time = 0 days 0 h 0 m 21 s

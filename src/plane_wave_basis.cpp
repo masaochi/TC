@@ -3,6 +3,47 @@
 
 #include "include/header.hpp"
 
+// private
+// called from set_Gvector_at_k()
+void PlaneWaveBasis::set_G_from_mill(const int ipw_at_k, const int npw_at_k_org, const std::vector<int> &mill,
+                                     Eigen::Vector3i &Gvector, int &icount, int &zero_index)
+{
+    if (ipw_at_k<npw_at_k_org) // For !gamma_only, all ipw_at_k. For gamma_only, a half of ipw_at_k.
+    {
+        for (int idim=0; idim<3; idim++)
+        {
+            Gvector(idim) = mill[icount]; // mill(1:3,1:npw_at_k) in the fortran code (see io_qe_files_read_wfc.f90)
+            ++icount;
+
+            while (Gvector(idim) <= -(size_FFT_grid_vec_[idim]+1)/2) { Gvector(idim) += size_FFT_grid_vec_[idim]; }
+            while (Gvector(idim) > size_FFT_grid_vec_[idim]/2) { Gvector(idim) -= size_FFT_grid_vec_[idim]; }
+        }
+        // find the index of G=(0,0,0)
+        if (Gvector(0)==0 && Gvector(1)==0 && Gvector(2)==0)
+        {
+            zero_index = icount/3 -1; // mill[zero_index*3 + 0--2] = zero vector. (zero_index = 0, 1, 2,...)
+        }
+    }
+    else // For gamma_only, not included in "mill". make -G from G.
+    {
+        if (zero_index<0) { error_messages::stop("G=0 was not found in mill"); }
+        if (icount == 3*(npw_at_k_org + zero_index)) // skip G=0
+        {
+            icount += 3;
+        }
+        
+        for (int idim=0; idim<3; idim++)
+        {
+            Gvector(idim) = -mill[icount - 3*npw_at_k_org]; // NOTE the minus sign!
+            ++icount;
+
+            while (Gvector(idim) <= -(size_FFT_grid_vec_[idim]+1)/2) { Gvector(idim) += size_FFT_grid_vec_[idim]; }
+            while (Gvector(idim) > size_FFT_grid_vec_[idim]/2) { Gvector(idim) -= size_FFT_grid_vec_[idim]; }
+        }
+    } // if (ipw_at_k<npw_at_k_org)
+}
+
+// public
 void PlaneWaveBasis::resize_G_at_k(const int num_independent_spins, const int num_irreducible_kpoints,
                                    const std::string &calc_mode)
 { 
@@ -36,12 +77,13 @@ void PlaneWaveBasis::set_num_G_at_k(const std::vector<int> num_G_at_k, const std
     num_G_at_k_ref_ = num_G_at_k;
 }
 
+// zero_index will be used outside this function... see also blochstates.set_phik_qe() for gamma_only treatment
 void PlaneWaveBasis::set_Gvector_at_k(const Symmetry &symmetry, const Kpoints &kpoints,
                                       const int ispin, const int ik, const std::vector<int> &mill,
-                                      const std::string &calc_mode)
+                                      int &zero_index, const std::string &calc_mode)
 {
     assert(calc_mode=="SCF" || calc_mode=="BAND");
-    const std::vector<int> &num_G_at_k_ref_ =
+    std::vector<int> &num_G_at_k_ref_ =
         calc_mode=="SCF" ? num_G_at_k_scf_ : num_G_at_k_band_;
     std::vector<std::vector<std::vector<Eigen::VectorXi> > > &Gindex_at_k_ref_ =
         calc_mode=="SCF" ? Gindex_at_k_scf_ : Gindex_at_k_band_;
@@ -53,6 +95,11 @@ void PlaneWaveBasis::set_Gvector_at_k(const Symmetry &symmetry, const Kpoints &k
     assert(ik < Gindex_at_k_ref_[ispin].size());
 
     const int nsym = calc_mode=="SCF" ? kpoints.kvectors_scf()[ik].size() : 1; // num. of equivalent k-points
+    const int npw_at_k_org = (gamma_only_ && ispin==1) ? (num_G_at_k_ref_[ik] + 1)/2 : num_G_at_k_ref_[ik]; // For gamma_only_ && ispin==1, npw_at_k was already reset.
+    if (gamma_only_ && ispin==0) // reset num_G_at_k_ref_[ik]
+    {
+        num_G_at_k_ref_[ik] = npw_at_k_org*2 - 1; // by using u(-G)=u(G)^*. -1: no double count for G=(0,0,0).
+    }
     const int npw_at_k = num_G_at_k_ref_[ik]; // num. of plane waves
 
     Gindex_at_k_ref_[ispin][ik].resize(nsym);    
@@ -65,19 +112,14 @@ void PlaneWaveBasis::set_Gvector_at_k(const Symmetry &symmetry, const Kpoints &k
     }
 
     Eigen::Vector3i Gvector, Gvector_sym;
+    zero_index = -1;
     if (calc_mode=="SCF")
     {
         int icount = 0;
         for (int ipw_at_k=0; ipw_at_k<npw_at_k ; ipw_at_k++) // G-grid at k (smaller than the FFT grid)
         {
-            for (int idim=0; idim<3; idim++)
-            {
-                Gvector(idim) = mill[icount]; // mill(1:3,1:npw_at_k) in the fortran code (see read_qe_wfc.f90)
-                ++icount;
-
-                while (Gvector(idim) <= -(size_FFT_grid_vec_[idim]+1)/2) { Gvector(idim) += size_FFT_grid_vec_[idim]; }
-                while (Gvector(idim) > size_FFT_grid_vec_[idim]/2) { Gvector(idim) -= size_FFT_grid_vec_[idim]; }
-            }
+            // mill -> Gvector and increase icount by 3
+            set_G_from_mill(ipw_at_k, npw_at_k_org, mill, Gvector, icount, zero_index);
             
             for (int isym=0; isym<nsym; isym++)
             {
@@ -105,11 +147,11 @@ void PlaneWaveBasis::set_Gvector_at_k(const Symmetry &symmetry, const Kpoints &k
         int icount = 0;
         for (int ipw_at_k=0; ipw_at_k<npw_at_k ; ipw_at_k++) // G-grid at k (smaller than the FFT grid)
         {
+            // mill -> Gvector and increase icount by 3
+            set_G_from_mill(ipw_at_k, npw_at_k_org, mill, Gvector, icount, zero_index);
+
             for (int idim=0; idim<3; idim++)
             {
-                Gvector(idim) = mill[icount]; // mill(1:3,1:npw_at_k) in the fortran code (see read_qe_wfc.f90)
-                ++icount;
-
                 while (Gvector(idim)<0) { Gvector(idim) += size_FFT_grid_vec_[idim]; }
                 while (Gvector(idim)>=size_FFT_grid_vec_[idim]) { Gvector(idim) -= size_FFT_grid_vec_[idim]; }
             }
@@ -132,27 +174,32 @@ void PlaneWaveBasis::set_scfinfo(const std::vector<int> &num_G_at_k_scf,
 
 void PlaneWaveBasis::setup_FFT(const int nr1, const int nr2, const int nr3)
 {
-    assert(are_FFTarrays_initialized_ == false); // not initialized twice!
+    assert(!are_FFTarrays_initialized_); // not initialized twice!
     assert(nr1 > 0 && nr2 > 0 && nr3 > 0);
 
     size_FFT_grid_vec_.resize(3);
     size_FFT_grid_vec_ = {nr1, nr2, nr3};
     size_FFT_grid_ = nr1*nr2*nr3;
+
+    in_forward_ = (Complex*) fftw_malloc(sizeof(Complex)*size_FFT_grid_);
+    out_forward_ = (Complex*) fftw_malloc(sizeof(Complex)*size_FFT_grid_);
+    in_backward_ = (Complex*) fftw_malloc(sizeof(Complex)*size_FFT_grid_);
+    out_backward_ = (Complex*) fftw_malloc(sizeof(Complex)*size_FFT_grid_);
     
-    in_forward = (Complex*) fftw_malloc(sizeof(Complex)*size_FFT_grid_);
-    out_forward = (Complex*) fftw_malloc(sizeof(Complex)*size_FFT_grid_);
-    in_backward = (Complex*) fftw_malloc(sizeof(Complex)*size_FFT_grid_);
-    out_backward = (Complex*) fftw_malloc(sizeof(Complex)*size_FFT_grid_);
-    
-    plan_forward = fftw_plan_dft_3d(size_FFT_grid_vec_[2],size_FFT_grid_vec_[1],size_FFT_grid_vec_[0],
-                                    reinterpret_cast<fftw_complex*>(in_forward),
-                                    reinterpret_cast<fftw_complex*>(out_forward),
-                                    FFTW_FORWARD,FFTW_PATIENT);
-    plan_backward = fftw_plan_dft_3d(size_FFT_grid_vec_[2],size_FFT_grid_vec_[1],size_FFT_grid_vec_[0],
-                                     reinterpret_cast<fftw_complex*>(in_backward),
-                                     reinterpret_cast<fftw_complex*>(out_backward),
-                                     FFTW_BACKWARD,FFTW_PATIENT);
+    plan_forward_ = fftw_plan_dft_3d(size_FFT_grid_vec_[2],size_FFT_grid_vec_[1],size_FFT_grid_vec_[0],
+                                     reinterpret_cast<fftw_complex*>(in_forward_),
+                                     reinterpret_cast<fftw_complex*>(out_forward_),
+                                     FFTW_FORWARD,FFTW_PATIENT);
+    plan_backward_ = fftw_plan_dft_3d(size_FFT_grid_vec_[2],size_FFT_grid_vec_[1],size_FFT_grid_vec_[0],
+                                      reinterpret_cast<fftw_complex*>(in_backward_),
+                                      reinterpret_cast<fftw_complex*>(out_backward_),
+                                      FFTW_BACKWARD,FFTW_PATIENT);
     are_FFTarrays_initialized_ = true;
+}
+
+void PlaneWaveBasis::set_gamma_only(const bool gamma_only)
+{
+    gamma_only_ = gamma_only;
 }
 
 Eigen::Vector3i PlaneWaveBasis::get_Gvector(const int &ipw) const
@@ -227,18 +274,18 @@ void PlaneWaveBasis::get_orbital_FFTgrid(const int &ispin, const int &ik, const 
 void PlaneWaveBasis::FFT_forward(const Eigen::VectorXcd &in, Eigen::VectorXcd &out)
 {
     assert(in.rows() == size_FFT_grid_ && out.rows() == size_FFT_grid_);
-    for (int i=0;i<size_FFT_grid_;++i) { in_forward[i] = in(i); }
-    fftw_execute(plan_forward);
-    for (int i=0;i<size_FFT_grid_;++i) { out(i) = out_forward[i]/static_cast<double>(size_FFT_grid_); }
+    for (int i=0;i<size_FFT_grid_;++i) { in_forward_[i] = in(i); }
+    fftw_execute(plan_forward_);
+    for (int i=0;i<size_FFT_grid_;++i) { out(i) = out_forward_[i]/static_cast<double>(size_FFT_grid_); }
 }
 
 // G-space -> R-space
 void PlaneWaveBasis::FFT_backward(const Eigen::VectorXcd &in, Eigen::VectorXcd &out)
 {
     assert(in.rows() == size_FFT_grid_ && out.rows() == size_FFT_grid_);
-    for (int i=0;i<size_FFT_grid_;++i) { in_backward[i] = in(i); }
-    fftw_execute(plan_backward);
-    for (int i=0;i<size_FFT_grid_;++i) { out(i) = out_backward[i]; }
+    for (int i=0;i<size_FFT_grid_;++i) { in_backward_[i] = in(i); }
+    fftw_execute(plan_backward_);
+    for (int i=0;i<size_FFT_grid_;++i) { out(i) = out_backward_[i]; }
 }
 
 void PlaneWaveBasis::bcast(const std::string &calc_mode, const bool am_i_mpi_rank0,
@@ -258,7 +305,6 @@ void PlaneWaveBasis::bcast(const std::string &calc_mode, const bool am_i_mpi_ran
 
     // set array size of num_G_at_k_ref_ and Gvector_at_k_ref_
     if (!am_i_mpi_rank0) { resize_G_at_k(num_independent_spins, num_irreducible_kpoints, calc_mode); }
-
     MPI_Bcast(&num_G_at_k_ref_[0], num_irreducible_kpoints, MPI_INT, 0, MPI_COMM_WORLD);
 
     // bcast Gindex_at_k_ref_ & phase_factor_at_k_ (for SCF)
@@ -291,17 +337,20 @@ void PlaneWaveBasis::bcast(const std::string &calc_mode, const bool am_i_mpi_ran
         MPI_Bcast(&ivec[0], 3, MPI_INT, 0, MPI_COMM_WORLD);
         if (!am_i_mpi_rank0) { setup_FFT(ivec[0], ivec[1], ivec[2]); }
     }
+
+    // gamma_only
+    MPI_Bcast(&gamma_only_, 1, MPI_CXX_BOOL, 0, MPI_COMM_WORLD);
 }
 
 PlaneWaveBasis::~PlaneWaveBasis()
 {
     if (are_FFTarrays_initialized_)
     {
-        fftw_destroy_plan(plan_forward);
-        fftw_destroy_plan(plan_backward);
-        fftw_free(in_forward);
-        fftw_free(out_forward);
-        fftw_free(in_backward);
-        fftw_free(out_backward);
+        fftw_destroy_plan(plan_forward_);
+        fftw_destroy_plan(plan_backward_);
+        fftw_free(in_forward_);
+        fftw_free(out_forward_);
+        fftw_free(in_backward_);
+        fftw_free(out_backward_);
     }
 }

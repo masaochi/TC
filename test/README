@@ -10,7 +10,7 @@ DO NOT use the input files (including pseudopot.) provided here for your researc
 These were made only for test calculation...
 
 [NOTE]
-test_full.py is given for developers, which will take 10--20 minutes.
+test_full1.py, test_full2.py, and test_full3.py are given for developers, which will take > 30 minutes in total.
 
 [NOTE]
 "reads_binary false" is specified in "input.in" provided here.

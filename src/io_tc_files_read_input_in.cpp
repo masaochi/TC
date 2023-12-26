@@ -68,20 +68,26 @@ void io_tc_files::read_input_in(FileNames &file_names,
 
         double energy_tolerance = diagonalization.energy_tolerance();
         double charge_tolerance = diagonalization.charge_tolerance();
+        double force_tolerance = diagonalization.force_tolerance();
         int max_num_iterations = diagonalization.max_num_iterations();
+        int max_num_ionic_steps = diagonalization.max_num_ionic_steps();
         bool mixes_density_matrix = diagonalization.mixes_density_matrix();
         double mixing_beta = diagonalization.mixing_beta();
         int num_refresh_david = diagonalization.num_refresh_david();
         int max_num_blocks_david = diagonalization.max_num_blocks_david();
+        bool biortho_david = diagonalization.biortho_david();
+        bool dumps_pwfn = diagonalization.dumps_pwfn();
+        bool reads_crystal_structure = diagonalization.reads_crystal_structure();
 
         bool is_heg = potentials.is_heg();
 
         std::vector<std::vector<double> > A_long = potentials.jastrow.A_long();
+        bool is_A_given_in_input_in = potentials.jastrow.is_A_given_in_input_in();
 
         bool reads_binary = file_names.reads_binary();
 
         std::string sline, s1, s2;
-        std::vector<bool> is_already_set(21, false); // 21 = total num. of the input keywords
+        std::vector<bool> is_already_set(26, false); // 26: total num. of the input keywords
         while (std::getline(ifs, sline))
         {
             std::stringstream ss{sline};
@@ -147,66 +153,96 @@ void io_tc_files::read_input_in(FileNames &file_names,
                 charge_tolerance = boost::lexical_cast<double>(s2); 
                 is_already_set[10] = true;
             }
+            else if (s1=="force_tolerance") 
+            {
+                if (is_already_set[11]) { already_set_error(s1, ost); }
+                force_tolerance = boost::lexical_cast<double>(s2); 
+                is_already_set[11] = true;
+            }
             else if (s1=="max_num_iterations") 
             { 
-                if (is_already_set[11]) { already_set_error(s1, ost); }
+                if (is_already_set[12]) { already_set_error(s1, ost); }
                 max_num_iterations = boost::lexical_cast<int>(s2); 
-                is_already_set[11] = true;
+                is_already_set[12] = true;
+            }
+            else if (s1=="max_num_ionic_steps") 
+            { 
+                if (is_already_set[13]) { already_set_error(s1, ost); }
+                max_num_ionic_steps = boost::lexical_cast<int>(s2); 
+                is_already_set[13] = true;
             }
             else if (s1=="mixing_beta") 
             { 
-                if (is_already_set[12]) { already_set_error(s1, ost); }
+                if (is_already_set[14]) { already_set_error(s1, ost); }
                 mixing_beta = boost::lexical_cast<double>(s2);
-                is_already_set[12] = true;
+                is_already_set[14] = true;
             }
             else if (s1=="num_refresh_david") 
             { 
-                if (is_already_set[13]) { already_set_error(s1, ost); }
+                if (is_already_set[15]) { already_set_error(s1, ost); }
                 num_refresh_david = boost::lexical_cast<int>(s2); 
-                is_already_set[13] = true;
+                is_already_set[15] = true;
             }
             else if (s1=="max_num_blocks_david") 
             { 
-                if (is_already_set[14]) { already_set_error(s1, ost); }
+                if (is_already_set[16]) { already_set_error(s1, ost); }
                 max_num_blocks_david = boost::lexical_cast<int>(s2); 
-                is_already_set[14] = true;
+                is_already_set[16] = true;
+            }
+            else if (s1=="biortho_david")
+            {
+                if (is_already_set[17]) { already_set_error(s1, ost); }
+                biortho_david = read_bool(s1,s2); 
+                is_already_set[17] = true;
+            }
+            else if (s1=="dumps_pwfn")
+            {
+                if (is_already_set[18]) { already_set_error(s1, ost); }
+                dumps_pwfn = read_bool(s1,s2); 
+                is_already_set[18] = true;
             }
             else if (s1=="is_heg")
             {
-                if (is_already_set[15]) { already_set_error(s1, ost); }
+                if (is_already_set[19]) { already_set_error(s1, ost); }
                 is_heg = read_bool(s1,s2); 
-                is_already_set[15] = true;
+                is_already_set[19] = true;
+            }
+            else if (s1=="reads_crystal_structure")
+            {
+                if (is_already_set[20]) { already_set_error(s1, ost); }
+                reads_crystal_structure = read_bool(s1,s2); 
+                is_already_set[20] = true;
             }
             else if (s1=="A_up_up") 
             { 
-                if (is_already_set[16]) { already_set_error(s1, ost); }
+                if (is_already_set[21]) { already_set_error(s1, ost); }
                 A_long[0][0] = boost::lexical_cast<double>(s2);
-                is_already_set[16] = true;
+                is_already_set[21] = true;
             }
             else if (s1=="A_up_dn") 
             { 
-                if (is_already_set[17]) { already_set_error(s1, ost); }
+                if (is_already_set[22]) { already_set_error(s1, ost); }
                 A_long[0][1] = boost::lexical_cast<double>(s2); // = A_up_dn
                 A_long[1][0] = boost::lexical_cast<double>(s2); // = A_dn_up
-                is_already_set[17] = true;
+                is_already_set[22] = true;
             }
             else if (s1=="A_dn_dn") 
             { 
-                if (is_already_set[18]) { already_set_error(s1, ost); }
+                if (is_already_set[23]) { already_set_error(s1, ost); }
                 A_long[1][1] = boost::lexical_cast<double>(s2);
-                is_already_set[18] = true;
+                is_already_set[23] = true;
             }
             else if (s1=="mixes_density_matrix")
             {
-                if (is_already_set[19]) { already_set_error(s1, ost); }
+                if (is_already_set[24]) { already_set_error(s1, ost); }
                 mixes_density_matrix = read_bool(s1,s2); 
-                is_already_set[19] = true;
+                is_already_set[24] = true;
             }
             else if (s1=="reads_binary") 
             {
-                if (is_already_set[20]) { already_set_error(s1, ost); }
+                if (is_already_set[25]) { already_set_error(s1, ost); }
                 reads_binary = read_bool(s1,s2);
-                is_already_set[20] = true;
+                is_already_set[25] = true;
             }
             else if (s1!="" && s1.c_str()[0]!='#' && s1!="num_bands_tc") // neither a void line nor a comment line
             {
@@ -219,11 +255,12 @@ void io_tc_files::read_input_in(FileNames &file_names,
         if (!is_already_set[1]) { error_messages::stop("The keyword calc_mode should be specified in input.in"); }
         if (!is_already_set[2]) { error_messages::stop("The keyword qe_save_dir should be specified in input.in"); }
         if (!is_already_set[3]) { error_messages::stop("The keyword pseudo_dir should be specified in input.in"); }
-        if (!((is_already_set[16] && is_already_set[17] && is_already_set[18]) ||
-              (!is_already_set[16] && !is_already_set[17] && !is_already_set[18])))
+        if (!((is_already_set[21] && is_already_set[22] && is_already_set[23]) ||
+              (!is_already_set[21] && !is_already_set[22] && !is_already_set[23])))
         {
-            error_messages::stop("Jastrow A parameters (A_up_up, A_up_dn, A_dn_dn) are only partially given in input.in");
+            error_messages::stop("Jastrow A parameters (A_up_up, A_up_dn, A_dn_dn) are only partially given in input.in. Specify all or do not specify them in input.in.");
         }
+        is_A_given_in_input_in = (is_already_set[21] || is_already_set[22] || is_already_set[23]);
 
         ifs.clear();
         ifs.seekg(0, std::ios_base::beg);
@@ -243,13 +280,17 @@ void io_tc_files::read_input_in(FileNames &file_names,
         kpoints.set_tc_input(smearing_mode, smearing_width);
         diagonalization.set(restarts,
                             energy_tolerance, charge_tolerance,
-                            max_num_iterations, 
+                            force_tolerance,
+                            max_num_iterations, max_num_ionic_steps,
                             mixes_density_matrix, mixing_beta,
                             num_refresh_david, max_num_blocks_david,
-                            method.calc_mode(), is_heg);
+                            biortho_david, dumps_pwfn, reads_crystal_structure,
+                            method.calc_mode(), method.calc_method(), is_heg);
         potentials.set_includes_div_correction(includes_div_correction);
         potentials.set_is_heg(is_heg);
-        potentials.jastrow.set(A_long);
+        potentials.jastrow.set_A_long(A_long);
+        potentials.jastrow.set_is_A_given_in_input_in(is_A_given_in_input_in);
+
         if (!reads_binary) { file_names.set_reads_binary_false(ost); }
 
         // Show parameters set here (if not specified in the input file, a default value is shown)
@@ -269,18 +310,24 @@ void io_tc_files::read_input_in(FileNames &file_names,
         *ost << "  includes_div_correction = " << bool_to_string(potentials.includes_div_correction()) << std::endl;
         *ost << "  energy_tolerance = " << diagonalization.energy_tolerance() << std::endl;
         *ost << "  charge_tolerance = " << diagonalization.charge_tolerance() << std::endl;
+        *ost << "  force_tolerance = " << diagonalization.force_tolerance() << std::endl;
         *ost << "  max_num_iterations = " << diagonalization.max_num_iterations() << std::endl;
+        *ost << "  max_num_ionic_steps = " << diagonalization.max_num_ionic_steps() << std::endl;
         *ost << "  mixes_density_matrix = " << bool_to_string(diagonalization.mixes_density_matrix()) << std::endl;
         *ost << "  mixing_beta = " << diagonalization.mixing_beta() << std::endl;
         *ost << "  num_refresh_david = " << diagonalization.num_refresh_david() << std::endl;
         *ost << "  max_num_blocks_david = " << diagonalization.max_num_blocks_david() << std::endl;
+        *ost << "  biortho_david = " << bool_to_string(diagonalization.biortho_david()) << std::endl;
+        *ost << "  dumps_pwfn = " << bool_to_string(diagonalization.dumps_pwfn()) << std::endl;
+        *ost << "  reads_crystal_structure = " << bool_to_string(diagonalization.reads_crystal_structure()) << std::endl;
         *ost << "  is_heg = " << bool_to_string(potentials.is_heg()) << std::endl;
-        if (method.calc_method()=="TC" || method.calc_method()=="BITC")
+        if (is_A_given_in_input_in)
         {
             *ost << "  A_up_up (unit: sqrt(V/(4piN)) ) = " << potentials.jastrow.A_long()[0][0] << std::endl;
             *ost << "  A_up_dn (unit: sqrt(V/(4piN)) ) = " << potentials.jastrow.A_long()[0][1] << std::endl;
             *ost << "  A_dn_up (unit: sqrt(V/(4piN)) ) = " << potentials.jastrow.A_long()[1][0] << std::endl;
             *ost << "  A_dn_dn (unit: sqrt(V/(4piN)) ) = " << potentials.jastrow.A_long()[1][1] << std::endl;
+            *ost << "  Jastrow parameters in atomic unit will be shown later." << std::endl;
         }
         if (!reads_binary)
         {
@@ -306,10 +353,10 @@ void io_tc_files::bcast_input_in(FileNames &file_names,
     diagonalization.bcast(am_i_mpi_rank0);
     method.bcast(am_i_mpi_rank0);
     kpoints.bcast_tc_input(am_i_mpi_rank0);
-    // Note: bloch_states.num_bands_tc_ will be Bcast in read_qe().
-    // because this variable is possibly initialized by num_band_qe_ in read_qe_xml().
+    // Note: bloch_states.num_bands_tc_ will be Bcast in io_qe_files::read_qe().
+    // because this variable is possibly initialized by num_band_qe_ in io_qe_files::read_qe_xml().
     potentials.bcast_tc_input();
-    // Jatrow parameters will be bcast later (after normalization using QE variables)
+    potentials.jastrow.bcast_A_long();
 
     if (am_i_mpi_rank0) { *ost << std::endl; }
 }
