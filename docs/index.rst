@@ -1,4 +1,4 @@
-User's Guide for TC++ ver.1.2
+User's Guide for TC++ ver.1.3
 =============================
 
 .. toctree::

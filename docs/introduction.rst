@@ -10,11 +10,12 @@ Supported Functionalities
 
 - Free-electron mode (FREE), HF, TC, BITC (biorthogonal TC)
 - SCF and band calculations
+- (from ver.1.3) Cell-fixed structural optimization for HF and BITC. Hellmann--Feynman theorem holds for BITC but not for TC.
 - Solid-state calculation under the periodic boundary condition. Homogeneous-electron-gas calculation using a periodic cell is also possible.
 - Plane-wave basis set
 - Norm-conserving pseudopotentials without partial core correction (available, e.g., in `Pseudopotential Library <https://pseudopotentiallibrary.org/>`_)
 - For spin-polarized calculation, only spin-collinear calculation without spin-orbit coupling is available.
-- Monkhorst-Pack k-grid with/without a shift. A k-grid should not break any crystal symmetry. Gamma-only calculation is at present not supported.
+- Monkhorst-Pack k-grid with/without a shift. A k-grid should not break any crystal symmetry.
 - RPA-type Jastrow factor
   :math:`u_{\sigma, \sigma'}({\bf r}, {\bf r'}) = \frac{A_{\sigma, \sigma'}}{|{\bf r}-{\bf r'}|}(1-e^{-|{\bf r}-{\bf r'}|/C_{\sigma,\sigma'}})`
   
@@ -31,6 +32,18 @@ Author & Contact
 
 History
 -------
+- 2023/12/26 ver.1.3
+
+  + Cell-fixed structural optimization is implemented for HF and BITC. Hellmann--Feynman theorem holds for BITC but not for TC.
+  + Gamma-only calculation is supported.
+  + Dump ``jastrow.plt`` to display the Jastrow function (can be used by ``load "jastrow.plt"`` with **gnuplot**)
+  + MPI+OpenMP parallelization. OpenMP is mainly for memory saving, not so efficient with respect to computational time.
+  + Test implementation for polynomial Jastrow functions (Not shown in the manual, will be described in a future release)
+  + Default values of the energy and charge convergence criteria are lowered by a factor of 10.
+  + Some cpp file names are changed (read_qe.cpp -> io_qe_files_read.cpp etc.)
+  + Bug fix for spin-polarized calculation (fixed in ver.1.2.2)
+  + Bug fix for divergence correction for TC and BITC (fixed in ver.1.2.3)
+    
 - 2023/1/16 ver.1.2
 
   + cmake and test are implemented.

@@ -60,12 +60,12 @@ Perform TC++ calculation with a command, e.g.,
 
    $ mpirun -np 4 $HOME/TC++/ver.1.0/src/tc++
 
-Since TC++ does not use OpenMP parallelization, please set **OMP_NUM_THREADS** to be 1.
+One can also use MPI+OpenMP parallelization by setting **OMP_NUM_THREADS** to a non-unity value, while MPI is more efficient than OpenMP with respect to computational time in TC++.
 
 .. note::
 
-   If you find that the memory requirement is too demanding for your machines, it is possible to specify a larger value for **OMP_NUM_THREADS**,
-   which reduces the memory requirement **per node** in parallelized calculation.
+   If you find that the memory requirement is too demanding (e.g., in massively parallel computation), MPI+OpenMP calculation with a large value of **OMP_NUM_THREADS**
+   can reduce the memory requirement **per node**.
 
 .. _output_files:
 
@@ -92,6 +92,20 @@ The following output files are obtained by TC++ calculation:
   These information are also shown in ``output.out``.
   For spin-polarized calculation, ``tc_bandplot_up.dat`` and ``tc_bandplot_dn.dat`` are dumped instead.
 
+- ``jastrow.plt`` (from ver.1.3)
+
+  A Jastrow function used in calculation is shown when ``calc_method = TC`` or ``calc_method = BITC``.
+  ``load 'jastrow.plt'``
+  with **gnuplot** will show the spin-parallel and spin-antiparallel Jastrow functions (in atomic unit).
+
+- ``tc_crystal_structure.dat`` (from ver.1.3)
+
+  An optimized crystal structure is dumped after structural optimization.
+  This file can be read for further (subsequent) structural optimization calculation by setting ``reads_crystal_structure = true`` (i.e., users can restart the structural optimization from the new structure).
+  Note that the structural optimization is switched on only when ``calc_mode = SCF`` and ``is_heg = false`` (default) and  ``calc_method = HF or BITC`` and ``max_num_ionic_steps > 0``.
+  Thus, if you would like to perform SCF and BAND calculations after the structural optimization, please rerun QE with the optimized crystal structure because
+  SCF nor BAND calculation with ``max_num_ionic_steps = 0`` (default) cannot read ``tc_crystal_structure.dat``. This is because rerunning QE is safer in accuracy considering that an initial guess of the orbitals is given by QE.
+  
 The following binary files are dumped in TC++ calculation.
 Users will not read them but some subsequent TC++ calculations need them.
 

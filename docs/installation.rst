@@ -97,7 +97,7 @@ and copy ``tc++`` compiled above to the ``test`` directory. Then, test calculati
 
 .. note::
 
-   ``test_full.py`` is also provided to cover a wider range of functionalities. This test is rather for developers, which will take 10--20 minutes.
+   ``test_full*.py`` is also provided to cover a wider range of functionalities. This test is rather for developers, which will take > 30 minutes.
 
 .. note::
 

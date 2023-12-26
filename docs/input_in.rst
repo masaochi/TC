@@ -17,9 +17,9 @@ All inputs are case-sensitive. Keywords listed in the alphabetical order:
 calc_method_ , calc_mode_ , pseudo_dir_ , qe_save_dir_
 
 [**Optional keywords**]
-A_dn_dn_ , A_up_dn_ , A_up_up_ , charge_tolerance_ , energy_tolerance_ , includes_div_correction_ ,
-is_heg_ , max_num_blocks_david_ , max_num_iterations_ , mixes_density_matrix_ , mixing_beta_ , num_bands_tc_ ,
-num_refresh_david_ , restarts_ , smearing_mode_ , smearing_width_ 
+A_dn_dn_ , A_up_dn_ , A_up_up_ , charge_tolerance_ , energy_tolerance_ , force_tolerance_ , includes_div_correction_ ,
+is_heg_ , max_num_blocks_david_ , max_num_ionic_steps_ , max_num_iterations_ , mixes_density_matrix_ , mixing_beta_ , num_bands_tc_ ,
+num_refresh_david_ , reads_crystal_structure_ , restarts_ , smearing_mode_ , smearing_width_ 
 
 Mandatory Keywords
 ------------------
@@ -105,22 +105,32 @@ Optional keywords
 
 .. _charge_tolerance:
 
-+------------------------------------+-----------------------------------------------------------------------------+
-| **charge_tolerance**               | REAL                                                                        |
-+------------------------------------+-----------------------------------------------------------------------------+
-| *Default:* 1e-4                    | :math:`\geq 0`                                                              |
-+------------------------------------+-----------------------------------------------------------------------------+
++------------------------------------------------+-----------------------------------------------------------------+
+| **charge_tolerance**                           | REAL                                                            |
++------------------------------------------------+-----------------------------------------------------------------+
+| *Default:* 1e-5 (1e-4 for ver.1.2 and before)  | :math:`\geq 0`                                                  |
++------------------------------------------------+-----------------------------------------------------------------+
 | In :math:`e^-`. Convergence criteria for the charge density, used only for calc_mode_ = SCF.                     |
 +------------------------------------------------------------------------------------------------------------------+
 
 .. _energy_tolerance:
 
-+------------------------------------+-------------------------------------------------------------------+
-| **energy_tolerance**               | REAL                                                              |
-+------------------------------------+-------------------------------------------------------------------+
-| *Default:* 1e-5                    | :math:`\geq 0`                                                    |
-+------------------------------------+-------------------------------------------------------------------+
++-----------------------------------------------+--------------------------------------------------------+
+| **energy_tolerance**                          | REAL                                                   |
++-----------------------------------------------+--------------------------------------------------------+
+| *Default:* 1e-6 (1e-5 for ver.1.2 and before) | :math:`\geq 0`                                         |
++-----------------------------------------------+--------------------------------------------------------+
 | In Ht. Convergence criteria for the total energy (calc_mode_ = SCF) or a sum of eigenvalues (BAND).    |
++--------------------------------------------------------------------------------------------------------+
+
+.. _force_tolerance:
+
++------------------------------------+-------------------------------------------------------------------+
+| **force_tolerance** (from ver.1.3) | REAL                                                              |
++------------------------------------+-------------------------------------------------------------------+
+| *Default:* 1e-2                    | :math:`\geq 0`                                                    |
++------------------------------------+-------------------------------------------------------------------+
+| In eV/ang. Convergence criteria for the force in structural optimization (see max_num_ionic_steps_)    |
 +--------------------------------------------------------------------------------------------------------+
 
 .. _includes_div_correction:
@@ -167,6 +177,17 @@ Optional keywords
 | Maximum number of iterations for the self-consistent-field loop (Also needed for calc_mode_ = BAND).     |
 +----------------------------------------------------------------------------------------------------------+
 
+.. _max_num_ionic_steps:
+
++---------------------------------------------------------------+------------------------------------------+
+| **max_num_ionic_steps** (from ver.1.3)                        | INTEGER                                  |
++---------------------------------------------------------------+------------------------------------------+
+| *Default:* 0                                                  | :math:`\geq 0`                           |
++---------------------------------------------------------------+------------------------------------------+
+| | Maximum number of structural-optimization steps. Structural optimization is switched on when           |
+| | calc_mode_ = SCF and is_heg_ = false and max_num_ionic_steps_ > 0 and calc_method_ = HF or BITC.       |
++----------------------------------------------------------------------------------------------------------+
+
 .. _mixes_density_matrix:
 
 +------------------------------------+--------------------------------------------------------------------------+
@@ -209,6 +230,19 @@ Optional keywords
 +------------------------------------+--------------------------------------------------------------------------+
 | Trial vectors are updated by **num_refresh_david** times for each update of the Fock operator.                |
 +---------------------------------------------------------------------------------------------------------------+
+
+.. _reads_crystal_structure:
+
++---------------------------------------------+------------------------------------------------------------+
+| **reads_crystal_structure** (from ver.1.3)  | BOOLEAN                                                    |
++---------------------------------------------+------------------------------------------------------------+
+| *Default:* false                            | true, false                                                |
++---------------------------------------------+------------------------------------------------------------+
+| | When **reads_crystal_structure** = true, TC++ reads ``tc_crystal_structure.dat``,                      |
+| | which is dumped in a previous structural-optimization run.                                             |
+| | Note that this option is available only for the structural optimization (i.e. max_num_ionic_steps_ >0).|
+| | Please also see :doc:`how_to_use` describing ``tc_crystsal_structure.dat``.                            |
++----------------------------------------------------------------------------------------------------------+
 
 .. _restarts:
 
@@ -294,4 +328,27 @@ Example 4
    mixes_density_matrix  true
    mixing_beta     0.2
 
+Example 5 (Structural optimization)
 
+::
+   
+   calc_method     BITC
+   calc_mode       SCF
+   pseudo_dir      /home/user/pseudopot
+   qe_save_dir     /home/user/QE/something/prefix.save
+   smearing_mode   fixed
+   max_num_iterations    20
+   max_num_ionic_steps   10   
+
+Example 6 (Restarted structural optimization reading ``tc_crystal_structure.dat``)
+
+::
+   
+   calc_method     BITC
+   calc_mode       SCF
+   pseudo_dir      /home/user/pseudopot
+   qe_save_dir     /home/user/QE/something/prefix.save
+   smearing_mode   fixed
+   max_num_iterations       20
+   max_num_ionic_steps      10
+   reads_crystal_structure  true
