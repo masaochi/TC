@@ -201,7 +201,7 @@ void Diagonalization::scf(Parallelization &parallelization,
                     is_charge_converged && is_charge_converged_prev;
 
                 // compute force
-                if (method.calc_method() == "HF" || method.calc_method() == "BITC") // H-F theorem does not hold for TC
+                if (!is_heg && (method.calc_method() == "HF" || method.calc_method() == "BITC")) // H-F theorem does not hold for TC
                 {
                     total_energy.set_force(calc_hamiltonian::force(parallelization, method,
                                                                    crystal_structure,
@@ -254,7 +254,7 @@ void Diagonalization::scf(Parallelization &parallelization,
                                            bloch_states.filling(), bloch_states.eigenvalues_scf(),
                                            bloch_states.fermi_energy(), uses_3body, am_i_mpi_rank0, ost);
             
-            if (method.calc_method() == "HF" || method.calc_method() == "BITC") // H-F theorem does not hold for TC
+            if (!is_heg && (method.calc_method() == "HF" || method.calc_method() == "BITC")) // H-F theorem does not hold for TC
             {
                 total_energy.set_force(calc_hamiltonian::force(parallelization, method,
                                                                crystal_structure,
