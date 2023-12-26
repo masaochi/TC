@@ -181,12 +181,6 @@ void Diagonalization::scf(Parallelization &parallelization,
             // Preparation for SCF calc.
             bloch_states.set_filling(spin, kpoints, (!is_first_iter && mixes_density_matrix_),
                                      am_i_mpi_rank0, ost); // set filling_old when (!is_fisrt_iter && mixes_...)==true
-            if (!is_first_iter && mixes_density_matrix_) { bloch_states.mix_density_matrix(mixing_beta_); }
-            bloch_states.set_density(crystal_structure, kpoints, plane_wave_basis, mixes_density_matrix_, 
-                                     mixing_beta_, is_first_iter, is_bitc, am_i_mpi_rank0, ost);
-            if (am_i_mpi_rank0) { my_clock.print_time_from_save(ost, "preparation for the next SCF loop. (set filling and density)"); }            
-
-            // convergence check and force calc.
             if (!is_first_iter) 
             {
                 total_energy.calc_total_energy(spin, kpoints,
@@ -195,6 +189,15 @@ void Diagonalization::scf(Parallelization &parallelization,
                 is_energy_converged =
                     (std::abs(total_energy.total_energy_difference()) < energy_tolerance_);
 
+                if (mixes_density_matrix_) { bloch_states.mix_density_matrix(mixing_beta_); }
+            }
+            bloch_states.set_density(crystal_structure, kpoints, plane_wave_basis, mixes_density_matrix_, 
+                                     mixing_beta_, is_first_iter, is_bitc, am_i_mpi_rank0, ost);
+            if (am_i_mpi_rank0) { my_clock.print_time_from_save(ost, "preparation for the next SCF loop. (set filling and density)"); }            
+
+            // convergence check and force calc.
+            if (!is_first_iter) 
+            {
                 is_charge_converged = (bloch_states.density_difference() < charge_tolerance_);
                 
                 is_scf_converged = is_energy_converged && is_energy_converged_prev &&
@@ -247,12 +250,16 @@ void Diagonalization::scf(Parallelization &parallelization,
 
         if (!is_scf_converged) // When the convergence is NOT achieved
         {
-            bloch_states.set_filling(spin, kpoints, false, am_i_mpi_rank0, ost); // no need to mix the density matrix
-            bloch_states.set_density(crystal_structure, kpoints, plane_wave_basis, mixes_density_matrix_, 
-                                     mixing_beta_, false, is_bitc, am_i_mpi_rank0, ost); // needed for calculating the force
+            bloch_states.set_filling(spin, kpoints, mixes_density_matrix_, am_i_mpi_rank0, ost);
             total_energy.calc_total_energy(spin, kpoints,
                                            bloch_states.filling(), bloch_states.eigenvalues_scf(),
                                            bloch_states.fermi_energy(), uses_3body, am_i_mpi_rank0, ost);
+
+            // density is required for calculating the force
+            if (mixes_density_matrix_) { bloch_states.mix_density_matrix(mixing_beta_); }
+            bloch_states.set_density(crystal_structure, kpoints, plane_wave_basis, mixes_density_matrix_, 
+                                     mixing_beta_, false, is_bitc, am_i_mpi_rank0, ost);
+            if (mixes_density_matrix_) { bloch_states.recover_filling_for_density_matrix(mixing_beta_); } // recover filling
             
             if (!is_heg && (method.calc_method() == "HF" || method.calc_method() == "BITC")) // H-F theorem does not hold for TC
             {
