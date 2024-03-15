@@ -5,16 +5,31 @@
 
 void Symmetry::set(const Spin &spin, const CrystalStructure &crystal_structure,
                    const int num_symmetry_operations,
-                   const std::vector<Eigen::Matrix3i> &rotation,
+                   const std::vector<Eigen::Matrix3i> &rotation_QE,
                    const std::vector<Eigen::Vector3d> &translation,
                    const std::string &no_t_rev, const std::string &noinv)
 {
     assert(num_symmetry_operations >= 0);
-    assert(rotation.size() == num_symmetry_operations);
+    assert(rotation_QE.size() == num_symmetry_operations);
     assert(translation.size() == num_symmetry_operations);
 
     num_symmetry_operations_ = num_symmetry_operations;
-    rotation_ = rotation;
+    // We set rotation (TC++) = inverse of rotation (QE) so that
+    // QE: r' = S*r - t
+    // TC++: r = (Sinv)*r' - t <=> r' = S*(r+t)
+    rotation_.resize(num_symmetry_operations_);
+    Eigen::Matrix3d rotation_double;
+    for (int isym=0; isym<num_symmetry_operations_; isym++)
+    {
+        rotation_double = rotation_QE[isym].cast<double>().inverse();
+        for (int i=0; i<3; i++)
+        {
+            for (int j=0; j<3; j++)
+            {
+                rotation_[isym](i,j) = std::round(rotation_double(i,j));
+            }
+        }
+    }
     translation_ = translation;
 
     // set atom_index_after_sym_

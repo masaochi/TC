@@ -40,7 +40,7 @@ double Jastrow::tc_2body(const Eigen::Vector3d &G, const int is1, const int is2)
     }
     else // with RPA
     {
-        if (deg_poly_>0) // RPA + polynomial
+        if (deg_poly_>1) // RPA + polynomial // NOTE! deg_poly_=1 then polynomial should be zero to be cuspless.
         {
             return tc_2body_RPAPOLY(G, is1, is2);
         }
@@ -132,19 +132,30 @@ void Jastrow::calculate_J_integ(const double G2, const int is1, const int is2, s
             // not a clever way to convert cpp_dec_float_50 to double...
             std::string temporary_Taylor_str = temporary_Taylor.str(0, std::ios_base::scientific);
             J_integ[ipoly] = std::stod(temporary_Taylor_str);
+/*
+            double temporary_Taylord = 0;
+            for (int jpoly=0; jpoly<max_deg_Taylor_; jpoly++)
+            {
+                int deg = 2*(max_deg_Taylor_ - jpoly);
+                temporary_Taylord
+                    = -temporary_Taylord * G2L2/((deg+1)*deg)
+                    + 1.0/static_cast<double>(ipoly+deg);
+            }
+            J_integ[ipoly] = temporary_Taylord;
+*/
         } // ipoly
     }
     else
     {
         double GL = std::sqrt(G2L2);
         double cos = std::cos(GL);
-        double sin = std::cos(GL);
+        double sin = std::sin(GL);
         for (int ipoly=ipoly_start; ipoly<N_degree; ipoly++)
         {
             // 1) cosine term
             double d_tmp = -1.0/(G2L2);
-            int n_tmp =  ipoly;
-            double coeff = 0; // d_tmp; first order term is not required (canceled each other in the cutoff function)
+            int n_tmp = ipoly;
+            double coeff = d_tmp; // 0 for the case when the first order term is not required (canceled each other in the cutoff function)
             for (int jpoly=0; jpoly<ipoly/2; jpoly++) // ipoly = 0, 1, 2, 3,...; ipoly/2 = 0, 0, 1, 1,...
             {
                 // e.g.) jpoly = 0, 1,...; numerator = n(n-1), (n-2)(n-3),... for ipoly=n.
@@ -162,7 +173,7 @@ void Jastrow::calculate_J_integ(const double G2, const int is1, const int is2, s
             {
                 d_tmp = ipoly/(G2L2*GL);
                 n_tmp = ipoly-1;
-                coeff = 0; // d_tmp; first order term is not required (canceled each other in the cutoff function)
+                coeff = d_tmp; // 0 for the case when the first order term is not required (canceled each other in the cutoff function)
                 for (int jpoly=0; jpoly<(ipoly-1)/2; jpoly++) // ipoly = 0, 1, 2, 3,...; (ipoly-1)/2 = *, 0, 0, 1, 1,...
                 {
                     // e.g.) jpoly = 0, 1, 2,...; numerator = (n-1)(n-2), (n-3)(n-4),... for ipoly=n.
@@ -191,11 +202,20 @@ double Jastrow::uk_POLY(const Eigen::Vector3d &G, const int is1, const int is2) 
     calculate_J_integ(G2, is1, is2, J_integ, false); // false: J_integ[0] is not calculated
 
     double return_val = 0.0;
-    for (int ipoly=0; ipoly<deg_poly_+3; ipoly++)
+    for (int ipoly=0; ipoly<c_poly_internal_[is1][is2].size(); ipoly++)
     {
         return_val += c_poly_internal_[is1][is2][ipoly] * J_integ[ipoly+1];
     }
     return return_val;
+/*
+    // test for long-double
+    boost::multiprecision::cpp_dec_float_50 return_val = 0;
+    for (int ipoly=0; ipoly<c_poly_internal_[is1][is2].size(); ipoly++)
+    {
+        return_val += c_poly_internal_[is1][is2][ipoly] * J_integ[ipoly+1];
+    }
+    return std::stod(return_val.str(0, std::ios_base::scientific));
+*/
 }
 
 double Jastrow::tc_2body_POLY(const Eigen::Vector3d &G, const int is1, const int is2) const
@@ -203,29 +223,49 @@ double Jastrow::tc_2body_POLY(const Eigen::Vector3d &G, const int is1, const int
     assert(is1>=0 && is1<=1 && is2>=0 && is2<=1);
 
     double G2 = G.squaredNorm();
-    std::vector<double> J_integ(2*deg_poly_+4); // use J_integ[0:2N+3]
+    std::vector<double> J_integ(2*(deg_poly_+C_damp_poly_)-2); // use J_integ[0:2N+3] for C_damp_poly=3, [0:2N+1] for C_damp_poly=2.
     calculate_J_integ(G2, is1, is2, J_integ, false); // false: J_integ[0] is not calculated
 
-    double return_val = 0.0;
     // Coulomb
-    if (G2>1e-12) { return_val += FourPI/G2; }
+    double return_val_sub1 = 0.0;
+    if (G2>1e-12) { return_val_sub1 += FourPI/G2; }
+
     // +\nabla^2 u (= -G^2 uk)
-    for (int ipoly=0; ipoly<deg_poly_+3; ipoly++) 
+    double return_val_sub2 = 0.0;
+    for (int ipoly=0; ipoly<c_poly_internal_[is1][is2].size(); ipoly++) 
     {
-        return_val -= G2 * c_poly_internal_[is1][is2][ipoly] * J_integ[ipoly+1];
+        return_val_sub2 -= G2 * c_poly_internal_[is1][is2][ipoly] * J_integ[ipoly+1];
     }
+
     // -(\nabla u)^2
-    for (int ipoly=1; ipoly<deg_poly_+3; ipoly++) // ipoly=0: no contribution
+/*
+    double return_val_sub3 = 0;
+    for (int ipoly=1; ipoly<c_poly_internal_[is1][is2].size(); ipoly++) // ipoly=0: no contribution
     {
-        for (int jpoly=1; jpoly<deg_poly_+3; jpoly++) // jpoly=0: no contribution
+        double return_val_sub4 = 0;
+        for (int jpoly=1; jpoly<c_poly_internal_[is1][is2].size(); jpoly++) // jpoly=0: no contribution
         {
-            return_val -= ipoly * jpoly
+            return_val_sub4 -= ipoly * jpoly
+                * c_poly_internal_[is1][is2][ipoly]
+                * c_poly_internal_[is1][is2][jpoly]
+                * J_integ[ipoly+jpoly-1];
+        }
+        return_val_sub3 += return_val_sub4;
+    }
+    return return_val_sub1 + return_val_sub2 + return_val_sub3;
+*/
+    boost::multiprecision::cpp_dec_float_50 return_val_sub3 = 0;
+    for (int ipoly=1; ipoly<c_poly_internal_[is1][is2].size(); ipoly++) // ipoly=0: no contribution
+    {
+        for (int jpoly=1; jpoly<c_poly_internal_[is1][is2].size(); jpoly++) // jpoly=0: no contribution
+        {
+            return_val_sub3 -= ipoly * jpoly
                 * c_poly_internal_[is1][is2][ipoly]
                 * c_poly_internal_[is1][is2][jpoly]
                 * J_integ[ipoly+jpoly-1];
         }
     }
-    return return_val;
+    return return_val_sub1 + return_val_sub2 + std::stod(return_val_sub3.str(0, std::ios_base::scientific));
 }
 
 // for RPA+polynomial
@@ -233,60 +273,54 @@ double Jastrow::tc_2body_POLY(const Eigen::Vector3d &G, const int is1, const int
 double Jastrow::tc_2body_RPAPOLY(const Eigen::Vector3d &G, const int is1, const int is2) const
 {
     assert(is1>=0 && is1<=1 && is2>=0 && is2<=1);
+    assert(deg_poly_>1); // Note: for deg_poly_=1, polynomial Jastrow = 0 (to satisfy the cuspless condition)
 
     double G2 = G.squaredNorm();
-    std::vector<double> J_integ(2*deg_poly_+4); // use J_integ[0:2N+3]
+    std::vector<double> J_integ(2*(deg_poly_+C_damp_poly_)-2); // use J_integ[0:2N+3] for C_damp_poly=3, [0:2N+1] for C_damp_poly=2.
     calculate_J_integ(G2, is1, is2, J_integ, true); // true: J_integ[0] is calculated
 
-    double return_val = 0.0;
-
     // Coulomb + \nabla^2 u (RPA) - (\nabla u)^2 (RPA x RPA)
-    return_val += tc_2body_RPA(G, is1, is2);
+    double return_val_sub1 = 0.0;
+    return_val_sub1 += tc_2body_RPA(G, is1, is2);
 
     // +\nabla^2 u (= -G^2 uk): polynomial
-    for (int ipoly=0; ipoly<deg_poly_+3; ipoly++) 
+    double return_val_sub2 = 0.0;
+    for (int ipoly=0; ipoly<c_poly_internal_[is1][is2].size(); ipoly++) 
     {
-        return_val -= G2 * c_poly_internal_[is1][is2][ipoly] * J_integ[ipoly+1];
+        return_val_sub2 -= G2 * c_poly_internal_[is1][is2][ipoly] * J_integ[ipoly+1];
     }
 
     // -(\nabla u)^2: polynomial x polynomial
-    for (int ipoly=1; ipoly<deg_poly_+3; ipoly++) // ipoly=0: no contribution
+    boost::multiprecision::cpp_dec_float_50 return_val_sub3 = 0;
+    for (int ipoly=1; ipoly<c_poly_internal_[is1][is2].size(); ipoly++) // ipoly=0: no contribution
     {
-        for (int jpoly=1; jpoly<deg_poly_+3; jpoly++) // jpoly=0: no contribution
+        for (int jpoly=1; jpoly<c_poly_internal_[is1][is2].size(); jpoly++) // jpoly=0: no contribution
         {
-            return_val -= ipoly * jpoly
+            return_val_sub3 -= ipoly * jpoly
                 * c_poly_internal_[is1][is2][ipoly]
                 * c_poly_internal_[is1][is2][jpoly]
                 * J_integ[ipoly+jpoly-1];
         }
     }
 
-    // -(\nabla u)^2: RPA x polynomial (ipoly>=2)
-    for (int ipoly=2; ipoly<deg_poly_+3; ipoly++)
-    {
-        return_val += 2 * ipoly * c_poly_internal_[is1][is2][ipoly]
-            * A_long_[is1][is2] * J_integ[ipoly-2];
-    }
+    // -(\nabla u)^2: RPA x polynomial
     double G1 = std::sqrt(G2);
-    if (deg_poly_>2) 
-    {
-        std::vector<double> J2_integ(deg_poly_+2); // use J2_integ[0:N+1]
-        calculate_J2_integ(G1, is1, is2, J2_integ);
-        for (int ipoly=2; ipoly<deg_poly_+3; ipoly++)
-        {
-            return_val -= 2 * ipoly * c_poly_internal_[is1][is2][ipoly]
-                * A_long_[is1][is2] * (J2_integ[ipoly-1]/F_long_[is1][is2] + J2_integ[ipoly-2]);
-        }
-    }
+    std::vector<double> J2_integ(deg_poly_+C_damp_poly_-1); // use J2_integ[0:N+1] for C_damp_poly=3, [0:N] for C_damp_poly=2
+    calculate_J2_integ(G1, is1, is2, J2_integ);
 
-    // -(\nabla u)^2: RPA x polynomial (ipoly=1). Note! ipoly=0 has no contribution (\nabla r^0 = 0)
-    if (deg_poly_>1) 
+    double return_val_sub4 = 0.0;
+    for (int ipoly=2; ipoly<c_poly_internal_[is1][is2].size(); ipoly++)
     {
-        return_val -= 2 * c_poly_internal_[is1][is2][1]
-            * A_long_[is1][is2] * J3_integ(G1, is1, is2);
+        return_val_sub4 += 2 * ipoly * c_poly_internal_[is1][is2][ipoly]
+            * A_long_[is1][is2] * (J_integ[ipoly-2]
+                                   -  (J2_integ[ipoly-1]/F_long_[is1][is2] + J2_integ[ipoly-2]));
     }
+    // -(\nabla u)^2: RPA x polynomial (ipoly=1). 
+    return_val_sub4 -= 2 * c_poly_internal_[is1][is2][1]
+        * A_long_[is1][is2] * J3_integ(G1, is1, is2);
+    // Note! ipoly=0 has no contribution for "RPA x polynomial" of -(\nabla u)^2. (since \nabla r^0 = 0)
 
-    return return_val;
+    return return_val_sub1 + return_val_sub2 + std::stod(return_val_sub3.str(0, std::ios_base::scientific)) + return_val_sub4;
 }
 
 // calculate J2_integ[0:N_degree-1] where N_degree = J2_integ.size()
@@ -314,6 +348,17 @@ void Jastrow::calculate_J2_integ(const double G1, const int is1, const int is2, 
                 coeff *= (-G2L2)/static_cast<double>((2*jpoly+3) * (2*jpoly+2));
             }
             J2_integ[ipoly] *= FourPI_power_L_[is1][is2][ipoly+1];
+/*
+            boost::multiprecision::cpp_dec_float_50 coeff = 1.0;
+            boost::multiprecision::cpp_dec_float_50 temporary_Taylor = 0.0;
+            for (int jpoly=0; jpoly<max_deg_Taylor2_/2; jpoly++)
+            {
+                temporary_Taylor += coeff * M_integ_[is1][is2][ipoly + 2*jpoly + 1];
+                coeff *= (-G2L2)/static_cast<boost::multiprecision::cpp_dec_float_50>((2*jpoly+3) * (2*jpoly+2));
+            }
+            temporary_Taylor *= FourPI_power_L_[is1][is2][ipoly+1];
+            J2_integ[ipoly] = std::stod( temporary_Taylor.str(0, std::ios_base::scientific) );
+*/
         }
     }
     else
@@ -386,8 +431,7 @@ void Jastrow::take_Hermitian_conj()
             FourPI_A_long_[is1][is2] *= -1;
 
             // polynomial terms
-            assert(c_poly_internal_[is1][is2].size() == deg_poly_);
-            for (int ideg=0; ideg<deg_poly_; ideg++)
+            for (int ideg=0; ideg<c_poly_internal_[is1][is2].size(); ideg++)
             {
                 c_poly_internal_[is1][is2][ideg] *= -1;
             }

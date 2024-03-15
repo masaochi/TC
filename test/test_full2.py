@@ -63,13 +63,13 @@ def check_tc(output, output_ref, checks_totE):
             exit()
 
     # Orbital energy check
-    lines_ref_orbE = [line for line in lines_ref if '   6 ' in line]
+    lines_ref_orbE = [line for line in lines_ref if '   5 ' in line]
     lines_ref_orbE_split = lines_ref_orbE[len(lines_ref_orbE)-1].split() # final line
     lines_ref_orbE_split2 = lines_ref_orbE[len(lines_ref_orbE)-2].split()
     orbE_ref = [lines_ref_orbE_split[1], lines_ref_orbE_split2[1]]
     print('  Reference orbital energies', orbE_ref)
 
-    lines_orbE = [line for line in lines if '   6 ' in line]
+    lines_orbE = [line for line in lines if '   5 ' in line]
     lines_orbE_split = lines_orbE[len(lines_orbE)-1].split() # final line
     lines_orbE_split2 = lines_orbE[len(lines_orbE)-2].split()
     orbE = [lines_orbE_split[1], lines_orbE_split2[1]]

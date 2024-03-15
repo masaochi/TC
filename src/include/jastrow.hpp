@@ -38,11 +38,12 @@ private:
     bool is_A_given_in_input_in_; // whether A is given in "input.in"
 
     // **
-    // POLY (polynomial) jastrow: u_poly(|r-r'|) = -\sum_{i=1}^deg_poly c_poly_input,i |r-r'|^{i-1} * (1 - |r-r'|/L_poly)^3 * step_function(L_poly - |r-r'|)
-    //                                           = \sum_{i=1}^{deg_poly+3} c_poly_internal,i |r-r'|^{i-1} * step_function(L_poly - |r-r'|)
+    // POLY (polynomial) jastrow: u_poly(|r-r'|) = -\sum_{i=1}^deg_poly c_poly_input,i |r-r'|^{i-1} * (1 - |r-r'|/L_poly)^C_damp_poly * step_function(L_poly - |r-r'|)
+    //                                           = \sum_{i=1}^{deg_poly+C_damp_poly} c_poly_internal,i |r-r'|^{i-1} * step_function(L_poly - |r-r'|)
     // NOTE! "-" sign in the first line and that in J=exp[-u] are canceled. Thus, coefficients are consistent with CASINO definition.
     // **
     int deg_poly_; // degree of a polynomial
+    int C_damp_poly_; // damping function (1 - |r-r'|/L_poly)^C_damp_poly. 2 or 3.
     std::vector<std::vector<double> > L_poly_; // cutoff length: L_poly[up(0),dn(1)][up(0),dn(1)]
     std::vector<std::vector<std::vector<double> > > c_poly_input_; // input coefficients of a polynomial: c_poly[up(0),dn(1)][up(0),dn(1)][0 -- deg_poly-1]
     std::vector<std::vector<std::vector<double> > > c_poly_internal_; // including a damping function and a minus sign (see above)
@@ -93,6 +94,7 @@ public:
     const std::vector<std::vector<double> > &A_long() const { return A_long_; }
     const std::vector<std::vector<double> > &F_long() const { return F_long_; }
     int deg_poly() const { return deg_poly_; }
+    int C_damp_poly() const { return C_damp_poly_; }
     const std::vector<std::vector<double> > &L_poly() const { return L_poly_; }
     const std::vector<std::vector<std::vector<double> > > &c_poly_input() const { return c_poly_input_; }
     bool is_A_zero() const { return is_A_zero_; }
@@ -109,11 +111,12 @@ public:
         is_A_zero_(false),
         is_A_given_in_input_in_(false),
         deg_poly_(0),
+        C_damp_poly_(3),
         L_poly_{{1.0, 1.0}, {1.0, 1.0}},
         FourPI_power_L_{{{1.0}, {1.0}}, {{1.0}, {1.0}}},
-        max_deg_poly_(16),
-        threshold_Taylor_(1000.0), // can be 800, 900 etc. for cheaper calc.
-        max_deg_Taylor_(50),
+        max_deg_poly_(16), // To increase max_deg_poly_, change the following parameters (threshold_*, max_deg_Taylor*) carefully.
+        threshold_Taylor_(1000.0),
+        max_deg_Taylor_(75),
         exp_LF_{{1.0, 1.0}, {1.0, 1.0}},
         threshold_Taylor2_(1.5),
         max_deg_Taylor2_(30) {}
@@ -133,6 +136,7 @@ public:
 
     // initialization (polynomial parameters)
     void set_polynomial_parameters(const int &deg_poly,
+                                   const int &C_damp_poly,
                                    const std::vector<std::vector<double> > &L_poly,
                                    const std::vector<std::vector<std::vector<double> > > &c_poly_input,
                                    const bool cusp_poly);

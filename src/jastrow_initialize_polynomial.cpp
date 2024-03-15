@@ -4,6 +4,7 @@
 #include "include/header.hpp"
 
 void Jastrow::set_polynomial_parameters(const int &deg_poly,
+                                        const int &C_damp_poly,
                                         const std::vector<std::vector<double> > &L_poly,
                                         const std::vector<std::vector<std::vector<double> > > &c_poly_input,
                                         const bool cusp_poly)
@@ -13,6 +14,7 @@ void Jastrow::set_polynomial_parameters(const int &deg_poly,
 
     if (deg_poly<0) { error_messages::inappropriate_argument("deg_poly (a degree of a polynomial Jastrow)", deg_poly, "should be non-negative"); }
     if (deg_poly>max_deg_poly_) { error_messages::inappropriate_argument("deg_poly (a degree of a polynomial Jastrow)", deg_poly, "should be <= max_deg_poly_(16) in include/jastrow.hpp"); } 
+    if (C_damp_poly!=2 && C_damp_poly!=3) { error_messages::inappropriate_argument("C_damp_poly (C in the damping function for the polynomial Jastrow)", C_damp_poly, "should be 2 or 3"); }
     for (int is1=0; is1<2; is1++)
     {
         for (int is2=0; is2<2; is2++)
@@ -32,6 +34,7 @@ void Jastrow::set_polynomial_parameters(const int &deg_poly,
 
     // set input parameters
     deg_poly_ = deg_poly;
+    C_damp_poly_ = C_damp_poly;
     L_poly_ = L_poly;
     c_poly_input_ = c_poly_input;
 
@@ -51,7 +54,7 @@ void Jastrow::set_polynomial_parameters(const int &deg_poly,
                 if (!cusp_poly) { cusp_const = 0.0; } // cuspless
                 double higher_order_coeff = deg_poly==1 ? 0.0 : c_poly_input_[is1][is2][1];
 
-                c_poly_input_[is1][is2][0] = (L/3.0)*(higher_order_coeff - cusp_const);
+                c_poly_input_[is1][is2][0] = (L/static_cast<double>(C_damp_poly))*(higher_order_coeff - cusp_const);
             }
         }
     }
@@ -66,18 +69,31 @@ void Jastrow::set_polynomial_parameters(const int &deg_poly,
         {
             double L = L_poly_[is1][is2];
 
-            c_poly_internal_[is1][is2].resize(deg_poly+3);
-            for (int ideg=0; ideg<deg_poly+3; ideg++)
+            c_poly_internal_[is1][is2].resize(deg_poly+C_damp_poly);
+            for (int ideg=0; ideg<deg_poly+C_damp_poly; ideg++)
             {
                 c_poly_internal_[is1][is2][ideg] = 0.0;
             }
 
             for (int ideg=0; ideg<deg_poly; ideg++)
             {
-                c_poly_internal_[is1][is2][ideg] -= c_poly_input_[is1][is2][ideg]; // c_i
-                c_poly_internal_[is1][is2][ideg+1] += 3.0*c_poly_input_[is1][is2][ideg]/L; // (3/L)*c_{i-1}
-                c_poly_internal_[is1][is2][ideg+2] -= 3.0*c_poly_input_[is1][is2][ideg]/(L*L); // (3/L^2)*c_{i-2}
-                c_poly_internal_[is1][is2][ideg+3] += c_poly_input_[is1][is2][ideg]/(L*L*L); // (1/L^3)*c_{i-3}
+                if (C_damp_poly==3)
+                {
+                    c_poly_internal_[is1][is2][ideg] -= c_poly_input_[is1][is2][ideg]; // c_i
+                    c_poly_internal_[is1][is2][ideg+1] += 3.0*c_poly_input_[is1][is2][ideg]/L; // (3/L)*c_{i-1}
+                    c_poly_internal_[is1][is2][ideg+2] -= 3.0*c_poly_input_[is1][is2][ideg]/(L*L); // (3/L^2)*c_{i-2}
+                    c_poly_internal_[is1][is2][ideg+3] += c_poly_input_[is1][is2][ideg]/(L*L*L); // (1/L^3)*c_{i-3}
+                }
+                else if (C_damp_poly==2)
+                {
+                    c_poly_internal_[is1][is2][ideg] -= c_poly_input_[is1][is2][ideg]; // c_i
+                    c_poly_internal_[is1][is2][ideg+1] += 2.0*c_poly_input_[is1][is2][ideg]/L; // (2/L)*c_{i-1}
+                    c_poly_internal_[is1][is2][ideg+2] -= c_poly_input_[is1][is2][ideg]/(L*L); // (1/L^2)*c_{i-2}
+                }
+                else
+                {
+                    error_messages::inappropriate_argument("C_damp_poly (C in the damping function for the polynomial Jastrow)", C_damp_poly, "should be 2 or 3");
+                }
             } // ideg
         } // is2
     } // is1
@@ -91,7 +107,7 @@ void Jastrow::set_derived_polynomial_parameters()
     {
         for (int is2=0; is2<2; is2++)
         {
-            FourPI_power_L_[is1][is2].resize(2*deg_poly_+6); // Fourpi*(L^i)                                                                                                    
+            FourPI_power_L_[is1][is2].resize(2*deg_poly_+6); // Fourpi*(L^i). +6 is sufficient both for C_damp_poly = 2 and 3.
             FourPI_power_L_[is1][is2][0] = FourPI;
             for (int ipoly=1; ipoly<FourPI_power_L_[is1][is2].size(); ipoly++)
             {
@@ -124,7 +140,7 @@ void Jastrow::set_derived_RPA_polynomial_parameters(const CrystalStructure &crys
         M_integ_[is1].resize(2);
         for (int is2=0; is2<2; is2++)
         {
-            M_integ_[is1][is2].resize(max_deg_Taylor2_ + deg_poly_ + 1);
+            M_integ_[is1][is2].resize(max_deg_Taylor2_ + deg_poly_ + 1); // sufficient both for C_damp_poly = 2 and 3.
             M_integ_[is1][is2][0] = F_long_[is1][is2] * (1.0 - exp_LF_[is1][is2]);
             for (int ideg=1; ideg<max_deg_Taylor2_; ideg++)
             {
@@ -134,6 +150,7 @@ void Jastrow::set_derived_RPA_polynomial_parameters(const CrystalStructure &crys
         }
     }
 
+    // Note: for deg_poly_=1, polynomial Jastrow = 0 (to satisfy the cuspless condition)
     if (deg_poly_>1) { prepare_for_J3_integ(crystal_structure, plane_wave_basis); } // for J3_integ 
 }
 
@@ -340,6 +357,9 @@ void Jastrow::bcast_polynomial_parameters(const bool am_i_mpi_rank0)
     // deg_poly_
     MPI_Bcast(&deg_poly_, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
+    // C_damp_poly_
+    MPI_Bcast(&C_damp_poly_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
     // L_poly_
     assert(L_poly_.size()==2 && L_poly_[0].size()==2 && L_poly_[1].size()==2);
     MPI_Bcast(&L_poly_[0][0], 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -354,7 +374,7 @@ void Jastrow::bcast_polynomial_parameters(const bool am_i_mpi_rank0)
         {
             for (int is2=0; is2<2; is2++)
             {
-                assert(c_poly_input_[is1][is2].size()==deg_poly_ && c_poly_internal_[is1][is2].size()==deg_poly_+3);
+                assert(c_poly_input_[is1][is2].size()==deg_poly_ && c_poly_internal_[is1][is2].size()==deg_poly_+C_damp_poly_);
             }
         }
     }
@@ -369,7 +389,7 @@ void Jastrow::bcast_polynomial_parameters(const bool am_i_mpi_rank0)
             for (int is2=0; is2<2; is2++)
             {
                 c_poly_input_[is1][is2].resize(deg_poly_);
-                c_poly_internal_[is1][is2].resize(deg_poly_+3);
+                c_poly_internal_[is1][is2].resize(deg_poly_+C_damp_poly_);
             }
         }
     }
@@ -378,7 +398,7 @@ void Jastrow::bcast_polynomial_parameters(const bool am_i_mpi_rank0)
         for (int is2=0; is2<2; is2++)
         {
             MPI_Bcast(&c_poly_input_[is1][is2][0], deg_poly_, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-            MPI_Bcast(&c_poly_internal_[is1][is2][0], deg_poly_+3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+            MPI_Bcast(&c_poly_internal_[is1][is2][0], deg_poly_+C_damp_poly_, MPI_DOUBLE, 0, MPI_COMM_WORLD);
         }
     }
 }
@@ -396,7 +416,7 @@ void Jastrow::print_polynomial_parameters(std::ostream *ost) const
 
             *ost << "   " << is1_name << "-" << is2_name << " channel:" << std::endl;
             *ost << "    L_poly = " << L_poly_[is1][is2] << std::endl;
-            *ost << "     for a polynomial cutoff function with C = 3: (1-r/L)^3 * step_function(L-r)" << std::endl;
+            *ost << "     for a polynomial cutoff function with C = " << C_damp_poly_ << ": (1-r/L)^" << C_damp_poly_ << "* step_function(L-r)" << std::endl;
 
             for (int ipoly=0; ipoly<deg_poly_; ipoly++)
             {

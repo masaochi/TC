@@ -1,7 +1,9 @@
-TC++ ver.1.2
-Num. of MPI Processes = 1
+TC++ ver.1.3.0
+Num. of MPI processes = 1
+Num. of OpenMP threads = 1
 
  Read TC input (input.in)
+  WARNING: reads_binary = false was set. This option should not be specified unless you perform test calculations in test folder.
   calc_method = HF
   calc_mode = BAND
   qe_save_dir = ./example6
@@ -10,14 +12,20 @@ Num. of MPI Processes = 1
   smearing_width = 0.01
   restarts = false
   includes_div_correction = true
-  energy_tolerance = 1e-05
-  charge_tolerance = 0.0001
+  energy_tolerance = 1e-06
+  charge_tolerance = 1e-05
+  force_tolerance = 0.01
   max_num_iterations = 2
+  max_num_ionic_steps = 0
   mixes_density_matrix = false
   mixing_beta = 0.7
   num_refresh_david = 1
   max_num_blocks_david = 2
+  biortho_david = false
+  dumps_pwfn = false
+  reads_crystal_structure = false
   is_heg = false
+  reads_binary = 0
 
  Bcast TC input (input.in)
 
@@ -41,6 +49,15 @@ Num. of MPI Processes = 1
   Atom: 1
    qes:espresso.output.atomic_structure.atomic_positions.atom.<xmlattr>.name =  Si
    qes.espresso.output.atomic_structure.atomic_positions.atom = 2.565 2.565 2.565
+
+   Atomic coordinates (in Bohr, cartesian)
+    Atom 0 ( 0 , 0 , 0 )
+    Atom 1 ( 2.565 , 2.565 , 2.565 )
+
+   Atomic coordinates (crystal coordinate)
+    Atom 0 ( 0 , 0 , 0 )
+    Atom 1 ( -0.25 , 0.75 , -0.25 )
+
   qes:espresso.output.magnetization.noncolin =  false
   qes:espresso.output.magnetization.lsda =  false
   qes:espresso.output.symmetries.nsym =  48
@@ -334,31 +351,32 @@ Num. of MPI Processes = 1
    qes:espresso.output.symmetries.symmetry.fractional_translation =  2.500000000000000e-1 2.500000000000000e-1 2.500000000000000e-1
   qes:espresso.input.symmetry_flags.no_t_rev =  false
   qes:espresso.input.symmetry_flags.noinv =  false
-  qes:espresso.output.band_structure.nbnd =  10
+  qes:espresso.output.band_structure.nbnd =  6
   qes:espresso.output.band_structure.nks =  2
   Irreducible k-point: 0
    qes:espresso.output.band_structure.ks_energies.k_point =  0.000000000000000e0 0.000000000000000e0 0.000000000000000e0
    qes:espresso.output.band_structure.ks_energies.k_point.<xmlattr>.weight =  1.000000000000e0
-   qes:espresso.output.band_structure.ks_energies.npw =  259
-   qes::espresso.output.band_structure_ks_energies.eigenvalues.<xmlattr>.size =  10
+   qes:espresso.output.band_structure.ks_energies.npw =  169
+   qes::espresso.output.band_structure_ks_energies.eigenvalues.<xmlattr>.size =  6
    qes:espresso.output.band_structure.ks_energies.eigenvalues =  
-          -2.002421991133374e-1 2.476178341445435e-1 2.476178341445560e-1 2.476178341448406e-1 3.393487048692785e-1
-          3.393487048692969e-1 3.393487048695255e-1 3.664710729049456e-1 5.361472260896782e-1 5.639070583742241e-1
+          -1.960450854841968e-1 2.481454026841480e-1 2.481454026843306e-1 2.481454026862806e-1 3.394822071656674e-1
+          3.394822071682509e-1
           
   Irreducible k-point: 1
    qes:espresso.output.band_structure.ks_energies.k_point =  -1.000000000000000e-1 1.000000000000000e-1 -1.000000000000000e-1
    qes:espresso.output.band_structure.ks_energies.k_point.<xmlattr>.weight =  1.000000000000e0
-   qes:espresso.output.band_structure.ks_energies.npw =  271
-   qes::espresso.output.band_structure_ks_energies.eigenvalues.<xmlattr>.size =  10
+   qes:espresso.output.band_structure.ks_energies.npw =  172
+   qes::espresso.output.band_structure_ks_energies.eigenvalues.<xmlattr>.size =  6
    qes:espresso.output.band_structure.ks_energies.eigenvalues =  
-          -1.961602752696733e-1 2.029324642271127e-1 2.391604109583296e-1 2.391604109583304e-1 3.405039907182324e-1
-          3.509849669628636e-1 3.509849669628693e-1 4.019192011932725e-1 5.452300599619937e-1 5.452300600537567e-1
+          -1.917339085697921e-1 2.052210495004814e-1 2.396520725618017e-1 2.396520725618022e-1 3.445594475343627e-1
+          3.513758212291696e-1
           
   qes:espresso.output.band_structure.nelec =  8.000000000000000e0
-  qes:espresso.output.basis_set.fft_grid.<xmlattr>.nr1 =  20
-  qes:espresso.output.basis_set.fft_grid.<xmlattr>.nr2 =  20
-  qes:espresso.output.basis_set.fft_grid.<xmlattr>.nr3 =  20
+  qes:espresso.output.basis_set.fft_grid.<xmlattr>.nr1 =  16
+  qes:espresso.output.basis_set.fft_grid.<xmlattr>.nr2 =  16
+  qes:espresso.output.basis_set.fft_grid.<xmlattr>.nr3 =  16
   qes:espresso.output.total_energy.ewald =  0.000000000000000e0
+  qes:espresso.output.basis_set.gamma_only =  false
   qes:espresso.output.algorithmic_info.uspp =  false
   qes:espresso.output.algorithmic_info.paw =  false
 
@@ -377,15 +395,18 @@ Num. of MPI Processes = 1
    UPF.PP_HEADER.<xmlattr>.core_correction =  false
    UPF.PP_HEADER.<xmlattr>.z_valence =  4.00000000000000
    Z_valence = 4
+   UPF.PP_HEADER.<xmlattr>.element =  Si
+   element_name = Si
+   atomic number = 14
    UPF.PP_HEADER.<xmlattr>.mesh_size =  1141
    mesh_size = 1141
    UPF.PP_HEADER.<xmlattr>.number_of_proj =  2
    num. of projectors = 2
     angular momentum = 0
     angular momentum = 1
+ set atomic_number & Z_valence
  set_upf
-
- Bcast_upf
+ Bcast upf variables
 
  Time for initialization = 0 days 0 h 0 m 0 s
  Read SCF informations (tc_scfinfo.dat)
@@ -397,47 +418,35 @@ Num. of MPI Processes = 1
 
  Start BAND calculation!
   bloch_states.set_filling()
-   Fermi energy: 3.63519671 eV
+   Fermi energy: 3.682664237 eV
 
    Spin 0
    k-vector 0 0 0
    (band index, energy (eV), filling)
-   0 -12.38139767 2
-   1 3.630077596 2
-   2 3.630631563 2
-   3 3.63519671 2
-   4 14.20144317 0
-   5 14.20184056 0
-   6 14.20391505 0
-   7 15.90536033 0
-   8 19.55979402 0
-   9 21.03623978 0
+   0 -12.27715803 2
+   1 3.682660469 2
+   2 3.682662989 2
+   3 3.682664237 2
+   4 14.16934539 0
+   5 14.16937506 0
 
    k-vector    0    0 -0.5
    (band index, energy (eV), filling)
-   0 -9.130189321 2
-   1 -5.061304026 2
-   2 2.137145357 2
-   3 2.137627202 2
-   4 13.24254075 0
-   5 15.18959531 0
-   6 15.19054259 0
-   7 19.51670846 0
-   8 24.00911629 0
-   9 24.64237659 0
+   0 -8.964095677 2
+   1 -5.022849533 2
+   2 2.167229037 2
+   3 2.167229271 2
+   4 13.34992311 0
+   5 15.17833523 0
 
    k-vector    0 -0.5 -0.5
    (band index, energy (eV), filling)
-   0 -6.475860871 2
-   1 -6.472248404 2
-   2 0.1061016071 2
-   3 0.1132728232 2
-   4 11.96314269 0
-   5 11.97380396 0
-   6 23.54599344 0
-   7 23.54856873 0
-   8 25.04538812 0
-   9 26.22690911 0
+   0 -6.375748351 2
+   1 -6.375745906 2
+   2 0.1221346446 2
+   3 0.1221372227 2
+   4 11.96688175 0
+   5 11.96688556 0
 
   bloch_states.set_density()
    num. of electrons (spin up) = (4,0) , num. of electrons (spin down) = (4,0)
@@ -445,121 +454,113 @@ Num. of MPI Processes = 1
    num. of electrons inside a sphere with a radius r around each atom
     Atom 0: 
     r (Bohr),  up,  down,  up - down,  up + down
-    0.1  1.459676296e-05  1.459676296e-05  0  2.919352591e-05
-    0.2  1.459676296e-05  1.459676296e-05  0  2.919352591e-05
-    0.3  1.459676296e-05  1.459676296e-05  0  2.919352591e-05
-    0.4  0.001292885393  0.001292885393  0  0.002585770786
-    0.5  0.001292885393  0.001292885393  0  0.002585770786
-    0.6  0.002493853393  0.002493853393  0  0.004987706786
-    0.7  0.009732456895  0.009732456895  0  0.01946491379
-    0.8  0.01450267629  0.01450267629  0  0.02900535257
-    0.9  0.03063417801  0.03063417801  0  0.06126835601
-    1  0.06201601519  0.06201601519  0  0.1240320304
-    1.1  0.09386433152  0.09386433152  0  0.187728663
-    1.2  0.1136533688  0.1136533688  0  0.2273067375
-    1.3  0.157987946  0.157987946  0  0.315975892
-    1.4  0.2260875865  0.2260875865  0  0.452175173
-    1.5  0.33591604  0.33591604  0  0.67183208
-    1.6  0.4415345129  0.4415345129  0  0.8830690258
-    1.7  0.5152643887  0.5152643887  0  1.030528777
-    1.8  0.5957155569  0.5957155569  0  1.191431114
-    1.9  0.7955826623  0.7955826623  0  1.591165325
-    2  0.8639355406  0.8639355406  0  1.727871081
-    2.1  1.038023707  1.038023707  0  2.076047414
-    2.2  1.153210297  1.153210297  0  2.306420595
-    2.3  1.325473126  1.325473126  0  2.650946251
-    2.4  1.476510872  1.476510872  0  2.953021745
-    2.5  1.653208141  1.653208141  0  3.306416282
-    2.6  1.785318874  1.785318874  0  3.570637747
-    2.7  1.976925335  1.976925335  0  3.95385067
-    2.8  2.126584748  2.126584748  0  4.253169496
-    2.9  2.285806081  2.285806081  0  4.571612163
-    3  2.452493835  2.452493835  0  4.904987671
-    3.1  2.6636262  2.6636262  0  5.3272524
-    3.2  2.794468002  2.794468002  0  5.588936004
-    3.3  2.92927334  2.92927334  0  5.858546681
-    3.4  3.136832651  3.136832651  0  6.273665301
-    3.5  3.332378462  3.332378462  0  6.664756925
-    3.6  3.462761734  3.462761734  0  6.925523468
-    3.7  3.663286603  3.663286603  0  7.326573206
-    3.8  3.821788217  3.821788217  0  7.643576435
-    3.9  3.991700209  3.991700209  0  7.983400417
-    4  4.150467933  4.150467933  0  8.300935867
+    0.1  6.926115203e-05  6.926115203e-05  0  0.0001385223041
+    0.2  6.926115203e-05  6.926115203e-05  0  0.0001385223041
+    0.3  6.926115203e-05  6.926115203e-05  0  0.0001385223041
+    0.4  6.926115203e-05  6.926115203e-05  0  0.0001385223041
+    0.5  0.004640397445  0.004640397445  0  0.00928079489
+    0.6  0.004640397445  0.004640397445  0  0.00928079489
+    0.7  0.008624357802  0.008624357802  0  0.0172487156
+    0.8  0.03123451324  0.03123451324  0  0.06246902648
+    0.9  0.03123451324  0.03123451324  0  0.06246902648
+    1  0.04536024645  0.04536024645  0  0.09072049289
+    1.1  0.07764069059  0.07764069059  0  0.1552813812
+    1.2  0.1715932943  0.1715932943  0  0.3431865886
+    1.3  0.1816878658  0.1816878658  0  0.3633757316
+    1.4  0.2473859546  0.2473859546  0  0.4947719091
+    1.5  0.2924411218  0.2924411218  0  0.5848822437
+    1.6  0.390873611  0.390873611  0  0.781747222
+    1.7  0.5310550926  0.5310550926  0  1.062110185
+    1.8  0.6206967973  0.6206967973  0  1.241393595
+    1.9  0.7395912713  0.7395912713  0  1.479182543
+    2  0.9279180078  0.9279180078  0  1.855836016
+    2.1  1.050250826  1.050250826  0  2.100501652
+    2.2  1.162444548  1.162444548  0  2.324889095
+    2.3  1.31775688  1.31775688  0  2.635513761
+    2.4  1.56295997  1.56295997  0  3.12591994
+    2.5  1.590605102  1.590605102  0  3.181210203
+    2.6  1.718863442  1.718863442  0  3.437726883
+    2.7  1.971436226  1.971436226  0  3.942872452
+    2.8  2.166853909  2.166853909  0  4.333707817
+    2.9  2.244220928  2.244220928  0  4.488441856
+    3  2.440075603  2.440075603  0  4.880151206
+    3.1  2.594562503  2.594562503  0  5.189125007
+    3.2  2.805107899  2.805107899  0  5.610215797
+    3.3  2.918505686  2.918505686  0  5.837011371
+    3.4  3.101533245  3.101533245  0  6.203066489
+    3.5  3.303942611  3.303942611  0  6.607885222
+    3.6  3.513095728  3.513095728  0  7.026191456
+    3.7  3.589191019  3.589191019  0  7.178382037
+    3.8  3.814730333  3.814730333  0  7.629460665
+    3.9  3.997737725  3.997737725  0  7.995475449
+    4  4.185502205  4.185502205  0  8.37100441
     Atom 1: 
     r (Bohr),  up,  down,  up - down,  up + down
-    0.1  1.454471942e-05  1.454471942e-05  0  2.908943884e-05
-    0.2  1.454471942e-05  1.454471942e-05  0  2.908943884e-05
-    0.3  1.454471942e-05  1.454471942e-05  0  2.908943884e-05
-    0.4  0.001291993792  0.001291993792  0  0.002583987584
-    0.5  0.001291993792  0.001291993792  0  0.002583987584
-    0.6  0.002492514708  0.002492514708  0  0.004985029417
-    0.7  0.009729474125  0.009729474125  0  0.01945894825
-    0.8  0.01449901056  0.01449901056  0  0.02899802112
-    0.9  0.03062929834  0.03062929834  0  0.06125859668
-    1  0.06201081209  0.06201081209  0  0.1240216242
-    1.1  0.09386003225  0.09386003225  0  0.1877200645
-    1.2  0.113649982  0.113649982  0  0.227299964
-    1.3  0.1579874079  0.1579874079  0  0.3159748158
-    1.4  0.2260920415  0.2260920415  0  0.4521840829
-    1.5  0.335929592  0.335929592  0  0.671859184
-    1.6  0.4415569378  0.4415569378  0  0.8831138757
-    1.7  0.5152927783  0.5152927783  0  1.030585557
-    1.8  0.5957500811  0.5957500811  0  1.191500162
-    1.9  0.7956303307  0.7956303307  0  1.591260661
-    2  0.8639872295  0.8639872295  0  1.727974459
-    2.1  1.038083281  1.038083281  0  2.076166561
-    2.2  1.153273566  1.153273566  0  2.306547132
-    2.3  1.32554114  1.32554114  0  2.651082279
-    2.4  1.476580442  1.476580442  0  2.953160884
-    2.5  1.653277516  1.653277516  0  3.306555032
-    2.6  1.785388025  1.785388025  0  3.57077605
-    2.7  1.976990872  1.976990872  0  3.953981743
-    2.8  2.126647323  2.126647323  0  4.253294646
-    2.9  2.285864164  2.285864164  0  4.571728328
-    3  2.452547319  2.452547319  0  4.905094637
-    3.1  2.663670673  2.663670673  0  5.327341345
-    3.2  2.794507754  2.794507754  0  5.589015507
-    3.3  2.929308578  2.929308578  0  5.858617155
-    3.4  3.13685818  3.13685818  0  6.27371636
-    3.5  3.332396628  3.332396628  0  6.664793255
-    3.6  3.462774919  3.462774919  0  6.925549839
-    3.7  3.663293585  3.663293585  0  7.326587171
-    3.8  3.821786354  3.821786354  0  7.643572707
-    3.9  3.991695966  3.991695966  0  7.983391931
-    4  4.150459978  4.150459978  0  8.300919956
+    0.1  6.926200474e-05  6.926200474e-05  0  0.0001385240095
+    0.2  6.926200474e-05  6.926200474e-05  0  0.0001385240095
+    0.3  6.926200474e-05  6.926200474e-05  0  0.0001385240095
+    0.4  6.926200474e-05  6.926200474e-05  0  0.0001385240095
+    0.5  0.004640418677  0.004640418677  0  0.009280837354
+    0.6  0.004640418677  0.004640418677  0  0.009280837354
+    0.7  0.008624392755  0.008624392755  0  0.01724878551
+    0.8  0.03123460707  0.03123460707  0  0.06246921414
+    0.9  0.03123460707  0.03123460707  0  0.06246921414
+    1  0.04536037075  0.04536037075  0  0.0907207415
+    1.1  0.07764088188  0.07764088188  0  0.1552817638
+    1.2  0.1715936155  0.1715936155  0  0.343187231
+    1.3  0.1816882049  0.1816882049  0  0.3633764098
+    1.4  0.2473863796  0.2473863796  0  0.4947727592
+    1.5  0.2924416007  0.2924416007  0  0.5848832014
+    1.6  0.3908741676  0.3908741676  0  0.7817483352
+    1.7  0.5310557854  0.5310557854  0  1.062111571
+    1.8  0.6206975835  0.6206975835  0  1.241395167
+    1.9  0.7395921284  0.7395921284  0  1.479184257
+    2  0.927919015  0.927919015  0  1.85583803
+    2.1  1.050251918  1.050251918  0  2.100503836
+    2.2  1.162445734  1.162445734  0  2.324891469
+    2.3  1.317758163  1.317758163  0  2.635516325
+    2.4  1.562961395  1.562961395  0  3.12592279
+    2.5  1.590606553  1.590606553  0  3.181213106
+    2.6  1.718864938  1.718864938  0  3.437729877
+    2.7  1.971437821  1.971437821  0  3.942875641
+    2.8  2.166855528  2.166855528  0  4.333711057
+    2.9  2.244222525  2.244222525  0  4.48844505
+    3  2.440077212  2.440077212  0  4.880154424
+    3.1  2.594564037  2.594564037  0  5.189128075
+    3.2  2.805109306  2.805109306  0  5.610218611
+    3.3  2.918507002  2.918507002  0  5.837014003
+    3.4  3.101534403  3.101534403  0  6.203068805
+    3.5  3.303943442  3.303943442  0  6.607886884
+    3.6  3.513096333  3.513096333  0  7.026192666
+    3.7  3.589191488  3.589191488  0  7.178382975
+    3.8  3.814730357  3.814730357  0  7.629460714
+    3.9  3.997737414  3.997737414  0  7.995474829
+    4  4.185501643  4.185501643  0  8.371003286
 
  Time for preparation for BAND calc. (set filling and density) = 0 days 0 h 0 m 0 s
    Print band energies
    Spin 0
    k-vector 0 0 0
    (band index, energy (eV))
-   0 -5.448867583
-   1 6.73802423
-   2 6.73802423
-   3 6.73802423
-   4 9.234148274
-   5 9.234148274
-   6 9.234148274
-   7 9.972185475
-   8 14.58930861
-   9 15.3446921
+   0 -5.334658308
+   1 6.752380101
+   2 6.752380101
+   3 6.752380101
+   4 9.237781057
+   5 9.237781057
 
    k-vector   0   0 0.1
    (band index, energy (eV))
-   0 -5.337792782
-   1 5.522073423
-   2 6.507886031
-   3 6.507886031
-   4 9.265585202
-   5 9.550787083
-   6 9.550787083
-   7 10.93677814
-   8 14.8364651
-   9 14.8364651
+   0 -5.217345213
+   1 5.584348998
+   2 6.521264825
+   3 6.521264825
+   4 9.375939799
+   5 9.561422769
 
  Iteration 1
   calc_hamiltonian
-  cf. dimension of subspace (up, ik=0) = 10
+  cf. dimension of subspace (up, ik=0) = 6
  Time for calculating the one-body terms = 0 days 0 h 0 m 0 s
  Time for calculating the Hartree term = 0 days 0 h 0 m 0 s
  Time for calculating the exchange term = 0 days 0 h 0 m 0 s
@@ -567,7 +568,7 @@ Num. of MPI Processes = 1
  Time for preparation for the next loop (preconditioning & Gram-Schmidt) = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (Bcast) = 0 days 0 h 0 m 0 s
   calc_hamiltonian
-  cf. dimension of subspace (up, ik=0) = 10
+  cf. dimension of subspace (up, ik=0) = 6
  Time for calculating the one-body terms = 0 days 0 h 0 m 0 s
  Time for calculating the Hartree term = 0 days 0 h 0 m 0 s
  Time for calculating the exchange term = 0 days 0 h 0 m 0 s
@@ -586,34 +587,26 @@ Num. of MPI Processes = 1
    Spin 0
    k-vector 0 0 0
    (band index, energy (eV))
-   0 -12.33137834
-   1 3.591143224
-   2 3.591172806
-   3 3.595038239
-   4 14.29632673
-   5 14.29698985
-   6 14.29700242
-   7 16.03651819
-   8 19.60225918
-   9 21.10099475
+   0 -12.2072424
+   1 3.621722435
+   2 3.621724151
+   3 3.621727257
+   4 14.28416414
+   5 14.28416453
 
    k-vector   0   0 0.1
    (band index, energy (eV))
-   0 -12.14727514
-   1 1.680642547
-   2 3.016714883
-   3 3.016832868
-   4 14.64503298
-   5 15.03700796
-   6 15.03754428
-   7 17.25556931
-   8 20.41707532
-   9 20.4173251
+   0 -12.02227505
+   1 2.094746814
+   2 3.076886035
+   3 3.160560298
+   4 14.82086106
+   5 15.04121024
 
-   mean absolute energy difference from the previous loop = 0.1833910951 Ht.
+   mean absolute energy difference from the previous loop = 0.1665407117 Ht.
  Iteration 2
   calc_hamiltonian
-  cf. dimension of subspace (up, ik=0) = 10
+  cf. dimension of subspace (up, ik=0) = 6
  Time for calculating the one-body terms = 0 days 0 h 0 m 0 s
  Time for calculating the Hartree term = 0 days 0 h 0 m 0 s
  Time for calculating the exchange term = 0 days 0 h 0 m 0 s
@@ -621,7 +614,7 @@ Num. of MPI Processes = 1
  Time for preparation for the next loop (preconditioning & Gram-Schmidt) = 0 days 0 h 0 m 0 s
  Time for preparation for the next loop (Bcast) = 0 days 0 h 0 m 0 s
   calc_hamiltonian
-  cf. dimension of subspace (up, ik=0) = 10
+  cf. dimension of subspace (up, ik=0) = 6
  Time for calculating the one-body terms = 0 days 0 h 0 m 0 s
  Time for calculating the Hartree term = 0 days 0 h 0 m 0 s
  Time for calculating the exchange term = 0 days 0 h 0 m 0 s
@@ -640,29 +633,21 @@ Num. of MPI Processes = 1
    Spin 0
    k-vector 0 0 0
    (band index, energy (eV))
-   0 -12.33390526
-   1 3.586041726
-   2 3.586071232
-   3 3.589990228
-   4 14.28352275
-   5 14.28416903
-   6 14.28418194
-   7 15.99551362
-   8 19.53419691
-   9 21.07803494
+   0 -12.21305708
+   1 3.616865857
+   2 3.616867565
+   3 3.616870694
+   4 14.27133561
+   5 14.27133611
 
    k-vector   0   0 0.1
    (band index, energy (eV))
-   0 -12.15573126
-   1 2.823262321
-   2 3.378215305
-   3 3.378483484
-   4 14.23077101
-   5 14.71809848
-   6 14.71855403
-   7 16.4893399
-   8 20.33416193
-   9 20.33443483
+   0 -12.03044704
+   1 2.94344161
+   2 3.405344146
+   3 3.517599792
+   4 14.36198809
+   5 14.71847963
 
  CAUTION!! convergence is not achieved...
- Total time = 0 days 0 h 0 m 3 s
+ Total time = 0 days 0 h 0 m 2 s

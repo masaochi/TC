@@ -83,7 +83,7 @@ void io_qmc_files::dump_jastrow_plt(const FileNames &file_names,
                         ofs << " + ";
                     }
                 }
-                ofs << "*(1-x/" << jastrow.L_poly()[is1][is2] << ")**3" << std::endl;
+                ofs << "*(1-x/" << jastrow.L_poly()[is1][is2] << ")**" << jastrow.C_damp_poly() << std::endl;
             } // is2
         } // is1
         ofs << std::endl;

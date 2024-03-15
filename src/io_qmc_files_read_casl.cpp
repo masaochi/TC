@@ -37,6 +37,7 @@ std::vector<std::string> read_a_line_casl(std::ifstream &ifs)
 
         // e.g., sline=="c_2: [ 0.0, ...." -> keywords[1] = "0.0"
         // e.g., sline=="Rules: [ 1-1=2-2 ]" -> keywords[1] = "1-1=2-2"
+        // e.g., sline=="Rank: [ 2, 0 ]" -> keywords[1] = "2"
         keywords[1] = keywords[1].substr(2, comma_pos-2); 
     }
     return keywords;
@@ -80,8 +81,7 @@ void io_qmc_files::read_casl(const FileNames &file_names,
             if (read_a_line_casl(ifs)[0]!="JASTROW") { error_messages::stop("The 1st line should be `JASTROW:' (read_casl)"); }
             if (read_a_line_casl(ifs)[0]!="Title") { error_messages::stop("The 2nd line should begin with `Title:' (read_casl)"); }
             if (read_a_line_casl(ifs)[0]!="TERM 1") { error_messages::stop("The 3rd line should be `TERM 1:' (read_casl)"); }
-            read_each_term_casl(ifs, num_independent_spins, jastrow, is_RPA_read, is_POLY_read, cusp_poly);
-            if (!ifs.eof()) { read_each_term_casl(ifs, num_independent_spins, jastrow, is_RPA_read, is_POLY_read, cusp_poly); } // "TERM 2" exists
+            while (!ifs.eof()) { read_each_term_casl(ifs, num_independent_spins, jastrow, is_RPA_read, is_POLY_read, cusp_poly); }
         } // if (ifs.fail())
     } // if (am_i_mpi_rank0)
     MPI_Bcast(&is_RPA_read, 1, MPI_CXX_BOOL, 0, MPI_COMM_WORLD);
@@ -119,7 +119,18 @@ void io_qmc_files::read_casl(const FileNames &file_names,
 void io_qmc_files::read_each_term_casl(std::ifstream &ifs, const int num_independent_spins, Jastrow &jastrow,
                                        bool &is_RPA_read, bool &is_POLY_read, bool &cusp_poly)
 {
-    if (read_a_line_casl(ifs)[0]!="Rank") { error_messages::stop("Rank is not given (read_casl)"); }
+    std::string sline;
+    std::vector<std::string> keywords = read_a_line_casl(ifs);
+    if (keywords[0]!="Rank" || keywords[1]!="2") // if this line is not "Rank: [2, *]" (e.g., one-body Jastrow)
+    {
+        // skip remaining lines before "TERM *:" (if exists)
+        while (std::getline(ifs, sline))
+        {
+            if (sline.find("TERM") != std::string::npos) { return; } // "TERM *" is found
+        } // else, end of file
+        return;
+    }
+
     if (read_a_line_casl(ifs)[0]!="Rules") { error_messages::stop("Rules is not given (read_casl)"); }
     if (read_a_line_casl(ifs)[0]!="e-e basis") { error_messages::stop("e-e-basis is not given (read_casl)"); }
     std::string jastrow_type = read_a_line_casl(ifs)[1];
@@ -179,10 +190,10 @@ bool io_qmc_files::read_RPA_casl(std::ifstream &ifs, const int num_independent_s
     jastrow.impose_cusp(false); // determine A_long
 
     // cutoff function is not read since TC++ does not use it.
-    // So skip remaining lines before "TERM 2:" (if exists)
+    // So skip remaining lines before "TERM *:" (if exists)
     while (std::getline(ifs, sline))
     {
-        if (sline.find("TERM 2") != std::string::npos) { return true; } // "TERM 2" is found
+        if (sline.find("TERM") != std::string::npos) { return true; } // "TERM *" is found
     } // else, end of file
     return true;
 }
@@ -191,6 +202,7 @@ bool io_qmc_files::read_POLY_casl(std::ifstream &ifs, const int num_independent_
 {
     // polynomial parameters to be read
     int deg_poly; // degree of a polynomial
+    int C_damp_poly; // an exponent in the damping function
     std::vector<std::vector<double> > L_poly(2); // cutoff length
     for (int is1=0; is1<2; is1++) { L_poly[is1].resize(2); }
     std::vector<std::vector<std::vector<double> > > c_poly_input(2); // coefficients of a polynomial c[i] r^i (i=0,1,2...)
@@ -216,7 +228,8 @@ bool io_qmc_files::read_POLY_casl(std::ifstream &ifs, const int num_independent_
     if (keywords[0]!="Type" || keywords[1]!="polynomial") { error_messages::stop("Type: polynomial should be given for e-e cutoff of polynomial terms (read_casl)"); }
     if (read_a_line_casl(ifs)[0]!="Constants") { error_messages::stop("Constants are not given for e-e cutoff of polynomial terms (read_casl)"); }
     keywords = read_a_line_casl(ifs);
-    if (keywords[0]!="C" || keywords[1]!="3") { error_messages::stop("C: 3 is not given for e-e cutoff of polynomial terms (read_casl)"); }
+    if (keywords[0]!="C" || (keywords[1]!="3" && keywords[1]!="2")) { error_messages::stop("C: 2 or C: 3 is not given for e-e cutoff of polynomial terms (read_casl)"); }
+    C_damp_poly = boost::lexical_cast<int>(keywords[1]);
     if (read_a_line_casl(ifs)[0]!="Parameters") { error_messages::stop("Parameters are not given for e-e cutoff of polynomial terms (read_casl)"); }
 
     if (read_a_line_casl(ifs)[0]!="Channel 1-1") { error_messages::stop("Channel 1-1 is not given for polynomial cutoff (read_casl)"); }
@@ -302,12 +315,12 @@ bool io_qmc_files::read_POLY_casl(std::ifstream &ifs, const int num_independent_
     } // if (deg_poly>1)
 
     // set polynomial-Jastrow parameters
-    jastrow.set_polynomial_parameters(deg_poly, L_poly, c_poly_input, cusp_poly);
+    jastrow.set_polynomial_parameters(deg_poly, C_damp_poly, L_poly, c_poly_input, cusp_poly);
 
-    // check whether "TERM 2" exists
+    // check whether "TERM *" exists
     while (std::getline(ifs, sline))
     {
-        if (sline.find("TERM 2") != std::string::npos) { return true; } // "TERM 2" is found
+        if (sline.find("TERM") != std::string::npos) { return true; } // "TERM *" is found
     } // else, end of file
     return true;
 }

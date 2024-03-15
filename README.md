@@ -1,5 +1,5 @@
 # TC++
-Version 1.3 (2023/12/26)
+Version 1.3.1 (2024/3/15)
 
 TC++ is a first-principles calculation code using the Hartree-Fock (HF) and the transcorrelated (TC) methods for periodic systems.
 
@@ -37,7 +37,7 @@ Type `cd test` and copy `tc++` into `test` directory. Then, you can perform a te
 [User's Guide](https://TCplusplus.readthedocs.io/)
 
 ## License
-(c) 2022--2023 Masayuki Ochi. Released under the MIT license. See [`LICENSE`](./LICENSE).
+(c) 2022--2024 Masayuki Ochi. Released under the MIT license. See [`LICENSE`](./LICENSE).
 
 Please cite the following paper in all publications resulting from your use of TC++.
 
